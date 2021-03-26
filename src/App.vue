@@ -1,15 +1,20 @@
 <template>
-  <div id="app" class="container">
+  <div id="app">
     <router-view />
   </div>
 </template>
 
 <style>
+body {
+  background-color: lavender !important;
+}
+
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  height: 100vh;
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
 }
 </style>

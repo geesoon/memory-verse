@@ -1,15 +1,40 @@
 <template>
   <div class="panel-container">
-    <h1>Choose Your Verses</h1>
-    <verses-selection-panel></verses-selection-panel>
+    <component
+      :is="currentComponent"
+      :selection="selection"
+      :level="level"
+      @message="updateComponentView"
+    ></component>
   </div>
 </template>
 
 <script>
-import VersesSelectionPanel from "../components/selectionPanelButtons.vue";
+import SelectionPanel from "../components/selectionPanel.vue";
+import AnswerPanel from "../components/answerPanel.vue";
+
 export default {
+  data() {
+    return {
+      currentComponent: "SelectionPanel",
+      selection: { book: { id: "", name: "" }, chapter: "", verses: "" },
+      level: "",
+    };
+  },
   components: {
-    VersesSelectionPanel,
+    SelectionPanel,
+    AnswerPanel,
+  },
+  methods: {
+    updateComponentView(componentName, selection, level) {
+      this.currentComponent = componentName;
+
+      this.level = level;
+      this.selection.book.id = selection.book.id;
+      this.selection.book.name = selection.book.name;
+      this.selection.chapter = selection.chapter;
+      this.selection.verses = selection.verses;
+    },
   },
 };
 </script>
@@ -20,6 +45,6 @@ export default {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100%;
+  height: 100vh;
 }
 </style>
