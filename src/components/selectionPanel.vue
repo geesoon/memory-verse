@@ -7,7 +7,7 @@
         class="btn panel-buttons"
         @click="showSelectionModal"
       >
-        <h3>Verses</h3>
+        <h4>Verses</h4>
       </button>
       <div class="btn-group panel-buttons">
         <button
@@ -21,14 +21,14 @@
           <h4>{{ this.level }}</h4>
         </button>
         <div id="level-dropdown" class="dropdown-menu">
-          <a class="dropdown-item" href="#" @click="level = 'EASY'"
-            ><h4>EASY</h4></a
+          <a class="dropdown-item" href="#" @click="level = 'Easy'"
+            ><h4>Easy</h4></a
           >
-          <a class="dropdown-item" href="#" @click="level = 'MEDIUM'"
-            ><h4>MEDIUM</h4></a
+          <a class="dropdown-item" href="#" @click="level = 'Medium'"
+            ><h4>Medium</h4></a
           >
-          <a class="dropdown-item" href="#" @click="level = 'HARD'"
-            ><h4>HARD</h4></a
+          <a class="dropdown-item" href="#" @click="level = 'Hard'"
+            ><h4>Hard</h4></a
           >
         </div>
       </div>
@@ -44,12 +44,12 @@
         class="btn panel-buttons"
         @click="startAnswering()"
       >
-        <h3>Start</h3>
+        <h4>Start</h4>
       </button>
     </div>
 
     <!-- Verses Selection Overlay Panel -->
-    <section class="verse-panel-overlay" v-show="showPanelOverlay">
+    <section class="selection-panel-overlay" v-show="showPanelOverlay">
       <div class="container">
         <div>
           <button class="btn btn-link" @click="resetPanelState()">X</button>
@@ -132,7 +132,7 @@ import booksChapter from "../data/book.json";
 export default {
   data() {
     return {
-      level: "EASY",
+      level: "Easy",
       showPanelOverlay: false,
       NTBooks: [],
       OTBooks: [],
@@ -159,17 +159,17 @@ export default {
     },
     updateSelectionVerse(verseNum) {
       this.selection.verses = verseNum;
-      const verseButton = document.querySelector("#verse-button > h3");
+      const verseButton = document.querySelector("#verse-button > h4");
       verseButton.innerHTML = `${this.selection.book.name} ${this.selection.chapter}:${this.selection.verses}`;
       this.resetPanelState();
     },
     resetPanelState() {
-      this.showPanelOverlay = false;
       this.isLoadingVerses = true;
       this.view = "book";
       this.numOfVerses = "";
       this.numOfChapters = "";
       this.isStartAlert = false;
+      this.showPanelOverlay = false;
     },
     showChaptersVersesPanel(chapterNum) {
       this.selection.chapter = chapterNum;
@@ -248,12 +248,13 @@ export default {
 /* Memory Verse title */
 .container-title {
   margin: 1rem;
-  padding: 1rem;
-  font-size: 3.5rem;
+  padding: 0.5rem;
+  font-size: 3rem;
   font-weight: bold;
   text-align: center;
-  border: 1px dashed black;
+  border: 1px solid black;
   border-radius: 1rem;
+  box-shadow: 10px 10px;
 }
 
 /* Select book */
@@ -279,7 +280,6 @@ export default {
 }
 
 .books-list-container {
-  background-color: white;
   border-radius: 5px;
   flex: 1;
   display: flex;
@@ -367,10 +367,10 @@ export default {
   align-items: flex-start;
 }
 
-.verse-panel-overlay {
+.selection-panel-overlay {
   padding: 1rem;
-  background-color: whitesmoke;
   position: fixed;
+  background-color: white;
   width: 100vw;
   top: 0;
   left: 0;
@@ -414,7 +414,6 @@ export default {
 }
 
 #verse-button {
-  background-color: whitesmoke;
   border-radius: 5px;
   border: 1px solid black;
 }
@@ -426,13 +425,12 @@ export default {
 }
 
 #level-button {
-  background-color: whitesmoke !important;
   border-radius: 5px !important;
   border: 1px solid black !important;
 }
 
 #start-button {
-  background-color: lightskyblue;
+  background-color: lavender;
   border-radius: 5px;
   border: 1px solid black;
 }

@@ -29,11 +29,13 @@ export default {
     updateComponentView(componentName, selection, level) {
       this.currentComponent = componentName;
 
-      this.level = level;
-      this.selection.book.id = selection.book.id;
-      this.selection.book.name = selection.book.name;
-      this.selection.chapter = selection.chapter;
-      this.selection.verses = selection.verses;
+      if (selection != null && level != null) {
+        this.level = level;
+        this.selection.book.id = selection.book.id;
+        this.selection.book.name = selection.book.name;
+        this.selection.chapter = selection.chapter;
+        this.selection.verses = selection.verses;
+      }
     },
   },
 };

@@ -5,10 +5,6 @@
 </template>
 
 <style>
-body {
-  background-color: lavender !important;
-}
-
 #app {
   font-family: Arial, sans-serif;
   display: flex;
