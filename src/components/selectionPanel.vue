@@ -35,7 +35,7 @@
     </div>
     <div>
       <div v-show="isStartAlert">
-        <div class="alert alert-danger" role="alert">
+        <div class="alert alert-info" role="alert" style="text-align: center">
           <strong>Please select a verse!</strong>
         </div>
       </div>
@@ -50,9 +50,15 @@
 
     <!-- Verses Selection Overlay Panel -->
     <section class="selection-panel-overlay" v-show="showPanelOverlay">
-      <div class="container">
-        <div>
-          <button class="btn btn-link" @click="resetPanelState()">X</button>
+      <div class="container ma-0">
+        <div class="closeSelectionContainer">
+          <button
+            class="btn btn-link"
+            style="font-weight: bold"
+            @click="resetPanelState()"
+          >
+            X
+          </button>
         </div>
 
         <!-- Select Book -->
@@ -101,16 +107,16 @@
           <div class="book-verses-title">
             {{ this.selection.book.name + " " + this.selection.chapter }}
           </div>
-          <div class="chapter-list-container">
-            <div class="spinner-container">
-              <div
-                v-if="isLoadingVerses"
-                class="spinner-border text-dark"
-                role="status"
-              >
-                <span class="visually-hidden"></span>
-              </div>
+          <div class="spinner-container">
+            <div
+              v-if="isLoadingVerses"
+              class="spinner-border text-dark"
+              role="status"
+            >
+              <span class="visually-hidden"></span>
             </div>
+          </div>
+          <div class="chapter-list-container">
             <div
               class="verse-title-box"
               v-for="verseNum in numOfVerses"
@@ -245,6 +251,17 @@ export default {
 </script>
 
 <style>
+.closeSelectionContainer {
+  text-align: end;
+  margin-bottom: -2rem;
+}
+
+.closeSelectionContainer > button {
+  font-size: 2rem;
+  color: black;
+  margin: 0px;
+}
+
 /* Memory Verse title */
 .container-title {
   margin: 1rem;
@@ -257,17 +274,36 @@ export default {
   box-shadow: 10px 10px;
 }
 
-/* Select book */
-.testament-title {
-  background-color: lavender;
-  padding: 0.5rem;
-  border-radius: 5px;
-  box-shadow: 10px 10px;
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin-bottom: 2rem;
-  margin-top: 2rem;
-  text-align: start;
+@media only screen and (max-width: 600px) {
+  /* Select book */
+  .testament-title {
+    background-color: lavender;
+    padding: 0.5rem;
+    border-radius: 5px;
+    box-shadow: 0px 5px 1px 2px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+    margin-top: 2rem;
+    text-align: start;
+    width: 100%;
+    text-align: center;
+  }
+}
+
+@media only screen and (min-width: 600px) {
+  /* Select book */
+  .testament-title {
+    background-color: lavender;
+    padding: 0.5rem;
+    border-radius: 5px;
+    box-shadow: 10px 10px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+    margin-top: 2rem;
+    text-align: start;
+  }
 }
 
 .books-overlay-container {
@@ -286,7 +322,6 @@ export default {
   flex-direction: row;
   justify-content: flex-start;
   align-items: flex-start;
-  padding: 1rem;
   flex-wrap: wrap;
   height: 100%;
   width: 100%;
@@ -368,7 +403,6 @@ export default {
 }
 
 .selection-panel-overlay {
-  padding: 1rem;
   position: fixed;
   background-color: white;
   width: 100vw;

@@ -1,60 +1,73 @@
 <template>
-  <div class="answer-panel-container" v-if="isQuestionConstructed">
-    <div class="answer-panel-button">
-      <button class="btn back-button" @click="goToMenu">Menu</button>
-      <div>
-        <button class="btn reset-button" @click="resetQuestion">Reset</button>
-        <button class="btn next-button" @click="nextVerse">Next Verse</button>
-      </div>
-    </div>
-    <div class="question-outer-container">
-      <div class="question-container">
-        <span
-          v-for="(word, index) in verse"
-          :key="index"
-          :id="'b' + index"
-          :class="word.class"
-        >
-          {{ word.word }}
-        </span>
-        <div class="question-verse-quote-container">
-          <span class="question-verse-quote"
-            >{{ this.selection.book.name }} {{ this.selection.chapter }}:{{
-              this.selection.verses
-            }}</span
+  <div class="answer-panel-container">
+    <section class="ma-0 pa-0">
+      <div class="answer-panel-button">
+        <div class="btn back-button" @click="goToMenu">Menu</div>
+        <div>
+          <div class="btn reset-button" @click="resetQuestion">Reset</div>
+          <div class="btn next-button" @click="nextVerse">Next</div>
+          <div
+            id="auto-button"
+            class="btn auto-off-button"
+            @click="toggleAutoVerse"
           >
+            Auto
+          </div>
         </div>
       </div>
-      <div class="progress">
-        <div
-          class="progress-bar progress-bar-striped"
-          role="progressbar"
-          style="width: 0%"
-          aria-valuenow="10"
-          aria-valuemin="0"
-          aria-valuemax="100"
-        ></div>
+      <div v-if="isQuestionConstructed">
+        <div class="question-outer-container">
+          <div class="question-container">
+            <span
+              v-for="(word, index) in verse"
+              :key="index"
+              :class="word.class"
+              :id="'b' + index"
+            >
+              {{ word.word }}
+            </span>
+            <div class="question-verse-quote-container">
+              <span class="question-verse-quote"
+                >{{ this.selection.book.name }} {{ this.selection.chapter }}:{{
+                  this.selection.verses
+                }}</span
+              >
+            </div>
+          </div>
+          <div class="progress">
+            <div
+              id="bar"
+              class="progress-bar progress-bar-striped in-progress"
+              role="progressbar"
+              style="width: 0%"
+              aria-valuenow="0"
+              aria-valuemin="0"
+              aria-valuemax="100"
+            ></div>
+          </div>
+        </div>
+        <draggable
+          class="answer-container"
+          v-model="answer"
+          group="answer"
+          @end="dragEnd"
+        >
+          <div
+            v-for="(element, index) in answer"
+            :key="'a' + index"
+            :id="'a' + index"
+            class="answer-block"
+          >
+            {{ element.word }}
+          </div>
+        </draggable>
       </div>
-    </div>
-    <draggable
-      class="answer-container"
-      v-model="answer"
-      group="answer"
-      @end="dragEnd"
-    >
-      <div
-        v-for="(element, index) in answer"
-        :key="'a' + index"
-        class="answer-block"
-      >
-        {{ element.word }}
+      <div class="answer-panel-loading" v-else>
+        <div>
+          <img src="../assets/book.gif" />
+        </div>
       </div>
-    </draggable>
-  </div>
-  <div class="answer-panel-loading" v-else>
-    <div>
-      <img src="../assets/book.gif" />
-    </div>
+    </section>
   </div>
 </template>
 
@@ -68,6 +81,8 @@ export default {
       answer: [],
       blankLocation: [],
       isQuestionConstructed: false,
+      isVerseCorrect: false,
+      isAutoVerse: false,
     };
   },
   props: {
@@ -81,38 +96,62 @@ export default {
   components: {
     draggable,
   },
-  computed: {
-    scoring: function () {
+  methods: {
+    toggleAutoVerse() {
+      if (this.isAutoVerse == false) {
+        this.isAutoVerse = true;
+        let autoButton = document.getElementById("auto-button");
+        autoButton.classList = "btn auto-on-button";
+        this.checkScore();
+      } else {
+        this.isAutoVerse = false;
+        let autoButton = document.getElementById("auto-button");
+        autoButton.classList = "btn auto-off-button";
+      }
+    },
+    checkScore(score) {
+      setTimeout(() => {
+        if (score == null) {
+          score = document.getElementById("bar").style.width.split("%")[0];
+        }
+        if (score == 100 && this.isAutoVerse == true) {
+          this.nextVerse();
+        }
+      }, 500);
+    },
+    calculateScore() {
       let score = 0;
       let arrFilled = [];
-      const filled = document.querySelectorAll(".question-container")[0]
+      let filled = document.querySelectorAll(".question-container")[0]
         .childNodes;
 
       filled.forEach((block) => {
         arrFilled.push(block.innerText);
       });
 
-      console.log(filled);
-
       this.answer.forEach((answer) => {
-        console.log(answer.index);
-        console.log("user:" + arrFilled[answer.index]);
-        console.log("answer:" + answer.word);
         if (arrFilled[answer.index] == answer.word) {
           score += 1;
         }
       });
-
       // Compare the list of innerHTML from .answer-container to answer array word
-      return score / this.answer.length;
+      return (score / this.answer.length) * 100;
     },
-  },
-  methods: {
     nextVerse() {
-      console.log("Next verse");
+      this.verse = [];
+      this.answer = [];
+      this.blankLocation = [];
+      this.isVerseCorrect = false;
+      this.isQuestionConstructed = false;
+      this.fetchVerse(this.selection.next);
     },
     resetQuestion() {
-      console.log("reset");
+      this.verse = [];
+      this.answer = [];
+      this.blankLocation = [];
+      this.isVerseCorrect = false;
+      this.isQuestionConstructed = false;
+      this.fetchVerse();
     },
     goToMenu() {
       this.$emit("message", "SelectionPanel");
@@ -121,31 +160,80 @@ export default {
       // Compare the drop location to all blank location, if match then replace else return to the answer pool
       let matchingId = "";
       this.blankLocation.forEach((blank) => {
-        if (
-          evt.originalEvent.pageX < blank.right &&
-          evt.originalEvent.pageX > blank.left &&
-          evt.originalEvent.pageY > blank.top &&
-          evt.originalEvent.pageY < blank.bottom
-        ) {
-          matchingId = blank.id;
+        if (evt.originalEvent.changedTouches != null) {
+          if (
+            evt.originalEvent.changedTouches[0].pageX < blank.right &&
+            evt.originalEvent.changedTouches[0].pageX > blank.left &&
+            evt.originalEvent.changedTouches[0].pageY > blank.top &&
+            evt.originalEvent.changedTouches[0].pageY < blank.bottom
+          ) {
+            matchingId = blank.id;
+          }
+        } else {
+          if (
+            evt.originalEvent.pageX < blank.right &&
+            evt.originalEvent.pageX > blank.left &&
+            evt.originalEvent.pageY > blank.top &&
+            evt.originalEvent.pageY < blank.bottom
+          ) {
+            matchingId = blank.id;
+          }
         }
       });
       if (matchingId != "") {
-        document.getElementById(matchingId).replaceWith(evt.item);
-        // update blank location after each successful drop
-        this.retrieveBlankLocation();
+        let blankReplaced = document.getElementById(matchingId);
+        evt.item.style.width = "auto";
+        evt.item.addEventListener("click", (e) => {
+          this.resetListener(e);
+        });
+        evt.item.id = matchingId;
+        evt.item.draggable = true;
+        blankReplaced.replaceWith(evt.item);
         this.updateScore();
+      } else {
+        console.log("Not within blank drop zone");
       }
+
+      // update blank location after each successful drop
+      this.retrieveBlankLocation();
+    },
+    resetListener(e) {
+      let clickedAnsweredBlock = document.getElementById(e.target.id);
+
+      //append answer back to answer container
+      let newAnswerBlock = document.createElement("div");
+      newAnswerBlock.classList = "answer-block";
+      newAnswerBlock.innerHTML = clickedAnsweredBlock.innerHTML;
+      let answerContainer = document.querySelector(".answer-container");
+      answerContainer.append(newAnswerBlock);
+
+      //replace answered block with blank block
+      let newBlankBlock = document.createElement("span");
+      newBlankBlock.id = clickedAnsweredBlock.id;
+      newBlankBlock.classList = "question-word-blank";
+      clickedAnsweredBlock.replaceWith(newBlankBlock);
+      this.updateScore();
     },
     updateScore() {
-      document.querySelector(".progress-bar").style.width = `${this.scoring}%`;
-      console.log(this.scoring);
+      let score = this.calculateScore();
+      let bar = document.getElementById("bar");
+      bar.style.width = `${score}%`;
+      if (score == 100) {
+        bar.classList = "progress-bar progress-bar-striped finished";
+      } else {
+        bar.classList = "progress-bar progress-bar-striped in-progress";
+      }
+
+      this.checkScore(score);
     },
     undoAnswerBlock(index) {
       console.log(index);
     },
-    fetchVerse() {
-      const verse = `${this.selection.book.id}.${this.selection.chapter}.${this.selection.verses}`;
+    fetchVerse(nextVerse) {
+      const verse =
+        nextVerse == null
+          ? `${this.selection.book.id}.${this.selection.chapter}.${this.selection.verses}`
+          : nextVerse;
       const header = new Headers();
       header.append("api-key", "ea2400ebed2327b5e1b9595f416366e0");
 
@@ -174,6 +262,11 @@ export default {
               this.verse.push({ word: element, class: "question-word" });
             }
           });
+          this.selection.book.name = data.data.reference.split(" ")[0];
+          this.selection.verses = data.data.reference.split(":")[1];
+          this.selection.chapter = data.data.chapterId.split(".")[1];
+          this.selection.book.id = data.data.bookId;
+          this.selection.next = data.data.next.id;
           this.constructQuestion();
         });
     },
@@ -213,6 +306,7 @@ export default {
       this.isQuestionConstructed = true;
     },
     retrieveBlankLocation() {
+      this.blankLocation = [];
       document
         .getElementsByClassName("question-word-blank")
         .forEach((blank) => {
@@ -254,22 +348,42 @@ export default {
   }
 
   .answer-panel-loading > div > img {
-    width: 80%;
+    width: 100vw;
+    height: auto;
   }
 
   .back-button,
   .reset-button,
-  .next-button {
+  .next-button,
+  .auto-off-button {
     border: 1px solid black !important;
-    padding: 0.5rem;
-    background-color: white;
-    border-radius: 10px;
-    text-align: center;
-    font-size: 1rem;
+    padding: 0.5rem !important;
+    background-color: white !important;
+    border-radius: 5px !important;
+    text-align: center !important;
+    font-size: 1rem !important;
     font-weight: bold !important;
   }
 
-  .reset-button {
+  .back-button:focus,
+  .reset-button:focus,
+  .next-button:focus,
+  .auto-off-button:click {
+    box-shadow: 1px 1px 1px 1px lightgray;
+  }
+
+  .auto-on-button {
+    border: 1px solid black !important;
+    padding: 0.5rem !important;
+    background-color: pink !important;
+    border-radius: 5px !important;
+    text-align: center !important;
+    font-size: 1rem !important;
+    font-weight: bold !important;
+  }
+
+  .reset-button,
+  .next-button {
     margin-right: 0.5rem;
   }
 
@@ -278,8 +392,12 @@ export default {
     height: 0.5rem !important;
   }
 
-  .progress-bar {
+  .in-progress {
     background-color: gray !important;
+  }
+
+  .finished {
+    background-color: lightgreen !important;
   }
 
   .answer-panel-button {
@@ -291,7 +409,7 @@ export default {
   }
 
   .answer-panel-container {
-    width: 100%;
+    width: 100vw;
     height: 100%;
   }
 
@@ -324,6 +442,10 @@ export default {
     box-shadow: 5px 5px gray;
   }
 
+  .question-word-blank:hover {
+    background-color: gray;
+  }
+
   .question-verse-quote-container {
     display: flex;
     flex-direction: row;
@@ -334,7 +456,8 @@ export default {
 
   .question-verse-quote {
     margin: 0.5rem;
-    font-size: 1.5rem;
+    font-size: 1rem;
+    font-weight: bold;
   }
 
   .answer-container {
@@ -362,8 +485,8 @@ export default {
 /* Desktop */
 @media only screen and (min-width: 600px) {
   .answer-panel-loading {
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: column;
     align-content: center;
@@ -373,12 +496,13 @@ export default {
   }
 
   .answer-panel-loading > div > img {
-    width: 20%;
+    width: 50%;
   }
 
   .back-button,
   .reset-button,
-  .next-button {
+  .next-button,
+  .auto-off-button {
     border: 1px solid black !important;
     padding: 0.5rem;
     background-color: white;
@@ -388,7 +512,18 @@ export default {
     font-weight: bold !important;
   }
 
-  .reset-button {
+  .auto-on-button {
+    border: 1px solid black !important;
+    padding: 0.5rem;
+    background-color: pink !important;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: bold !important;
+  }
+
+  .reset-button,
+  .next-button {
     margin-right: 0.5rem;
   }
 
@@ -404,8 +539,12 @@ export default {
     border-radius: 0px 0px 10px 10px !important;
   }
 
-  .progress-bar {
+  .in-progress {
     background-color: gray !important;
+  }
+
+  .finished {
+    background-color: lightgreen !important;
   }
 
   .answer-panel-button {
@@ -417,7 +556,7 @@ export default {
   }
 
   .answer-panel-container {
-    width: 80%;
+    width: 70vw;
     height: 100%;
   }
 
@@ -459,7 +598,8 @@ export default {
 
   .question-verse-quote {
     margin: 0.5rem;
-    font-size: 1.5rem;
+    font-size: 1rem;
+    font-weight: bold;
   }
 
   .answer-container {
