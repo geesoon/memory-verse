@@ -77,12 +77,12 @@ import draggable from "vuedraggable";
 export default {
   data() {
     return {
-      verse: [],
-      answer: [],
-      blankLocation: [],
-      isQuestionConstructed: false,
-      isVerseCorrect: false,
-      isAutoVerse: false,
+      verse: [] /**Store the question block */,
+      answer: [] /**Store the answer block */,
+      blankLocation: [] /**Store the blank location property */,
+      isQuestionConstructed: false /**Indicator for complete question constructed */,
+      isVerseCorrect: false /**Indicator for 100% */,
+      isAutoVerse: false /**Indicator for auto toggle */,
     };
   },
   props: {
@@ -98,6 +98,7 @@ export default {
   },
   methods: {
     toggleAutoVerse() {
+      /**Toggle the auto verse feature */
       if (this.isAutoVerse == false) {
         this.isAutoVerse = true;
         let autoButton = document.getElementById("auto-button");
@@ -110,6 +111,8 @@ export default {
       }
     },
     checkScore(score) {
+      /**Cater for auto button
+       * Check if score is 100% if true then fetch the next verse automatically */
       setTimeout(() => {
         if (score == null) {
           score = document.getElementById("bar").style.width.split("%")[0];
@@ -120,6 +123,7 @@ export default {
       }, 500);
     },
     calculateScore() {
+      /**Calculate the score based on the number of correct answer over the length of answer array */
       let score = 0;
       let arrFilled = [];
       let filled = document.querySelectorAll(".question-container")[0]
@@ -138,6 +142,7 @@ export default {
       return (score / this.answer.length) * 100;
     },
     nextVerse() {
+      /**Reset the component data and fetch the next verse */
       this.verse = [];
       this.answer = [];
       this.blankLocation = [];
@@ -146,6 +151,7 @@ export default {
       this.fetchVerse(this.selection.next);
     },
     resetQuestion() {
+      /**Reset the question and the component data */
       this.verse = [];
       this.answer = [];
       this.blankLocation = [];
@@ -198,6 +204,7 @@ export default {
       this.retrieveBlankLocation();
     },
     resetListener(e) {
+      /**onclick listener attached to every answered block to remove from question container and attach back to the answer pool */
       let clickedAnsweredBlock = document.getElementById(e.target.id);
 
       //append answer back to answer container
@@ -215,6 +222,7 @@ export default {
       this.updateScore();
     },
     updateScore() {
+      /**Update the score bar and score */
       let score = this.calculateScore();
       let bar = document.getElementById("bar");
       bar.style.width = `${score}%`;
@@ -226,10 +234,8 @@ export default {
 
       this.checkScore(score);
     },
-    undoAnswerBlock(index) {
-      console.log(index);
-    },
     fetchVerse(nextVerse) {
+      /**Fetch verse based on either the current verse selection or by next verse id */
       const verse =
         nextVerse == null
           ? `${this.selection.book.id}.${this.selection.chapter}.${this.selection.verses}`
@@ -271,9 +277,14 @@ export default {
         });
     },
     constructQuestion() {
+      /**Construct question based on the verses retrieved and the level selected  */
       let verseLength = this.verse.length;
       let replacePercentage = null;
 
+      /**10% blank for Easy
+       * 25% blank for Medium
+       * 50% blank for Hard
+       */
       if (this.level == "Easy") {
         replacePercentage = 0.1;
       } else if (this.level == "Medium") {
@@ -295,6 +306,7 @@ export default {
         if (arr.indexOf(r) === -1) arr.push(r);
       }
 
+      // Stored the answer-word to answer array
       arr.forEach((index) => {
         this.answer.push({
           word: this.verse[index].word,
@@ -306,6 +318,7 @@ export default {
       this.isQuestionConstructed = true;
     },
     retrieveBlankLocation() {
+      /**Retrieve the latest blank in question container and its boundingClientRect properties */
       this.blankLocation = [];
       document
         .getElementsByClassName("question-word-blank")

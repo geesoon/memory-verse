@@ -139,20 +139,28 @@ export default {
   data() {
     return {
       level: "Easy",
-      showPanelOverlay: false,
-      NTBooks: [],
-      OTBooks: [],
-      booksChapter: booksChapter.data,
-      selection: { book: { id: "", name: "" }, chapter: "", verses: "" },
+      showPanelOverlay: false /**Indicator to show selection panel overlay */,
+      NTBooks: [] /**Array of new testament book name */,
+      OTBooks: [] /**Array of old testament book name */,
+      booksChapter:
+        booksChapter.data /**Stored json data locally to lower the number of queries needed to select a verse */,
+      selection: {
+        book: { id: "", name: "" },
+        chapter: "",
+        verses: "",
+      } /**User's verse selection */,
       numOfChapters: "",
       numOfVerses: "",
-      view: "book",
-      isLoadingVerses: true,
-      isStartAlert: false,
+      view: "book" /**Indicator of which selection view to display */,
+      isLoadingVerses: true /**Indicator for verse loading spinner */,
+      isStartAlert: false /**Indicator for no-verse selected start */,
     };
   },
   methods: {
     startAnswering() {
+      /**
+       * Check if verse is selected, if yes then change component to answer panel
+       */
       if (
         this.selection.book.name != "" &&
         this.selection.chapter != "" &&
@@ -164,12 +172,18 @@ export default {
       }
     },
     updateSelectionVerse(verseNum) {
+      /**
+       * Update the verse button text to the selected verse book:chapter:verse & reset the panel state
+       */
       this.selection.verses = verseNum;
       const verseButton = document.querySelector("#verse-button > h4");
       verseButton.innerHTML = `${this.selection.book.name} ${this.selection.chapter}:${this.selection.verses}`;
       this.resetPanelState();
     },
     resetPanelState() {
+      /**
+       * Reset the selection panel view to book
+       */
       this.isLoadingVerses = true;
       this.view = "book";
       this.numOfVerses = "";
@@ -178,6 +192,9 @@ export default {
       this.showPanelOverlay = false;
     },
     showChaptersVersesPanel(chapterNum) {
+      /**
+       * Fetch verses reference in the book:chapter
+       */
       this.selection.chapter = chapterNum;
       this.view = "verse";
       const header = new Headers();
@@ -204,6 +221,9 @@ export default {
         });
     },
     showBookChaptersPanel(bookId, testament) {
+      /**
+       * Display the chapter selection panel based on the selected book
+       */
       if (testament == "OT") {
         this.numOfChapters = this.OTBooks.find((book) => {
           return book.id === bookId;
@@ -226,9 +246,15 @@ export default {
       this.view = "chapter";
     },
     showSelectionModal() {
+      /**
+       * Display the selection panel overlay
+       */
       this.showPanelOverlay = true;
     },
     parseData() {
+      /**
+       * Read bible books stored in local data/json into old and new testament arrays
+       */
       let afterOT = false;
       for (let i = 0; i < this.booksChapter.length; i++) {
         if (afterOT) {
@@ -245,6 +271,7 @@ export default {
     },
   },
   mounted() {
+    /**Prepare bible books data on mounted */
     this.parseData();
   },
 };
