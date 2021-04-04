@@ -18,14 +18,14 @@
       <div v-if="isQuestionConstructed">
         <div class="question-outer-container">
           <div class="question-container">
-            <span
+            <div
               v-for="(word, index) in verse"
               :key="index"
               :class="word.class"
               :id="'b' + index"
             >
               {{ word.word }}
-            </span>
+            </div>
             <div class="question-verse-quote-container">
               <span class="question-verse-quote"
                 >{{ this.selection.book.name }} {{ this.selection.chapter }}:{{
@@ -46,11 +46,13 @@
             ></div>
           </div>
         </div>
+        <!-- use blankLocation length as the key to force draggable to rerender everytime user drag and drop successfully -->
         <draggable
           class="answer-container"
           v-model="answer"
           group="answer"
           @end="dragEnd"
+          :move="isSortable"
         >
           <div
             v-for="(element, index) in answer"
@@ -83,6 +85,7 @@ export default {
       isQuestionConstructed: false /**Indicator for complete question constructed */,
       isVerseCorrect: false /**Indicator for 100% */,
       isAutoVerse: false /**Indicator for auto toggle */,
+      // selectedBlankId: "",
     };
   },
   props: {
@@ -97,6 +100,10 @@ export default {
     draggable,
   },
   methods: {
+    isSortable() {
+      /**return false to disable block from sorting while user drag and to avoid vue-draggable from targeting the wrong block as it sorts */
+      return false;
+    },
     toggleAutoVerse() {
       /**Toggle the auto verse feature */
       if (this.isAutoVerse == false) {
@@ -113,14 +120,14 @@ export default {
     checkScore(score) {
       /**Cater for auto button
        * Check if score is 100% if true then fetch the next verse automatically */
-      setTimeout(() => {
-        if (score == null) {
-          score = document.getElementById("bar").style.width.split("%")[0];
-        }
-        if (score == 100 && this.isAutoVerse == true) {
+      if (score == null) {
+        score = document.getElementById("bar").style.width.split("%")[0];
+      }
+      if (score == 100 && this.isAutoVerse == true) {
+        setTimeout(() => {
           this.nextVerse();
-        }
-      }, 500);
+        }, 500);
+      }
     },
     calculateScore() {
       /**Calculate the score based on the number of correct answer over the length of answer array */
@@ -168,10 +175,10 @@ export default {
       this.blankLocation.forEach((blank) => {
         if (evt.originalEvent.changedTouches != null) {
           if (
-            evt.originalEvent.changedTouches[0].pageX < blank.right &&
-            evt.originalEvent.changedTouches[0].pageX > blank.left &&
-            evt.originalEvent.changedTouches[0].pageY > blank.top &&
-            evt.originalEvent.changedTouches[0].pageY < blank.bottom
+            evt.originalEvent.changedTouches[0].clientX < blank.right &&
+            evt.originalEvent.changedTouches[0].clientX > blank.left &&
+            evt.originalEvent.changedTouches[0].clientY > blank.top &&
+            evt.originalEvent.changedTouches[0].clientY < blank.bottom
           ) {
             matchingId = blank.id;
           }
@@ -189,11 +196,12 @@ export default {
       if (matchingId != "") {
         let blankReplaced = document.getElementById(matchingId);
         evt.item.style.width = "auto";
+        evt.item.style.margin = "0px 0.5rem 0.5rem 0px";
         evt.item.addEventListener("click", (e) => {
           this.resetListener(e);
         });
         evt.item.id = matchingId;
-        evt.item.draggable = true;
+        evt.item.draggable = false;
         blankReplaced.replaceWith(evt.item);
         this.updateScore();
       } else {
@@ -205,8 +213,8 @@ export default {
     },
     resetListener(e) {
       /**onclick listener attached to every answered block to remove from question container and attach back to the answer pool */
-      let clickedAnsweredBlock = document.getElementById(e.target.id);
-
+      var clickedAnsweredBlock = document.getElementById(e.target.id);
+      console.log(clickedAnsweredBlock);
       //append answer back to answer container
       let newAnswerBlock = document.createElement("div");
       newAnswerBlock.classList = "answer-block";
@@ -220,6 +228,7 @@ export default {
       newBlankBlock.classList = "question-word-blank";
       clickedAnsweredBlock.replaceWith(newBlankBlock);
       this.updateScore();
+      this.retrieveBlankLocation();
     },
     updateScore() {
       /**Update the score bar and score */
@@ -231,7 +240,6 @@ export default {
       } else {
         bar.classList = "progress-bar progress-bar-striped in-progress";
       }
-
       this.checkScore(score);
     },
     fetchVerse(nextVerse) {
@@ -317,6 +325,28 @@ export default {
       });
       this.isQuestionConstructed = true;
     },
+    // selectBlankBlock(e) {
+    //   if (e.target.classList == "question-word-blank") {
+    //     console.log(e.target.id);
+    //     this.selectedBlankId = e.target.id;
+    //   }
+    // },
+    // updateAnswerBlock(e) {
+    //   console.log(e);
+    //   console.log(this.selectedBlankId);
+    //   if (this.selectedBlankId != "") {
+    //     let selectedBlankBlock = document.getElementById(this.selectedBlankId);
+    //     let selectedAnsBlock = document.getElementById(e.target.id);
+    //     selectedAnsBlock.style.width = "auto";
+    //     selectedAnsBlock.style.margin = "0px 0.5rem 0.5rem 0px";
+    //     selectedAnsBlock.draggable = false;
+    //     selectedAnsBlock.addEventListener("click", (e) => {
+    //       this.resetListener(e);
+    //     });
+    //     selectedBlankBlock.replaceWith(selectedAnsBlock);
+    //     this.updateScore();
+    //   }
+    // },
     retrieveBlankLocation() {
       /**Retrieve the latest blank in question container and its boundingClientRect properties */
       this.blankLocation = [];
@@ -336,6 +366,9 @@ export default {
     },
   },
   created() {
+    // Listen for window resize
+    window.addEventListener("resize", this.retrieveBlankLocation);
+
     // Cater for minimum loading gif
     setTimeout(() => {
       this.fetchVerse();
@@ -343,6 +376,9 @@ export default {
   },
   updated() {
     this.retrieveBlankLocation();
+  },
+  destroyed() {
+    window.removeEventListener("resize", this.retrieveBlankLocation);
   },
 };
 </script>
@@ -414,7 +450,11 @@ export default {
   }
 
   .answer-panel-button {
-    margin: 1rem;
+    top: 0;
+    background-color: white;
+    padding: 1rem;
+    width: 100%;
+    position: sticky;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -561,7 +601,11 @@ export default {
   }
 
   .answer-panel-button {
-    margin: 1rem;
+    background-color: white;
+    padding: 1rem;
+    width: 100%;
+    position: sticky;
+    top: 0;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
