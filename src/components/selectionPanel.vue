@@ -289,18 +289,6 @@ export default {
   margin: 0px;
 }
 
-/* Memory Verse title */
-.container-title {
-  margin: 1rem;
-  padding: 0.5rem;
-  font-size: 3rem;
-  font-weight: bold;
-  text-align: center;
-  border: 1px solid black;
-  border-radius: 1rem;
-  box-shadow: 10px 10px;
-}
-
 @media only screen and (max-width: 600px) {
   /* Select book */
   .testament-title {
