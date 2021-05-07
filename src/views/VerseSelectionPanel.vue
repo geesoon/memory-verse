@@ -1,134 +1,84 @@
 <template>
-  <div class="panel-button-container">
-    <div class="container-title">Memory Verse</div>
-    <div class="selection-buttons">
-      <button
-        id="verse-button"
-        class="btn panel-buttons"
-        @click="showSelectionModal"
-      >
-        <h4>Verses</h4>
-      </button>
-      <div class="btn-group panel-buttons">
-        <button
-          type="button"
-          id="level-button"
-          class="btn dropdown-toggle"
-          data-toggle="dropdown"
-          aria-haspopup="true"
-          aria-expanded="false"
-        >
-          <h4>{{ this.level }}</h4>
-        </button>
-        <div id="level-dropdown" class="dropdown-menu">
-          <a class="dropdown-item" href="#" @click="level = 'Easy'"
-            ><h4>Easy</h4></a
-          >
-          <a class="dropdown-item" href="#" @click="level = 'Medium'"
-            ><h4>Medium</h4></a
-          >
-          <a class="dropdown-item" href="#" @click="level = 'Hard'"
-            ><h4>Hard</h4></a
-          >
-        </div>
-      </div>
-    </div>
-    <div>
-      <div v-show="isStartAlert">
-        <div class="alert alert-info" role="alert" style="text-align: center">
-          <strong>Please select a verse!</strong>
-        </div>
-      </div>
-      <button
-        id="start-button"
-        class="btn panel-buttons"
-        @click="startAnswering()"
-      >
-        <h4>Start</h4>
-      </button>
-    </div>
-
+  <div class="verse-container">
     <!-- Verses Selection Overlay Panel -->
-    <section class="selection-panel-overlay" v-show="showPanelOverlay">
-      <div class="container ma-0">
-        <div class="closeSelectionContainer">
-          <button
-            class="btn btn-link"
-            style="font-weight: bold"
-            @click="resetPanelState()"
+    <div class="container ma-0">
+      <div class="closeSelectionContainer">
+        <button
+          class="btn btn-link"
+          style="font-weight: bold"
+          @click="resetPanelState()"
+        >
+          X
+        </button>
+      </div>
+
+      <!-- Select Book -->
+      <div v-if="view == 'book'" class="books-overlay-container">
+        <div class="testament-title">Old Testament</div>
+        <div class="books-list-container">
+          <span
+            class="books-title"
+            v-for="book in OTBooks"
+            :key="book.id"
+            @click="showBookChaptersPanel(book.id, 'OT')"
           >
-            X
-          </button>
+            {{ book.name }}
+          </span>
         </div>
-
-        <!-- Select Book -->
-        <div v-if="view == 'book'" class="books-overlay-container">
-          <div class="testament-title">Old Testament</div>
-          <div class="books-list-container">
-            <span
-              class="books-title"
-              v-for="book in OTBooks"
-              :key="book.id"
-              @click="showBookChaptersPanel(book.id, 'OT')"
-            >
-              {{ book.name }}
-            </span>
-          </div>
-          <div class="testament-title">New Testament</div>
-          <div class="books-list-container">
-            <span
-              class="books-title"
-              v-for="book in NTBooks"
-              :key="book.id"
-              @click="showBookChaptersPanel(book.id, 'NT')"
-            >
-              {{ book.name }}
-            </span>
-          </div>
+        <div class="testament-title">New Testament</div>
+        <div class="books-list-container">
+          <span
+            class="books-title"
+            v-for="book in NTBooks"
+            :key="book.id"
+            @click="showBookChaptersPanel(book.id, 'NT')"
+          >
+            {{ book.name }}
+          </span>
         </div>
+      </div>
 
-        <!-- Select Chapter -->
-        <div v-if="view == 'chapter'" class="chapters-overlay-container">
-          <div class="book-verses-title">{{ this.selection.book.name }}</div>
-          <div class="chapter-list-container">
-            <div
-              class="chapter-title-box"
-              v-for="chapterNum in numOfChapters"
-              :key="chapterNum"
-              @click="showChaptersVersesPanel(chapterNum)"
-            >
-              {{ chapterNum }}
-            </div>
-          </div>
-        </div>
-
-        <!-- Select Verses -->
-        <div v-if="view == 'verse'" class="verses-overlay-container">
-          <div class="book-verses-title">
-            {{ this.selection.book.name + " " + this.selection.chapter }}
-          </div>
-          <div class="spinner-container">
-            <div
-              v-if="isLoadingVerses"
-              class="spinner-border text-dark"
-              role="status"
-            >
-              <span class="visually-hidden"></span>
-            </div>
-          </div>
-          <div class="chapter-list-container">
-            <div
-              class="verse-title-box"
-              v-for="verseNum in numOfVerses"
-              :key="verseNum"
-              @click="updateSelectionVerse(verseNum)"
-            >
-              v{{ verseNum }}
-            </div>
+      <!-- Select Chapter -->
+      <div v-if="view == 'chapter'" class="chapters-overlay-container">
+        <div class="book-verses-title">{{ this.selection.book.name }}</div>
+        <div class="chapter-list-container">
+          <div
+            class="chapter-title-box"
+            v-for="chapterNum in numOfChapters"
+            :key="chapterNum"
+            @click="showChaptersVersesPanel(chapterNum)"
+          >
+            {{ chapterNum }}
           </div>
         </div>
       </div>
-    </section>
+
+      <!-- Select Verses -->
+      <div v-if="view == 'verse'" class="verses-overlay-container">
+        <div class="book-verses-title">
+          {{ this.selection.book.name + " " + this.selection.chapter }}
+        </div>
+        <div class="spinner-container">
+          <div
+            v-if="isLoadingVerses"
+            class="spinner-border text-dark"
+            role="status"
+          >
+            <span class="visually-hidden"></span>
+          </div>
+        </div>
+        <div class="chapter-list-container">
+          <div
+            class="verse-title-box"
+            v-for="verseNum in numOfVerses"
+            :key="verseNum"
+            @click="updateSelectionVerse(verseNum)"
+          >
+            v{{ verseNum }}
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -139,7 +89,6 @@ export default {
   data() {
     return {
       level: "Easy",
-      showPanelOverlay: false /**Indicator to show selection panel overlay */,
       NTBooks: [] /**Array of new testament book name */,
       OTBooks: [] /**Array of old testament book name */,
       booksChapter:
@@ -176,20 +125,13 @@ export default {
        * Update the verse button text to the selected verse book:chapter:verse & reset the panel state
        */
       this.selection.verses = verseNum;
-      const verseButton = document.querySelector("#verse-button > h4");
-      verseButton.innerHTML = `${this.selection.book.name} ${this.selection.chapter}:${this.selection.verses}`;
       this.resetPanelState();
     },
     resetPanelState() {
       /**
        * Reset the selection panel view to book
        */
-      this.isLoadingVerses = true;
-      this.view = "book";
-      this.numOfVerses = "";
-      this.numOfChapters = "";
-      this.isStartAlert = false;
-      this.showPanelOverlay = false;
+      this.$router.push("/dashboard");
     },
     showChaptersVersesPanel(chapterNum) {
       /**
@@ -244,12 +186,6 @@ export default {
         }).name;
       }
       this.view = "chapter";
-    },
-    showSelectionModal() {
-      /**
-       * Display the selection panel overlay
-       */
-      this.showPanelOverlay = true;
     },
     parseData() {
       /**
@@ -418,14 +354,7 @@ export default {
 }
 
 .selection-panel-overlay {
-  position: fixed;
-  background-color: white;
   width: 100vw;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  z-index: 2;
   overflow-y: scroll;
   padding-bottom: 5rem;
 }
@@ -439,13 +368,12 @@ export default {
   align-items: center;
 }
 
-.panel-button-container {
+.verse-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 50%;
-  width: 80%;
+  margin: 0rem 1rem;
 }
 
 .selection-buttons {

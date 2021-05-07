@@ -2,10 +2,12 @@
   <div class="dashboard-container">
     <div class="header-bar">
       <div class="home-title-header">Memory<br />Verse</div>
-      <div class="avatar-circle">H</div>
+      <div class="avatar-circle" @click="changeRoute('profile')">H</div>
     </div>
     <section class="dashboard-menu">
-      <div class="verse dashboard-items">Select Verses</div>
+      <div class="verse dashboard-items" @click="changeRoute('verses')">
+        Select Verses
+      </div>
       <div class="level dashboard-items">
         Medium<br /><span class="level-text">level</span>
       </div>
@@ -25,7 +27,13 @@
 </template>
 
 <script>
-export default {};
+export default {
+  methods: {
+    changeRoute(rn) {
+      this.$router.push(rn);
+    },
+  },
+};
 </script>
 
 <style>
@@ -106,6 +114,7 @@ export default {};
   height: 20vh;
   text-align: center;
   font-size: 2rem;
+  cursor: pointer;
 }
 
 .footer-bar {

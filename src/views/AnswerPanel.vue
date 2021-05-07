@@ -167,7 +167,7 @@ export default {
       this.fetchVerse();
     },
     goToMenu() {
-      this.$emit("message", "SelectionPanel");
+      this.$router.replace("dashboard");
     },
     dragEnd(evt) {
       // Compare the drop location to all blank location, if match then replace else return to the answer pool
