@@ -1,12 +1,6 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
 import Home from "../views/Home.vue";
-import Dashboard from "../views/Dashboard.vue";
-import Register from "../views/Register.vue";
-import Login from "../views/Login.vue";
-import Profile from "../views/Profile.vue";
-import VerseSelectionPanel from "../views/VerseSelectionPanel.vue";
-import AnswerPanel from "../views/AnswerPanel.vue";
 import firebase from "firebase";
 
 Vue.use(VueRouter);
@@ -20,17 +14,17 @@ const routes = [
   {
     path: "/register",
     name: "Register",
-    component: Register,
+    component: () => import("../views/Register.vue"),
   },
   {
     path: "/login",
     name: "Login",
-    component: Login,
+    component: () => import("../views/Login.vue"),
   },
   {
     path: "/dashboard",
     name: "Dashboard",
-    component: Dashboard,
+    component: () => import("../views/Dashboard.vue"),
     meta: {
       authRequired: true,
     },
@@ -38,7 +32,7 @@ const routes = [
   {
     path: "/profile",
     name: "Profile",
-    component: Profile,
+    component: () => import("../views/Profile.vue"),
     meta: {
       authRequired: true,
     },
@@ -46,7 +40,7 @@ const routes = [
   {
     path: "/verses",
     name: "VerseSelectionPanel",
-    component: VerseSelectionPanel,
+    component: () => import("../views/VerseSelectionPanel.vue"),
     meta: {
       authRequired: true,
     },
@@ -54,7 +48,7 @@ const routes = [
   {
     path: "/answer",
     name: "AnswerPanel",
-    component: AnswerPanel,
+    component: () => import("../views/AnswerPanel.vue"),
     meta: {
       authRequired: true,
     },

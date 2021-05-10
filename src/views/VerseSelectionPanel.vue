@@ -40,7 +40,7 @@
 
       <!-- Select Chapter -->
       <div v-if="view == 'chapter'" class="chapters-overlay-container">
-        <div class="book-verses-title">{{ this.selection.book.name }}</div>
+        <div class="book-verses-title">{{ this.getSelection.book.name }}</div>
         <div class="chapter-list-container">
           <div
             class="chapter-title-box"
@@ -56,7 +56,7 @@
       <!-- Select Verses -->
       <div v-if="view == 'verse'" class="verses-overlay-container">
         <div class="book-verses-title">
-          {{ this.selection.book.name + " " + this.selection.chapter }}
+          {{ this.getSelection.book.name + " " + this.getSelection.chapter }}
         </div>
         <div class="spinner-container">
           <div
@@ -88,16 +88,10 @@ import booksChapter from "../data/book.json";
 export default {
   data() {
     return {
-      level: "Easy",
       NTBooks: [] /**Array of new testament book name */,
       OTBooks: [] /**Array of old testament book name */,
       booksChapter:
-        booksChapter.data /**Stored json data locally to lower the number of queries needed to select a verse */,
-      selection: {
-        book: { id: "", name: "" },
-        chapter: "",
-        verses: "",
-      } /**User's verse selection */,
+        booksChapter.books /**Stored json data locally to lower the number of queries needed to select a verse */,
       numOfChapters: "",
       numOfVerses: "",
       view: "book" /**Indicator of which selection view to display */,
@@ -105,45 +99,34 @@ export default {
       isStartAlert: false /**Indicator for no-verse selected start */,
     };
   },
-  methods: {
-    startAnswering() {
-      /**
-       * Check if verse is selected, if yes then change component to answer panel
-       */
-      if (
-        this.selection.book.name != "" &&
-        this.selection.chapter != "" &&
-        this.selection.verses != ""
-      ) {
-        this.$emit("message", "AnswerPanel", this.selection, this.level);
-      } else {
-        this.isStartAlert = true;
-      }
+  computed: {
+    getSelection() {
+      return this.$store.getters.getVerseInfo.selection;
     },
+  },
+  methods: {
     updateSelectionVerse(verseNum) {
       /**
        * Update the verse button text to the selected verse book:chapter:verse & reset the panel state
        */
-      this.selection.verses = verseNum;
-      this.resetPanelState();
+      this.$store.commit("setVerses", verseNum);
+      this.$router.push("/dashboard");
     },
     resetPanelState() {
-      /**
-       * Reset the selection panel view to book
-       */
+      this.$store.commit("resetSelection");
       this.$router.push("/dashboard");
     },
     showChaptersVersesPanel(chapterNum) {
       /**
        * Fetch verses reference in the book:chapter
        */
-      this.selection.chapter = chapterNum;
+      this.$store.commit("setChapter", chapterNum);
       this.view = "verse";
       const header = new Headers();
       header.append("api-key", "ea2400ebed2327b5e1b9595f416366e0");
       const request = new Request(
         `https://api.scripture.api.bible/v1/bibles/de4e12af7f28f599-02/chapters/${
-          this.selection.book.id + "." + chapterNum
+          this.getSelection.book.id + "." + chapterNum
         }/verses`,
         { methods: "GET", headers: header }
       );
@@ -166,24 +149,31 @@ export default {
       /**
        * Display the chapter selection panel based on the selected book
        */
+      let book = {
+        id: "",
+        name: "",
+      };
+
       if (testament == "OT") {
         this.numOfChapters = this.OTBooks.find((book) => {
           return book.id === bookId;
         }).length;
 
-        this.selection.book.id = bookId;
-        this.selection.book.name = this.OTBooks.find((book) => {
+        book.id = bookId;
+        book.name = this.OTBooks.find((book) => {
           return book.id === bookId;
         }).name;
+        this.$store.commit("setBook", book);
       } else {
         this.numOfChapters = this.NTBooks.find((book) => {
           return book.id === bookId;
         }).length;
 
-        this.selection.book.id = bookId;
-        this.selection.book.name = this.NTBooks.find((book) => {
+        book.id = bookId;
+        book.name = this.NTBooks.find((book) => {
           return book.id === bookId;
         }).name;
+        this.$store.commit("setBook", book);
       }
       this.view = "chapter";
     },
