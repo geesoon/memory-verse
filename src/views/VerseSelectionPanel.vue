@@ -3,13 +3,7 @@
     <!-- Verses Selection Overlay Panel -->
     <div class="container ma-0">
       <div class="closeSelectionContainer">
-        <button
-          class="btn btn-link"
-          style="font-weight: bold"
-          @click="resetPanelState()"
-        >
-          X
-        </button>
+        <span class="material-icons" @click="resetPanelState()"> clear </span>
       </div>
 
       <!-- Select Book -->
@@ -206,13 +200,6 @@ export default {
 <style>
 .closeSelectionContainer {
   text-align: end;
-  margin-bottom: -2rem;
-}
-
-.closeSelectionContainer > button {
-  font-size: 2rem;
-  color: black;
-  margin: 0px;
 }
 
 @media only screen and (max-width: 600px) {
@@ -224,10 +211,9 @@ export default {
     box-shadow: 0px 5px 1px 2px;
     font-size: 1.5rem;
     font-weight: bold;
-    margin-bottom: 2rem;
-    margin-top: 2rem;
+    margin: 1rem 0rem;
     text-align: start;
-    width: 100%;
+    width: 90%;
     text-align: center;
   }
 }
@@ -241,8 +227,7 @@ export default {
     box-shadow: 10px 10px;
     font-size: 1.5rem;
     font-weight: bold;
-    margin-bottom: 2rem;
-    margin-top: 2rem;
+    margin: 1rem 0rem;
     text-align: start;
   }
 }

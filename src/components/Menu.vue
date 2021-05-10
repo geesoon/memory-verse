@@ -12,7 +12,7 @@
       Select Verse
     </div>
     <div class="level dashboard-items" @click="goToView('Level')">
-      Medium<br /><span class="level-text">level</span>
+      {{ this.getVerseInfo.level }}<br /><span class="level-text">level</span>
     </div>
     <div class="collection dashboard-items" @click="goToView('Collection')">
       Collection
@@ -60,12 +60,12 @@ export default {
 
 .level {
   grid-area: level;
-  background: blue;
+  background: turquoise;
 }
 
 .collection {
   grid-area: collection;
-  background: green;
+  background: lightgreen;
 }
 
 .start {
@@ -78,7 +78,6 @@ export default {
 }
 
 .dashboard-menu {
-  margin: 1rem 0rem;
   display: grid;
   gap: 1rem;
   grid-template:
@@ -100,7 +99,7 @@ export default {
   width: 45vw;
   height: 20vh;
   text-align: center;
-  font-size: 2rem;
+  font-size: 1.5rem;
   cursor: pointer;
 }
 </style>

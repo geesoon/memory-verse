@@ -1,7 +1,7 @@
 <template>
   <div class="profile-container">
-    <div class="navBar" @click="goToDashboard">
-      <div class="back-btn">Back</div>
+    <div class="navBar">
+      <span class="material-icons" @click="goToDashboard"> arrow_back </span>
     </div>
     <div class="profilePic">
       <div class="avatar">H</div>

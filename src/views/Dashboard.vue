@@ -16,6 +16,7 @@
     </div>
   </div>
 </template>
+w
 
 <script>
 import Menu from "../components/Menu.vue";
@@ -46,7 +47,7 @@ export default {
 
 <style>
 .dashboard-container {
-  height: 100%;
+  width: 100vw;
 }
 
 .header-bar {
@@ -54,7 +55,8 @@ export default {
   flex-direction: row;
   justify-content: space-between;
   align-content: center;
-  margin: 1rem;
+  width: 100%;
+  margin-bottom: 2rem;
 }
 
 .avatar-circle {
@@ -76,12 +78,12 @@ export default {
   border: 1px solid black;
   border-radius: 1rem;
   box-shadow: 10px 10px;
-  margin-bottom: 4rem;
 }
 
 .footer-bar {
   text-align: center;
   font-size: 0.8rem;
   width: 100%;
+  margin: 2rem 0rem;
 }
 </style>

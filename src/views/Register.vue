@@ -72,7 +72,7 @@ export default {
   text-align: left;
   margin-left: 1rem;
   margin-top: 1rem;
-  font-size: 0.8rem;
+  font-size: 1rem;
 }
 
 .register-form {
@@ -85,6 +85,7 @@ export default {
 }
 
 .register-form > input {
+  font-size: 1rem;
   border-radius: 1rem !important;
   height: 8vh;
   border: 1px solid black;
@@ -94,6 +95,7 @@ export default {
 }
 
 .register-form > button {
+  font-size: 1rem;
   border: 1px solid black;
   font-weight: bold;
   padding: 1rem;

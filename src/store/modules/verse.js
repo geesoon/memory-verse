@@ -3,8 +3,8 @@ const state = {
     book: { id: "", name: "" },
     chapter: "",
     verses: "",
-  } /**User's verse selection */,
-  level: "Easy",
+  },
+  level: "Medium",
   isStartAlert: false,
 };
 

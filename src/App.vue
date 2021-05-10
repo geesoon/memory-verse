@@ -16,4 +16,8 @@
   width: 100%;
   height: 100%;
 }
+
+.material-icons {
+  cursor: pointer !important;
+}
 </style>
