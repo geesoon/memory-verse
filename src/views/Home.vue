@@ -41,7 +41,6 @@ export default {
         .auth()
         .signInWithEmailAndPassword(this.email, this.password)
         .then(() => {
-          alert("Successfully logged in");
           this.$router.push("/dashboard");
         })
         .catch((error) => {
@@ -62,7 +61,7 @@ export default {
 }
 
 .login-form-container {
-  margin: 1rem;
+  margin: 3rem 1rem;
 }
 
 /* Memory Verse title */
@@ -104,11 +103,10 @@ a {
 
 .login-form > input {
   font-size: 1rem;
-  border-radius: 1rem !important;
   height: 8vh;
   border: 1px solid black;
   padding: 1rem;
-  border-radius: 1rem;
+  border-radius: 0.5rem;
   margin: 0.5rem;
 }
 
@@ -118,7 +116,7 @@ a {
   font-weight: bold;
   padding: 1rem;
   margin: 0.5rem;
-  border-radius: 1rem;
+  border-radius: 0.5rem;
   background: #1877f2;
   color: white;
 }
@@ -129,9 +127,10 @@ a {
   font-weight: bold;
   padding: 1rem;
   margin: 0.5rem;
-  border-radius: 1rem;
+  margin-bottom: 5rem;
+  border-radius: 0.5rem;
   color: white;
-  background: ;
+  background: #42b72a;
 }
 
 @media only screen and (min-width: 768px) {

@@ -1,69 +1,73 @@
 <template>
   <div class="verse-container">
     <!-- Verses Selection Overlay Panel -->
-    <div class="container ma-0">
-      <div class="closeSelectionContainer">
-        <span class="material-icons" @click="resetPanelState()"> clear </span>
-      </div>
+    <div class="verse-nav-bar">
+      <span class="material-icons"> arrow_back </span>
+      <span class="material-icons" @click="resetPanelState()"> clear </span>
+    </div>
 
-      <!-- Select Book -->
-      <div v-if="view == 'book'" class="books-overlay-container">
-        <div class="testament-title">Old Testament</div>
-        <div class="books-list-container">
-          <span
-            class="books-title"
-            v-for="book in OTBooks"
-            :key="book.id"
-            @click="showBookChaptersPanel(book.id, 'OT')"
-          >
-            {{ book.name }}
-          </span>
-        </div>
-        <div class="testament-title">New Testament</div>
-        <div class="books-list-container">
-          <span
-            class="books-title"
-            v-for="book in NTBooks"
-            :key="book.id"
-            @click="showBookChaptersPanel(book.id, 'NT')"
-          >
-            {{ book.name }}
-          </span>
+    <!-- Select Book -->
+    <div v-if="view == 'book'" class="books-overlay-container">
+      <div class="testament-title">
+        <span class="material-icons"> book </span>
+        Old Testament
+      </div>
+      <div class="books-list-container">
+        <span
+          class="books-title"
+          v-for="book in OTBooks"
+          :key="book.id"
+          @click="showBookChaptersPanel(book.id, 'OT')"
+        >
+          {{ book.name }}
+        </span>
+      </div>
+      <div class="testament-title">
+        <span class="material-icons"> book </span>New Testament
+      </div>
+      <div class="books-list-container">
+        <span
+          class="books-title"
+          v-for="book in NTBooks"
+          :key="book.id"
+          @click="showBookChaptersPanel(book.id, 'NT')"
+        >
+          {{ book.name }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Select Chapter -->
+    <div v-if="view == 'chapter'" class="chapters-overlay-container">
+      <div class="book-verses-title">{{ this.getSelection.book.name }}</div>
+      <div class="chapter-list-container">
+        <div
+          class="chapter-title-box"
+          v-for="chapterNum in numOfChapters"
+          :key="chapterNum"
+          @click="showChaptersVersesPanel(chapterNum)"
+        >
+          {{ chapterNum }}
         </div>
       </div>
+    </div>
 
-      <!-- Select Chapter -->
-      <div v-if="view == 'chapter'" class="chapters-overlay-container">
-        <div class="book-verses-title">{{ this.getSelection.book.name }}</div>
-        <div class="chapter-list-container">
-          <div
-            class="chapter-title-box"
-            v-for="chapterNum in numOfChapters"
-            :key="chapterNum"
-            @click="showChaptersVersesPanel(chapterNum)"
-          >
-            {{ chapterNum }}
-          </div>
-        </div>
+    <!-- Select Verses -->
+    <div v-if="view == 'verse'" class="verses-overlay-container">
+      <div class="book-verses-title">
+        {{ this.getSelection.book.name + " " + this.getSelection.chapter }}
       </div>
-
-      <!-- Select Verses -->
-      <div v-if="view == 'verse'" class="verses-overlay-container">
-        <div class="book-verses-title">
-          {{ this.getSelection.book.name + " " + this.getSelection.chapter }}
-        </div>
-        <div class="loading-container" v-if="isLoadingVerse">
-          <span class="material-icons"> pending </span>
-        </div>
-        <div class="chapter-list-container" v-else>
-          <div
-            class="verse-title-box"
-            v-for="verseNum in numOfVerses"
-            :key="verseNum"
-            @click="updateSelectionVerse(verseNum)"
-          >
-            v{{ verseNum }}
-          </div>
+      <div class="loading-container" v-if="isLoadingVerse">
+        <span class="material-icons"> pending </span>
+      </div>
+      <div class="chapter-list-container" v-else>
+        <div
+          class="verse-title-box"
+          v-for="verseNum in numOfVerses"
+          :key="verseNum"
+          @click="updateSelectionVerse(verseNum)"
+        >
+          v{{ verseNum }}
         </div>
       </div>
     </div>
@@ -192,22 +196,23 @@ export default {
 </script>
 
 <style>
-.closeSelectionContainer {
-  text-align: end;
+.verse-nav-bar {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 5vh;
 }
 
 /* Select book */
 .testament-title {
-  background-color: lavender;
   padding: 0.5rem;
   border-radius: 5px;
-  box-shadow: 0px 5px 1px 2px;
   font-size: 1.5rem;
   font-weight: bold;
   margin: 1rem 0rem;
   text-align: start;
-  width: 90%;
-  text-align: center;
 }
 
 .books-overlay-container {
@@ -321,8 +326,7 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  margin: 0rem 1rem;
+  justify-content: flex-start;
 }
 
 .selection-buttons {

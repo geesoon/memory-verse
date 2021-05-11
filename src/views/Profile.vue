@@ -5,15 +5,13 @@
     </div>
     <div class="profilePic">
       <div class="avatar">{{ this.getAvatarName }}</div>
-      <div @click="updateProfilePic">Change</div>
+      <!-- <div @click="updateProfilePic">Change</div> -->
     </div>
     <div class="profileInfo">
-      <div class="profile-btn">{{ this.getUserEmail() }}</div>
+      <div class="user-email">{{ this.getUserEmail() }}</div>
       <div class="update-pw-btn" @click="updatePassword">Update Password</div>
     </div>
-    <div>
-      <div class="logout-btn" @click="logout">Log Out</div>
-    </div>
+    <div class="logout-btn" @click="logout">Log Out</div>
   </div>
 </template>
 
@@ -93,12 +91,9 @@ export default {
   font-weight: bold;
 }
 
-.profile-btn {
-  border: 1px solid black;
-  border-radius: 1rem;
+.user-email {
   padding: 1rem 3rem;
-  margin: 1rem 0;
-  cursor: pointer;
+  margin: 1rem 0rem;
 }
 
 .profilePic {
@@ -106,7 +101,7 @@ export default {
 }
 
 .update-pw-btn {
-  border-radius: 1rem;
+  border-radius: 0.5rem;
   padding: 1rem 3rem;
   margin: 1rem 0;
   cursor: pointer;
@@ -116,7 +111,7 @@ export default {
 }
 
 .logout-btn {
-  border-radius: 1rem;
+  border-radius: 0.5rem;
   padding: 1rem 3rem;
   margin: 1rem 0;
   cursor: pointer;

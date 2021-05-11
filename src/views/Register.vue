@@ -64,9 +64,6 @@ export default {
 
 /* Memory Verse title */
 .home-title-top-left {
-  /* position: relative;
-  left: 0;
-  top: 0; */
   margin: 1rem;
   padding: 1.5rem;
   font-size: 1.5rem;
@@ -97,11 +94,10 @@ export default {
 
 .register-form > input {
   font-size: 1rem;
-  border-radius: 1rem !important;
   height: 8vh;
   border: 1px solid black;
   padding: 1rem;
-  border-radius: 1rem;
+  border-radius: 0.5rem;
   margin: 0.5rem;
 }
 
@@ -111,7 +107,7 @@ export default {
   border: none;
   padding: 1rem;
   margin: 0.5rem;
-  border-radius: 1rem;
+  border-radius: 0.5rem;
   background: #42b72a;
   color: white;
 }
