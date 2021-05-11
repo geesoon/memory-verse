@@ -17,7 +17,9 @@
     <div class="collection dashboard-items" @click="goToView('Collection')">
       Collection
     </div>
-    <div class="start dashboard-items">Start</div>
+    <div class="start dashboard-items" @click="changeRoute('/answer')">
+      Start
+    </div>
   </section>
 </template>
 
@@ -56,6 +58,7 @@ export default {
 <style>
 .verse {
   grid-area: verse;
+  background: lavender;
 }
 
 .level {
@@ -96,10 +99,16 @@ export default {
   flex-direction: column;
   border: 1px solid black;
   border-radius: 1rem;
-  width: 45vw;
   height: 20vh;
   text-align: center;
   font-size: 1.5rem;
   cursor: pointer;
+}
+
+.dashboard-items:hover {
+  box-shadow: 13px 14px 0px -3px rgba(0, 0, 0, 0.74);
+  -webkit-box-shadow: 13px 14px 0px -3px rgba(0, 0, 0, 0.74);
+  -moz-box-shadow: 13px 14px 0px -3px rgba(0, 0, 0, 0.74);
+  transition: box-shadow 300ms;
 }
 </style>

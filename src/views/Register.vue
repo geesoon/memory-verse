@@ -1,20 +1,21 @@
 <template>
   <div class="home-container">
-    <div class="home-title-top-left" @click="gotoHome">Memory Verse</div>
-    <div class="register-info">
-      <span>Register now to create your own verse collection!</span>
+    <div class="register-header">
+      <div class="home-title-top-left" @click="gotoHome">Memory Verse</div>
+      <div class="register-info">
+        <p class="sign-up">Sign Up</p>
+        <p>Create your own verse collection with an account.</p>
+      </div>
     </div>
     <form @submit.prevent="register" class="register-form">
       <input type="text" placeholder="Email" v-model="email" />
       <input type="password" placeholder="Password" v-model="password" />
-      <button type="submit">Register</button>
+      <button>Sign Up</button>
     </form>
     <div class="sign-in-tip">
       <span
         >Already have an account?
-        <router-link to="/login" class="sign-in-link"
-          >Sign in</router-link
-        ></span
+        <router-link to="/" class="sign-in-link">Log In</router-link></span
       >
     </div>
   </div>
@@ -51,11 +52,21 @@ export default {
 </script>
 
 <style>
+.sign-up {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.register-header {
+  display: flex;
+  flex-direction: row;
+}
+
 /* Memory Verse title */
 .home-title-top-left {
-  position: relative;
+  /* position: relative;
   left: 0;
-  top: 0;
+  top: 0; */
   margin: 1rem;
   padding: 1.5rem;
   font-size: 1.5rem;
@@ -96,11 +107,12 @@ export default {
 
 .register-form > button {
   font-size: 1rem;
-  border: 1px solid black;
   font-weight: bold;
+  border: none;
   padding: 1rem;
   margin: 0.5rem;
   border-radius: 1rem;
-  background: #e6e6fa;
+  background: #42b72a;
+  color: white;
 }
 </style>

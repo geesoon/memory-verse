@@ -1,18 +1,18 @@
 <template>
-  <div class="profile-container">
+  <div class="profile-container animate__animated animate__slideInRight">
     <div class="navBar">
       <span class="material-icons" @click="goToDashboard"> arrow_back </span>
     </div>
     <div class="profilePic">
-      <div class="avatar">H</div>
+      <div class="avatar">{{ this.getAvatarName }}</div>
       <div @click="updateProfilePic">Change</div>
     </div>
     <div class="profileInfo">
-      <div class="profile-btn">hiewgs@gmail.com</div>
-      <div class="profile-btn" @click="updatePassword">Update Password</div>
+      <div class="profile-btn">{{ this.getUserEmail() }}</div>
+      <div class="update-pw-btn" @click="updatePassword">Update Password</div>
     </div>
-    <div class="logout-btn">
-      <div class="profile-btn" @click="logout">Log Out</div>
+    <div>
+      <div class="logout-btn" @click="logout">Log Out</div>
     </div>
   </div>
 </template>
@@ -21,7 +21,15 @@
 import firebase from "firebase";
 
 export default {
+  computed: {
+    getAvatarName() {
+      return this.$store.getters.getAvatarName;
+    },
+  },
   methods: {
+    getUserEmail() {
+      return firebase.auth().currentUser.email;
+    },
     goToDashboard() {
       this.$router.replace("dashboard");
     },
@@ -49,6 +57,14 @@ export default {
 </script>
 
 <style>
+.profile-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+}
+
 .navBar {
   display: flex;
   flex-direction: row;
@@ -62,19 +78,6 @@ export default {
   border-radius: 0.5rem;
   padding: 0.5rem 1rem;
   cursor: pointer;
-}
-
-.profile-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-  height: 90vh;
-  width: 100%;
-}
-
-.profilePic {
-  text-align: center;
 }
 
 .avatar {
@@ -96,5 +99,35 @@ export default {
   padding: 1rem 3rem;
   margin: 1rem 0;
   cursor: pointer;
+}
+
+.profilePic {
+  text-align: center;
+}
+
+.update-pw-btn {
+  border-radius: 1rem;
+  padding: 1rem 3rem;
+  margin: 1rem 0;
+  cursor: pointer;
+  background: #1877f2;
+  color: white;
+  font-weight: bold;
+}
+
+.logout-btn {
+  border-radius: 1rem;
+  padding: 1rem 3rem;
+  margin: 1rem 0;
+  cursor: pointer;
+  background: #42b72a;
+  color: white;
+  font-weight: bold;
+}
+
+@media only screen and (min-width: 600px) {
+  .profile-container {
+    width: 40vw;
+  }
 }
 </style>

@@ -60,10 +60,16 @@ export default {
   flex-direction: column;
   border: 1px solid black;
   border-radius: 1rem;
-  width: 45vw;
   height: 20vh;
   text-align: center;
   font-size: 2rem;
   cursor: pointer;
+}
+
+.level-items:hover {
+  box-shadow: 13px 14px 0px -3px rgba(0, 0, 0, 0.74);
+  -webkit-box-shadow: 13px 14px 0px -3px rgba(0, 0, 0, 0.74);
+  -moz-box-shadow: 13px 14px 0px -3px rgba(0, 0, 0, 0.74);
+  transition: box-shadow 300ms;
 }
 </style>

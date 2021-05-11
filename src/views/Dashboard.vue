@@ -2,7 +2,9 @@
   <div class="dashboard-container">
     <div class="header-bar">
       <div class="home-title-header">Memory<br />Verse</div>
-      <div class="avatar-circle" @click="changeRoute('profile')">H</div>
+      <div class="avatar-circle" @click="changeRoute('profile')">
+        {{ this.getAvatarName }}
+      </div>
     </div>
     <component :is="this.getCurrentView" />
     <div class="footer-bar">
@@ -16,9 +18,9 @@
     </div>
   </div>
 </template>
-w
 
 <script>
+import firebase from "firebase";
 import Menu from "../components/Menu.vue";
 import Level from "../components/Level.vue";
 import Collection from "../components/Collection.vue";
@@ -27,6 +29,9 @@ export default {
   computed: {
     getCurrentView() {
       return this.$store.getters.getCurrentView;
+    },
+    getAvatarName() {
+      return this.$store.getters.getAvatarName;
     },
   },
   components: {
@@ -41,6 +46,12 @@ export default {
   },
   created() {
     this.$store.commit("setView", "Menu");
+
+    let avatarName = firebase
+      .auth()
+      .currentUser.email.split("")[0]
+      .toUpperCase();
+    this.$store.commit("setAvatarName", avatarName);
   },
 };
 </script>
@@ -85,5 +96,11 @@ export default {
   font-size: 0.8rem;
   width: 100%;
   margin: 2rem 0rem;
+}
+
+@media only screen and (min-width: 768px) {
+  .dashboard-container {
+    width: 30vw;
+  }
 }
 </style>

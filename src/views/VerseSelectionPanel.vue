@@ -52,16 +52,10 @@
         <div class="book-verses-title">
           {{ this.getSelection.book.name + " " + this.getSelection.chapter }}
         </div>
-        <div class="spinner-container">
-          <div
-            v-if="isLoadingVerses"
-            class="spinner-border text-dark"
-            role="status"
-          >
-            <span class="visually-hidden"></span>
-          </div>
+        <div class="loading-container" v-if="isLoadingVerse">
+          <span class="material-icons"> pending </span>
         </div>
-        <div class="chapter-list-container">
+        <div class="chapter-list-container" v-else>
           <div
             class="verse-title-box"
             v-for="verseNum in numOfVerses"
@@ -202,34 +196,18 @@ export default {
   text-align: end;
 }
 
-@media only screen and (max-width: 600px) {
-  /* Select book */
-  .testament-title {
-    background-color: lavender;
-    padding: 0.5rem;
-    border-radius: 5px;
-    box-shadow: 0px 5px 1px 2px;
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin: 1rem 0rem;
-    text-align: start;
-    width: 90%;
-    text-align: center;
-  }
-}
-
-@media only screen and (min-width: 600px) {
-  /* Select book */
-  .testament-title {
-    background-color: lavender;
-    padding: 0.5rem;
-    border-radius: 5px;
-    box-shadow: 10px 10px;
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin: 1rem 0rem;
-    text-align: start;
-  }
+/* Select book */
+.testament-title {
+  background-color: lavender;
+  padding: 0.5rem;
+  border-radius: 5px;
+  box-shadow: 0px 5px 1px 2px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 1rem 0rem;
+  text-align: start;
+  width: 90%;
+  text-align: center;
 }
 
 .books-overlay-container {
@@ -255,7 +233,6 @@ export default {
 
 .books-title,
 .book-verses-title {
-  border: 1px solid black;
   border-radius: 5px;
   background-color: lavender;
   padding: 1rem;
@@ -335,12 +312,9 @@ export default {
 }
 
 /* General */
-.spinner-container {
+.loading-container {
   width: 100%;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
+  text-align: center;
 }
 
 .verse-container {
@@ -398,5 +372,24 @@ export default {
 
 .dropdown-toggle::after {
   display: none !important;
+}
+
+@media only screen and (min-width: 600px) {
+  /* Select book */
+  .testament-title {
+    background-color: lavender;
+    padding: 0.5rem;
+    border-radius: 5px;
+    box-shadow: 10px 10px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 1rem 0rem;
+    text-align: start;
+    width: 200px;
+  }
+
+  .verse-container {
+    width: 70vw;
+  }
 }
 </style>

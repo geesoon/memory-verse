@@ -4,13 +4,13 @@
     <form @submit.prevent="login" class="login-form">
       <input type="text" placeholder="Email" v-model="email" />
       <input type="password" placeholder="Password" v-model="password" />
-      <button type="submit">Login</button>
+      <button type="submit">Log In</button>
     </form>
     <div class="sign-in-tip">
       <span
         >Don't have an account?
         <router-link to="/register" class="sign-in-link"
-          >Register Now</router-link
+          >Create an account now</router-link
         ></span
       >
     </div>
@@ -74,6 +74,6 @@ export default {
   padding: 1rem;
   margin: 0.5rem;
   border-radius: 1rem;
-  background: #e6e6fa;
+  background: ;
 }
 </style>

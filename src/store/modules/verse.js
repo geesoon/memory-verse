@@ -3,6 +3,7 @@ const state = {
     book: { id: "", name: "" },
     chapter: "",
     verses: "",
+    next: "",
   },
   level: "Medium",
   isStartAlert: false,
@@ -19,6 +20,13 @@ const getters = {
 };
 
 const mutations = {
+  setSelection(state, selection) {
+    state.selection.book.id = selection.book.id;
+    state.selection.book.name = selection.book.name;
+    state.selection.chapter = selection.chapter;
+    state.selection.verses = selection.verses;
+    state.selection.next = selection.next;
+  },
   setStartAlert(state, alert) {
     state.isStartAlert = alert;
   },
@@ -32,6 +40,9 @@ const mutations = {
   setVerses(state, verses) {
     state.selection.verses = verses;
   },
+  setNext(state, next) {
+    state.selection.next = next;
+  },
   setLevel(state, level) {
     state.level = level;
   },
@@ -40,6 +51,7 @@ const mutations = {
     state.selection.book.name = "";
     state.selection.chapter = "";
     state.selection.verses = "";
+    state.selection.next = "";
     state.isStartAlert = false;
   },
 };

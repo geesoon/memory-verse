@@ -1,73 +1,79 @@
 <template>
   <div class="answer-panel-container">
-    <section class="ma-0 pa-0">
-      <div class="answer-panel-button">
-        <div class="btn back-button" @click="goToMenu">Menu</div>
-        <div>
-          <div class="btn reset-button" @click="resetQuestion">Reset</div>
-          <div class="btn next-button" @click="nextVerse">Next</div>
-          <div
-            id="auto-button"
-            class="btn auto-off-button"
-            @click="toggleAutoVerse"
-          >
-            Auto
-          </div>
-        </div>
+    <div class="answer-panel-button">
+      <div class="back-button" @click="goToMenu">
+        <span class="material-icons">home</span>
       </div>
-      <div v-if="isQuestionConstructed">
-        <div class="question-outer-container">
-          <div class="question-container">
-            <div
-              v-for="(word, index) in verse"
-              :key="index"
-              :class="word.class"
-              :id="'b' + index"
-            >
-              {{ word.word }}
-            </div>
-            <div class="question-verse-quote-container">
-              <span class="question-verse-quote"
-                >{{ this.selection.book.name }} {{ this.selection.chapter }}:{{
-                  this.selection.verses
-                }}</span
-              >
-            </div>
-          </div>
-          <div class="progress">
-            <div
-              id="bar"
-              class="progress-bar progress-bar-striped in-progress"
-              role="progressbar"
-              style="width: 0%"
-              aria-valuenow="0"
-              aria-valuemin="0"
-              aria-valuemax="100"
-            ></div>
-          </div>
+      <div class="right-btn-set">
+        <div class="btn reset-button" @click="resetQuestion">
+          <span class="material-icons"> restart_alt </span>
         </div>
-        <!-- use blankLocation length as the key to force draggable to rerender everytime user drag and drop successfully -->
-        <draggable
-          class="answer-container"
-          v-model="answer"
-          group="answer"
-          @end="dragEnd"
-          :move="isSortable"
+        <div class="btn next-button" @click="nextVerse">
+          <span class="material-icons"> skip_next </span>
+        </div>
+        <div
+          id="auto-button"
+          class="btn auto-off-button"
+          @click="toggleAutoVerse"
         >
-          <div
-            v-for="(element, index) in answer"
-            :key="'a' + index"
-            :id="'a' + index"
-            class="answer-block"
-          >
-            {{ element.word }}
-          </div>
-        </draggable>
-      </div>
-      <div class="answer-panel-loading" v-else>
-        <div>
-          <img src="../assets/book.gif" />
+          <span class="material-icons" v-if="isAutoVerse"> toggle_on </span>
+          <span class="material-icons" v-else> toggle_off </span>
         </div>
+      </div>
+    </div>
+    <section v-if="isQuestionConstructed">
+      <div class="question-outer-container">
+        <div class="question-container">
+          <div
+            v-for="(word, index) in verse"
+            :key="index"
+            :class="word.class"
+            :id="'b' + index"
+          >
+            {{ word.word }}
+          </div>
+          <div class="question-verse-quote-container">
+            <span class="question-verse-quote"
+              >{{ this.getSelection.book.name }}
+              {{ this.getSelection.chapter }}:{{
+                this.getSelection.verses
+              }}</span
+            >
+          </div>
+        </div>
+        <div class="progress">
+          <div
+            id="bar"
+            class="progress-bar progress-bar-striped in-progress"
+            role="progressbar"
+            style="width: 0%"
+            aria-valuenow="0"
+            aria-valuemin="0"
+            aria-valuemax="100"
+          ></div>
+        </div>
+      </div>
+      <!-- use blankLocation length as the key to force draggable to rerender everytime user drag and drop successfully -->
+      <draggable
+        class="answer-container"
+        v-model="answer"
+        group="answer"
+        @end="dragEnd"
+        :move="isSortable"
+      >
+        <div
+          v-for="(element, index) in answer"
+          :key="'a' + index"
+          :id="'a' + index"
+          class="answer-block"
+        >
+          {{ element.word }}
+        </div>
+      </draggable>
+    </section>
+    <section class="answer-panel-loading" v-else>
+      <div>
+        <img src="../assets/book.gif" />
       </div>
     </section>
   </div>
@@ -88,13 +94,13 @@ export default {
       // selectedBlankId: "",
     };
   },
-  props: {
-    selection: {
-      book: { id: String, name: String },
-      chapter: String,
-      verses: String,
+  computed: {
+    getSelection() {
+      return this.$store.getters.getVerseInfo.selection;
     },
-    level: String,
+    getLevel() {
+      return this.$store.getters.getVerseInfo.level;
+    },
   },
   components: {
     draggable,
@@ -155,7 +161,7 @@ export default {
       this.blankLocation = [];
       this.isVerseCorrect = false;
       this.isQuestionConstructed = false;
-      this.fetchVerse(this.selection.next);
+      this.fetchVerse(this.getSelection.next);
     },
     resetQuestion() {
       /**Reset the question and the component data */
@@ -244,9 +250,11 @@ export default {
     },
     fetchVerse(nextVerse) {
       /**Fetch verse based on either the current verse selection or by next verse id */
+      let selection = this.getSelection;
+
       const verse =
         nextVerse == null
-          ? `${this.selection.book.id}.${this.selection.chapter}.${this.selection.verses}`
+          ? `${selection.book.id}.${selection.chapter}.${selection.verses}`
           : nextVerse;
       const header = new Headers();
       header.append("api-key", "ea2400ebed2327b5e1b9595f416366e0");
@@ -276,11 +284,20 @@ export default {
               this.verse.push({ word: element, class: "question-word" });
             }
           });
-          this.selection.book.name = data.data.reference.split(" ")[0];
-          this.selection.verses = data.data.reference.split(":")[1];
-          this.selection.chapter = data.data.chapterId.split(".")[1];
-          this.selection.book.id = data.data.bookId;
-          this.selection.next = data.data.next.id;
+
+          let updatedSelection = {
+            book: { name: "", id: "" },
+            verses: "",
+            chapter: "",
+            next: "",
+          };
+          updatedSelection.book.name = data.data.reference.split(" ")[0];
+          updatedSelection.verses = data.data.reference.split(":")[1];
+          updatedSelection.chapter = data.data.chapterId.split(".")[1];
+          updatedSelection.book.id = data.data.bookId;
+          updatedSelection.next = data.data.next.id;
+          this.$store.commit("setSelection", updatedSelection);
+
           this.constructQuestion();
         });
     },
@@ -296,9 +313,9 @@ export default {
       if (this.level == "Easy") {
         replacePercentage = 0.1;
       } else if (this.level == "Medium") {
-        replacePercentage = 0.25;
+        replacePercentage = 0.2;
       } else {
-        replacePercentage = 0.5;
+        replacePercentage = 0.3;
       }
 
       let numOfWordToBeReplaced = replacePercentage * verseLength;
@@ -325,28 +342,6 @@ export default {
       });
       this.isQuestionConstructed = true;
     },
-    // selectBlankBlock(e) {
-    //   if (e.target.classList == "question-word-blank") {
-    //     console.log(e.target.id);
-    //     this.selectedBlankId = e.target.id;
-    //   }
-    // },
-    // updateAnswerBlock(e) {
-    //   console.log(e);
-    //   console.log(this.selectedBlankId);
-    //   if (this.selectedBlankId != "") {
-    //     let selectedBlankBlock = document.getElementById(this.selectedBlankId);
-    //     let selectedAnsBlock = document.getElementById(e.target.id);
-    //     selectedAnsBlock.style.width = "auto";
-    //     selectedAnsBlock.style.margin = "0px 0.5rem 0.5rem 0px";
-    //     selectedAnsBlock.draggable = false;
-    //     selectedAnsBlock.addEventListener("click", (e) => {
-    //       this.resetListener(e);
-    //     });
-    //     selectedBlankBlock.replaceWith(selectedAnsBlock);
-    //     this.updateScore();
-    //   }
-    // },
     retrieveBlankLocation() {
       /**Retrieve the latest blank in question container and its boundingClientRect properties */
       this.blankLocation = [];
@@ -384,155 +379,162 @@ export default {
 </script>
 
 <style>
-@media only screen and (max-width: 600px) {
-  .answer-panel-loading {
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-content: center;
-    justify-content: center;
-    text-align: center;
-    background-color: #f5f7f6;
-  }
+.right-btn-set {
+  display: flex;
+  flex-direction: row;
+}
 
-  .answer-panel-loading > div > img {
-    width: 100vw;
-    height: auto;
-  }
+.answer-panel-button {
+  background-color: white;
+  padding: 1rem;
+  position: sticky;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
 
-  .back-button,
-  .reset-button,
-  .next-button,
-  .auto-off-button {
-    border: 1px solid black !important;
-    padding: 0.5rem !important;
-    background-color: white !important;
-    border-radius: 5px !important;
-    text-align: center !important;
-    font-size: 1rem !important;
-    font-weight: bold !important;
-  }
+.answer-panel-loading {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  justify-content: center;
+  text-align: center;
+  background-color: #f5f7f6;
+}
 
-  .back-button:focus,
-  .reset-button:focus,
-  .next-button:focus,
-  .auto-off-button:click {
-    box-shadow: 1px 1px 1px 1px lightgray;
-  }
+.answer-panel-loading > div > img {
+  width: 100vw;
+  height: auto;
+}
 
-  .auto-on-button {
-    border: 1px solid black !important;
-    padding: 0.5rem !important;
-    background-color: pink !important;
-    border-radius: 5px !important;
-    text-align: center !important;
-    font-size: 1rem !important;
-    font-weight: bold !important;
-  }
+.back-button,
+.reset-button,
+.next-button,
+.auto-off-button {
+  border: 1px solid black !important;
+  padding: 0.5rem !important;
+  background-color: white !important;
+  border-radius: 5px !important;
+  text-align: center !important;
+  font-size: 1rem !important;
+  font-weight: bold !important;
+  cursor: pointer;
+}
 
-  .reset-button,
-  .next-button {
-    margin-right: 0.5rem;
-  }
+.back-button:focus,
+.reset-button:focus,
+.next-button:focus,
+.auto-off-button:click {
+  box-shadow: 1px 1px 1px 1px lightgray;
+}
 
-  .progress {
-    border-radius: 0px !important;
-    height: 0.5rem !important;
-  }
+.auto-on-button {
+  border: 1px solid black !important;
+  padding: 0.5rem !important;
+  background-color: pink !important;
+  border-radius: 5px !important;
+  text-align: center !important;
+  font-size: 1rem !important;
+  font-weight: bold !important;
+}
 
-  .in-progress {
-    background-color: gray !important;
-  }
+.reset-button,
+.next-button {
+  margin-right: 0.5rem;
+}
 
-  .finished {
-    background-color: lightgreen !important;
-  }
+.progress {
+  border-radius: 0px !important;
+  height: 0.5rem !important;
+}
 
-  .answer-panel-button {
-    top: 0;
-    background-color: white;
-    padding: 1rem;
-    width: 100%;
-    position: sticky;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-  }
+.in-progress {
+  background-color: gray !important;
+}
 
-  .answer-panel-container {
-    width: 100vw;
-    height: 100%;
-  }
+.finished {
+  background-color: lightgreen !important;
+}
 
-  .question-outer-container {
-    margin-bottom: 3rem;
-  }
+.answer-panel-button {
+  top: 0;
+}
 
-  .question-container {
-    padding: 1rem;
-    background-color: whitesmoke;
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-start;
-  }
+.answer-panel-container {
+  width: 100%;
+  height: 100%;
+}
 
-  .question-word {
-    margin: 0.3rem;
-    font-size: 1.5rem;
-    font-weight: bold;
-  }
+.question-outer-container {
+  margin-bottom: 1rem;
+}
 
-  .question-word-blank {
-    width: 5rem;
-    background-color: lightgray;
-    border-radius: 10px;
-    margin: 0.5rem;
-    height: 2rem;
-    box-shadow: 5px 5px gray;
-  }
+.question-container {
+  padding: 1rem;
+  background-color: whitesmoke;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+}
 
-  .question-word-blank:hover {
-    background-color: gray;
-  }
+.question-word {
+  margin: 0.3rem;
+  font-size: 1rem;
+  font-weight: bold;
+}
 
-  .question-verse-quote-container {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
-    align-items: flex-end;
-    width: 100%;
-  }
+.question-word-blank {
+  width: 5rem;
+  background-color: lightgray;
+  border-radius: 10px;
+  margin: 0.5rem;
+  height: 1.5rem;
+  box-shadow: 5px 5px gray;
+}
 
-  .question-verse-quote {
-    margin: 0.5rem;
-    font-size: 1rem;
-    font-weight: bold;
-  }
+.question-word-blank:hover {
+  background-color: gray;
+}
 
-  .answer-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    flex-wrap: wrap;
-  }
+.question-verse-quote-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: flex-end;
+  width: 100%;
+}
 
-  .answer-block {
-    box-shadow: 5px 5px;
-    width: 50%;
-    margin: 0.5rem;
-    padding: 0.5rem;
-    background-color: lavender;
-    border-radius: 10px;
-    text-align: center;
-    font-size: 1.5rem;
-    font-weight: bold;
-    cursor: pointer;
-  }
+.question-verse-quote {
+  margin: 0.5rem;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.answer-container {
+  /* display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  flex-wrap: wrap; */
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.answer-block {
+  box-shadow: 5px 5px;
+  margin: 0.5rem;
+  padding: 0.5rem;
+  background-color: lavender;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
 }
 
 /* Desktop */
