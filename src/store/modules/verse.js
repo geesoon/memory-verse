@@ -5,7 +5,7 @@ const state = {
     verses: "",
     next: "",
   },
-  level: "Medium",
+  level: "Easy",
   isStartAlert: false,
 };
 

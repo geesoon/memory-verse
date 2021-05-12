@@ -1,5 +1,5 @@
 <template>
-  <div class="profile-container animate__animated animate__slideInRight">
+  <section class="profile-container">
     <div class="navBar">
       <span class="material-icons" @click="goToDashboard"> arrow_back </span>
     </div>
@@ -12,7 +12,7 @@
       <div class="update-pw-btn" @click="updatePassword">Update Password</div>
     </div>
     <div class="logout-btn" @click="logout">Log Out</div>
-  </div>
+  </section>
 </template>
 
 <script>

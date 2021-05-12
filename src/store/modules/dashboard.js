@@ -1,5 +1,5 @@
 const state = {
-  view: "Menu",
+  view: "Home",
   avatarName: "",
   user: {
     email: "",

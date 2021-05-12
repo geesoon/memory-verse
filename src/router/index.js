@@ -1,6 +1,6 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import Home from "../views/Home.vue";
+import Login from "../views/Login.vue";
 import firebase from "firebase";
 
 Vue.use(VueRouter);
@@ -8,8 +8,8 @@ Vue.use(VueRouter);
 const routes = [
   {
     path: "/",
-    name: "Home",
-    component: Home,
+    name: "Login",
+    component: Login,
   },
   {
     path: "/register",
@@ -28,14 +28,6 @@ const routes = [
     path: "/profile",
     name: "Profile",
     component: () => import("../views/Profile.vue"),
-    meta: {
-      authRequired: true,
-    },
-  },
-  {
-    path: "/verses",
-    name: "VerseSelectionPanel",
-    component: () => import("../views/VerseSelectionPanel.vue"),
     meta: {
       authRequired: true,
     },

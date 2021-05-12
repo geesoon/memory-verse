@@ -65,14 +65,13 @@ export default {
 /* Memory Verse title */
 .home-title-top-left {
   margin: 1rem;
-  padding: 1.5rem;
-  font-size: 1.5rem;
+  padding: 1rem;
+  font-size: 1rem;
   font-weight: bold;
   text-align: center;
   border: 1px solid black;
   border-radius: 0.5rem;
   box-shadow: 10px 10px;
-  width: 100px;
   cursor: pointer;
 }
 

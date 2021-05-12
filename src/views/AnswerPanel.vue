@@ -72,9 +72,29 @@
       </draggable>
     </section>
     <section class="answer-panel-loading" v-else>
-      <div>
+      <!-- <div>
         <img src="../assets/book.gif" />
-      </div>
+      </div> -->
+      <v-skeleton-loader
+        type="image"
+        style="width: 100vw; height: 15rem"
+      ></v-skeleton-loader>
+      <v-row>
+        <v-skeleton-loader
+          type="image"
+          class="answer-block-skeleton"
+        ></v-skeleton-loader>
+
+        <v-skeleton-loader
+          type="image"
+          class="answer-block-skeleton"
+        ></v-skeleton-loader>
+
+        <v-skeleton-loader
+          type="image"
+          class="answer-block-skeleton"
+        ></v-skeleton-loader>
+      </v-row>
     </section>
   </div>
 </template>
@@ -310,9 +330,10 @@ export default {
        * 25% blank for Medium
        * 50% blank for Hard
        */
-      if (this.level == "Easy") {
+      console.log(this.getLevel);
+      if (this.getLevel == "Easy") {
         replacePercentage = 0.1;
-      } else if (this.level == "Medium") {
+      } else if (this.getLevel == "Medium") {
         replacePercentage = 0.2;
       } else {
         replacePercentage = 0.3;
@@ -379,6 +400,12 @@ export default {
 </script>
 
 <style>
+.answer-block-skeleton {
+  width: 25vw;
+  height: 3rem;
+  margin: 1rem;
+}
+
 .right-btn-set {
   display: flex;
   flex-direction: row;
@@ -397,17 +424,8 @@ export default {
 .answer-panel-loading {
   width: 100vw;
   height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-content: center;
-  justify-content: center;
   text-align: center;
   background-color: #f5f7f6;
-}
-
-.answer-panel-loading > div > img {
-  width: 100vw;
-  height: auto;
 }
 
 .back-button,
@@ -516,11 +534,6 @@ export default {
 }
 
 .answer-container {
-  /* display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  flex-wrap: wrap; */
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
 }
@@ -544,14 +557,10 @@ export default {
     height: 100%;
     display: flex;
     flex-direction: column;
-    align-content: center;
-    justify-content: center;
+    align-content: flex-start;
+    justify-content: flex-start;
     text-align: center;
     background-color: #f5f7f6;
-  }
-
-  .answer-panel-loading > div > img {
-    width: 50%;
   }
 
   .back-button,
