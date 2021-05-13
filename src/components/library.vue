@@ -4,7 +4,7 @@
       <div class="my-collection-bar">
         <div
           class="avatar-container library-avatar"
-          @click="changeRoute('profile')"
+          @click="goToView('Profile')"
         >
           <div class="avatar-circle">{{ this.getAvatarName }}</div>
         </div>
@@ -91,6 +91,9 @@ export default {
     },
   },
   methods: {
+    goToView(view) {
+      this.$store.commit("setView", view);
+    },
     changeRoute(rn) {
       this.$router.push(rn);
     },

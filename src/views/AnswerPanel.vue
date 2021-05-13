@@ -2,7 +2,7 @@
   <div class="answer-panel-container">
     <div class="answer-panel-button">
       <div class="back-button" @click="goToMenu">
-        <span class="material-icons">home</span>
+        <span class="material-icons"> expand_more </span>
       </div>
       <div class="right-btn-set">
         <div class="btn reset-button" @click="resetQuestion">
@@ -19,6 +19,20 @@
           <span class="material-icons" v-if="isAutoVerse"> toggle_on </span>
           <span class="material-icons" v-else> toggle_off </span>
         </div>
+        <div class="btn more-button" @click="isShowOptions = true">
+          <span class="material-icons"> more_vert </span>
+        </div>
+        <v-bottom-sheet v-model="isShowOptions">
+          <v-sheet class="text-center" height="200px">
+            <v-btn class="mt-6" text color="red" @click="sheet = !sheet">
+              close
+            </v-btn>
+            <div class="py-3">
+              This is a bottom sheet using the controlled by v-model instead of
+              activator
+            </div>
+          </v-sheet>
+        </v-bottom-sheet>
       </div>
     </div>
     <section v-if="isQuestionConstructed">
@@ -428,6 +442,7 @@ export default {
   background-color: #f5f7f6;
 }
 
+.more-button,
 .back-button,
 .reset-button,
 .next-button,
@@ -442,6 +457,7 @@ export default {
   cursor: pointer;
 }
 
+.more-button:focus,
 .back-button:focus,
 .reset-button:focus,
 .next-button:focus,
@@ -459,6 +475,7 @@ export default {
   font-weight: bold !important;
 }
 
+.auto-off-button,
 .reset-button,
 .next-button {
   margin-right: 0.5rem;

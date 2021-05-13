@@ -24,6 +24,7 @@
 import Home from "../components/home.vue";
 import Search from "../components/search.vue";
 import Library from "../components/library.vue";
+import Profile from "../components/profile.vue";
 
 export default {
   data: () => ({
@@ -38,6 +39,7 @@ export default {
     Home,
     Search,
     Library,
+    Profile,
   },
   methods: {
     goToView(view) {

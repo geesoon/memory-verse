@@ -4,11 +4,15 @@
       <div class="home-title-header" @click="goToView('Home')">
         Memory Verse
       </div>
-      <div class="avatar-container" @click="changeRoute('profile')">
+      <div class="avatar-container" @click="goToView('Profile')">
         <div class="avatar-circle">{{ this.getAvatarName }}</div>
       </div>
     </div>
     <section style="padding-top: 5rem">
+      <div class="votd">
+        <p>In the beginning, God created the heaven and the earth</p>
+        <p style="text-align: right">- Gen 1:1</p>
+      </div>
       <!-- <v-skeleton-loader
         type="image"
         style="width: 30vw; height: 6rem"
@@ -205,6 +209,16 @@ export default {
   border-radius: 0.5rem;
   box-shadow: 8px 5px;
   cursor: pointer;
+}
+
+.votd {
+  font-size: 1.3rem;
+  font-weight: 300;
+  background: #1877f2;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  opacity: 0.9;
+  margin: 0.5rem 0rem;
 }
 
 .section-title {

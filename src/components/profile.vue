@@ -1,7 +1,7 @@
 <template>
   <section class="profile-container">
     <div class="navBar">
-      <span class="material-icons" @click="goToDashboard"> arrow_back </span>
+      <span class="material-icons" @click="goToView('Home')"> arrow_back </span>
     </div>
     <div class="profilePic">
       <div class="avatar">{{ this.getAvatarName }}</div>
@@ -25,11 +25,11 @@ export default {
     },
   },
   methods: {
+    goToView(view) {
+      this.$store.commit("setView", view);
+    },
     getUserEmail() {
       return firebase.auth().currentUser.email;
-    },
-    goToDashboard() {
-      this.$router.replace("dashboard");
     },
     updateProfilePic() {
       console.log("update profile pic");
@@ -44,10 +44,12 @@ export default {
         .then(() => {
           alert("Successfully logged out");
           this.$router.push("/");
+          this.$store.commit("setView", "Home");
         })
         .catch((error) => {
           alert(error.message);
           this.$router.push("/");
+          this.$store.commit("setView", "Home");
         });
     },
   },

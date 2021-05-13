@@ -25,14 +25,6 @@ const routes = [
     },
   },
   {
-    path: "/profile",
-    name: "Profile",
-    component: () => import("../views/Profile.vue"),
-    meta: {
-      authRequired: true,
-    },
-  },
-  {
     path: "/answer",
     name: "AnswerPanel",
     component: () => import("../views/AnswerPanel.vue"),
