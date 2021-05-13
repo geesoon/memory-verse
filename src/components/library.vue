@@ -10,9 +10,76 @@
         </div>
         <div class="section-title">Your Collection</div>
       </div>
-      <span class="material-icons"> playlist_add </span>
     </div>
+    <v-dialog
+      v-model="isAddCollection"
+      persistent
+      fullscreen
+      scrollable
+      hide-overlay
+      transition="dialog-bottom-transition"
+    >
+      <v-card>
+        <v-card-title class="add-collection-title-bar">
+          <span>Add Collection</span>
+        </v-card-title>
+        <v-card-text>
+          <v-container>
+            <v-row>
+              <v-col cols="12" sm="6" md="4">
+                <v-text-field label="Collection name*" required></v-text-field>
+              </v-col>
+              <v-col cols="12" sm="6">
+                <v-select
+                  :items="['Everday', '3 days', '1 week', '2 weeks', '3 weeks']"
+                  label="Review Period*"
+                  required
+                ></v-select>
+              </v-col>
+              <v-col cols="12" sm="6">
+                <v-combobox
+                  v-model="verseToBeAdd"
+                  hide-selected
+                  label="Add Some Verses"
+                  small-chips
+                  multiple
+                  deletable-chips
+                >
+                  <template v-slot:no-data>
+                    <v-list-item>
+                      <v-list-item-content>
+                        <v-list-item-title style="overflow: wrap">
+                          Press <kbd>enter</kbd> to add
+                          <strong>{{ search }}</strong>
+                        </v-list-item-title>
+                      </v-list-item-content>
+                    </v-list-item>
+                  </template>
+                </v-combobox>
+              </v-col>
+            </v-row>
+          </v-container>
+          <small>*indicates required field</small>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="blue darken-1" text @click="isAddCollection = false">
+            Close
+          </v-btn>
+          <v-btn color="blue darken-1" text @click="this.addCollection()">
+            Save
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <section class="collection-container">
+      <v-fab-transition>
+        <v-btn class="fab-add-collection" color="#d5e37d" fab right>
+          <span class="material-icons" @click="isAddCollection = true">
+            playlist_add
+          </span>
+        </v-btn>
+      </v-fab-transition>
       <div class="view-toggle">
         <span
           class="material-icons"
@@ -64,7 +131,14 @@ export default {
   data: () => ({
     collection: [],
     isGridView: false,
+    isAddCollection: false,
+    verseToBeAdd: [],
   }),
+  watch: {
+    verseToBeAdd: function () {
+      console.log(this.verseToBeAdd);
+    },
+  },
   computed: {
     getAvatarName() {
       return this.$store.getters.getAvatarName;
@@ -74,6 +148,9 @@ export default {
     },
   },
   methods: {
+    addCollection() {
+      console.log("save new collection");
+    },
     getCollection() {
       const db = firebase.firestore();
 
@@ -161,5 +238,18 @@ export default {
   padding: 1.5rem 1rem;
   background: #d5e37d;
   box-shadow: 8px 0px 0px 0px;
+}
+
+.fab-add-collection {
+  position: absolute;
+  bottom: 5rem;
+  right: 2rem;
+  z-index: 4;
+}
+
+.add-collection-title-bar {
+  background: #d5e37d;
+  font-weight: bold;
+  font-size: 1.3rem;
 }
 </style>
