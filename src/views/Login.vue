@@ -41,10 +41,31 @@ export default {
         .auth()
         .signInWithEmailAndPassword(this.email, this.password)
         .then(() => {
-          this.$router.push("/dashboard");
+          this.getUserId();
         })
         .catch((error) => {
           alert(error.message);
+        });
+    },
+    getUserId() {
+      console.log("get user's id");
+      const db = firebase.firestore();
+      let logonEmail = firebase.auth().currentUser.email;
+      db.collection("users")
+        .where("email", "==", logonEmail)
+        .get()
+        .then((querySnapshot) => {
+          querySnapshot.forEach((doc) => {
+            this.$store.commit("setUser", {
+              email: this.email,
+              id: doc.id,
+            });
+          });
+
+          this.$router.push("/dashboard");
+        })
+        .catch((error) => {
+          console.log("Error getting users id", error);
         });
     },
   },

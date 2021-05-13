@@ -40,7 +40,7 @@
             class="recent-item"
             @click="startAnswering(item)"
           >
-            {{ item.id }} {{ item.chapter }}:{{ item.verse }}
+            {{ item.abbreviation }} {{ item.chapter }}:{{ item.verse }}
           </div>
         </div>
       </div>
@@ -52,7 +52,7 @@
             :key="key"
             class="collection-item"
           >
-            {{ item }}
+            {{ item.name }}
           </div>
         </div>
       </div>
@@ -109,43 +109,8 @@ export default {
     selectedBook: "",
     isShowAllBook: false,
     level: "Easy",
-    recent: [
-      {
-        name: "John",
-        id: "JHN",
-        chapter: "1",
-        verse: "1",
-      },
-      {
-        name: "Genesis",
-        id: "GEN",
-        chapter: "1",
-        verse: "1",
-      },
-      {
-        name: "John",
-        id: "JHN",
-        chapter: "1",
-        verse: "1",
-      },
-      {
-        name: "John",
-        id: "JHN",
-        chapter: "1",
-        verse: "1",
-      },
-    ],
-    collection: [
-      "YA-2021 John",
-      "YA-2020",
-      "YA-2019",
-      "YA",
-      "YA",
-      "YA",
-      "YA",
-      "YA",
-      "YA",
-    ],
+    recent: [],
+    collection: [],
     bibleBooks: booksChapter.books,
   }),
   components: {
@@ -157,6 +122,9 @@ export default {
     },
     getLevel() {
       return this.$store.getters.getVerseInfo.level;
+    },
+    getUserId() {
+      return this.$store.getters.getUserInfo.id;
     },
   },
   watch: {
@@ -181,6 +149,48 @@ export default {
       this.$store.commit("setVerses", ref.verse);
       this.$router.push("/answer");
     },
+    getRecent() {
+      const db = firebase.firestore();
+      console.log(this.getUserId);
+      db.collection("users")
+        .doc(this.getUserId)
+        .collection("history")
+        .get()
+        .then((querySnapshot) => {
+          querySnapshot.forEach((doc) => {
+            this.recent.push({
+              id: doc.data().id,
+              name: doc.data().name,
+              abbreviation: doc.data().abbreviation,
+              chapter: doc.data().chapter,
+              verse: doc.data().verse,
+            });
+          });
+        })
+        .catch((error) => {
+          console.log("Error getting users recent verse", error);
+        });
+    },
+    getCollection() {
+      const db = firebase.firestore();
+
+      db.collection("users")
+        .doc(this.getUserId)
+        .collection("collection")
+        .get()
+        .then((querySnapshot) => {
+          querySnapshot.forEach((doc) => {
+            this.collection.push({
+              name: doc.data().name,
+              last_review: doc.data().id,
+              review_period: doc.data().review_period,
+            });
+          });
+        })
+        .catch((error) => {
+          console.log("Error getting users collection", error);
+        });
+    },
   },
   created() {
     let avatarName = firebase
@@ -189,6 +199,10 @@ export default {
       .toUpperCase();
     this.$store.commit("setAvatarName", avatarName);
     this.selectedBook = "";
+  },
+  mounted() {
+    this.getCollection();
+    this.getRecent();
   },
 };
 </script>

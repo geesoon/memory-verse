@@ -143,7 +143,7 @@ export default {
       blankLocation: [] /**Store the blank location property */,
       isQuestionConstructed: false /**Indicator for complete question constructed */,
       isVerseCorrect: false /**Indicator for 100% */,
-      isAutoVerse: false /**Indicator for auto toggle */,
+      isAutoVerse: true /**Indicator for auto toggle */,
       isShowOptions: false,
       selectedOption: "",
       snackbarMsg: "",
@@ -183,6 +183,7 @@ export default {
         case "Turn on auto-verse":
           this.isAutoVerse = true;
           this.snackbarMsg = "Auto-verse is on";
+          this.checkScore();
           break;
         case "Turn off auto-verse":
           this.isAutoVerse = false;
@@ -204,19 +205,6 @@ export default {
     isSortable() {
       /**return false to disable block from sorting while user drag and to avoid vue-draggable from targeting the wrong block as it sorts */
       return false;
-    },
-    toggleAutoVerse() {
-      /**Toggle the auto verse feature */
-      if (this.isAutoVerse == false) {
-        this.isAutoVerse = true;
-        let autoButton = document.getElementById("auto-button");
-        autoButton.classList = "btn auto-on-button";
-        this.checkScore();
-      } else {
-        this.isAutoVerse = false;
-        let autoButton = document.getElementById("auto-button");
-        autoButton.classList = "btn auto-off-button";
-      }
     },
     checkScore(score) {
       /**Cater for auto button
@@ -642,31 +630,16 @@ export default {
   font-size: 1.2rem;
 }
 
-@media only screen and (min-width: 768px) {
-  .answer-container {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-  }
-
-  .answer-block {
-    box-shadow: 5px 5px;
-    margin: 0.5rem;
-    padding: 0.5rem;
-    background-color: lavender;
-    border-radius: 10px;
-    text-align: center;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-  }
-}
-/* Desktop */
+/* Desktop  */
 @media only screen and (min-width: 1024px) {
   .answer-panel-container {
     width: 70vw;
     height: 100%;
   }
+}
 
+/* Tablet */
+@media only screen and (min-width: 768px) {
   .answer-panel-loading {
     width: 100%;
     height: 100%;

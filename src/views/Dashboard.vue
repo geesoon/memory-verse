@@ -1,6 +1,8 @@
 <template>
   <v-container class="dashboard-container">
-    <component :is="this.getCurrentView" keep-alive class="content" />
+    <keep-alive>
+      <component :is="this.getCurrentView" class="content" />
+    </keep-alive>
     <!-- Mobile navigation drawer -->
     <v-bottom-navigation :value="value" grow fixed class="nav-bottom">
       <v-btn value="home" @click="goToView('home')">

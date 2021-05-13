@@ -54,8 +54,7 @@
           @click="showCollection(item)"
         >
           <div>
-            {{ item.name }}<br />
-            {{ item.num }}
+            {{ item.name }}
           </div>
           <!-- <v-btn icon>
             <span class="material-icons"> more_vert </span>
@@ -67,32 +66,44 @@
 </template>
 
 <script>
+import firebase from "firebase";
+
 export default {
   data: () => ({
-    collection: [
-      { name: "YA", num: "5" },
-      { name: "YA", num: "5" },
-      { name: "YA", num: "5" },
-      { name: "YA", num: "5" },
-      { name: "YA", num: "5" },
-      { name: "YA", num: "5" },
-      { name: "YA", num: "5" },
-      { name: "YA", num: "5" },
-      { name: "YA", num: "5" },
-      { name: "YA", num: "5" },
-      { name: "YA", num: "5" },
-      { name: "YA", num: "5" },
-      { name: "YA", num: "5" },
-      { name: "YA", num: "5" },
-    ],
+    collection: [],
     isGridView: false,
   }),
   computed: {
     getAvatarName() {
       return this.$store.getters.getAvatarName;
     },
+    getUserId() {
+      return this.$store.getters.getUserInfo.id;
+    },
   },
   methods: {
+    getCollection() {
+      const db = firebase.firestore();
+
+      db.collection("users")
+        .doc(this.getUserId)
+        .collection("collection")
+        .get()
+        .then((querySnapshot) => {
+          querySnapshot.forEach((doc) => {
+            this.collection.push({
+              name: doc.data().name,
+              last_review: doc.data().id,
+              review_period: doc.data().review_period,
+            });
+          });
+
+          console.log(this.collection);
+        })
+        .catch((error) => {
+          console.log("Error getting users collection", error);
+        });
+    },
     showCollection(selectedCollection) {
       console.log(selectedCollection);
     },
@@ -102,6 +113,9 @@ export default {
     changeRoute(rn) {
       this.$router.push(rn);
     },
+  },
+  created() {
+    this.getCollection();
   },
 };
 </script>

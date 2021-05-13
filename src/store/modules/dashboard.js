@@ -3,6 +3,7 @@ const state = {
   avatarName: "",
   user: {
     email: "",
+    id: "",
   },
 };
 
@@ -27,6 +28,13 @@ const mutations = {
   },
   setUser(state, user) {
     state.user.email = user.email;
+    state.user.id = user.id;
+  },
+  clearState(state) {
+    state.view = "Home";
+    state.avatarName = "";
+    state.user.email = "";
+    state.user.id = "";
   },
 };
 

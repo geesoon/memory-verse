@@ -45,6 +45,7 @@ export default {
           alert("Successfully logged out");
           this.$router.push("/");
           this.$store.commit("setView", "Home");
+          this.$store.commit("clearState");
         })
         .catch((error) => {
           alert(error.message);
