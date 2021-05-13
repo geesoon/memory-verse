@@ -78,12 +78,20 @@
                 Show All
               </v-btn>
             </template>
-            <bible-book-panel />
+            <bible-book-panel
+              @closeDialog="isShowAllBook = false"
+              :book="selectedBook"
+            />
           </v-dialog>
         </div>
         <div class="bible-books-list">
-          <div v-for="n in 15" :key="n" class="book-item">
-            {{ bibleBooks[n].id }}
+          <div
+            v-for="n in 15"
+            :key="n"
+            class="book-item"
+            @click="showBookChapter(bibleBooks[n])"
+          >
+            {{ bibleBooks[n].abbreviation }}
           </div>
         </div>
       </div>
@@ -97,23 +105,8 @@ import booksChapter from "../data/book.json";
 import bibleBookPanel from "../components/bibleBookPanel.vue";
 
 export default {
-  components: {
-    bibleBookPanel,
-  },
-  computed: {
-    getAvatarName() {
-      return this.$store.getters.getAvatarName;
-    },
-    getLevel() {
-      return this.$store.getters.getVerseInfo.level;
-    },
-  },
-  watch: {
-    level: function () {
-      this.$store.commit("setLevel", this.level);
-    },
-  },
   data: () => ({
+    selectedBook: "",
     isShowAllBook: false,
     level: "Easy",
     recent: [
@@ -142,10 +135,39 @@ export default {
         verse: "1",
       },
     ],
-    collection: ["YA", "YA", "YA", "YA", "YA", "YA", "YA", "YA", "YA"],
+    collection: [
+      "YA-2021 John",
+      "YA-2020",
+      "YA-2019",
+      "YA",
+      "YA",
+      "YA",
+      "YA",
+      "YA",
+      "YA",
+    ],
     bibleBooks: booksChapter.books,
   }),
+  components: {
+    bibleBookPanel,
+  },
+  computed: {
+    getAvatarName() {
+      return this.$store.getters.getAvatarName;
+    },
+    getLevel() {
+      return this.$store.getters.getVerseInfo.level;
+    },
+  },
+  watch: {
+    level: function () {
+      this.$store.commit("setLevel", this.level);
+    },
+  },
   methods: {
+    showBookChapter() {
+      this.isShowAllBook = true;
+    },
     goToView(view) {
       this.$store.commit("setView", view);
     },
@@ -166,6 +188,7 @@ export default {
       .currentUser.email.split("")[0]
       .toUpperCase();
     this.$store.commit("setAvatarName", avatarName);
+    this.selectedBook = "";
   },
 };
 </script>
@@ -198,6 +221,7 @@ export default {
   height: 45px;
   font-weight: bold;
   font-size: 1.5rem;
+  cursor: pointer;
 }
 
 .home-title-header {
@@ -268,15 +292,18 @@ export default {
 
 .collection-item,
 .recent-item {
-  padding: 2rem 2rem;
+  padding: 1rem 2rem;
   margin: 0rem 0.5rem;
   border-radius: 0.5rem;
   background: #d5e37d;
   font-size: 1.3rem;
   font-weight: bold;
   text-align: center;
+  cursor: pointer;
+  height: 6rem;
 }
 
+/* Truncate collection name */
 .collection-item {
   border-radius: 0px !important;
   box-shadow: 8px 8px 0px 0px;
@@ -289,6 +316,7 @@ export default {
   font-size: 1.3rem;
   font-weight: bold;
   text-align: center;
+  cursor: pointer;
 }
 
 .bible-books-bar {
@@ -301,5 +329,20 @@ export default {
 .show-all-book-btn {
   font-size: 0.8rem;
   font-weight: bold;
+}
+
+@media only screen and (min-width: 768px) {
+  .bible-books-list {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
+@media only screen and (min-width: 1024px) {
+  .avatar-container {
+    display: none;
+  }
+  .bible-books-list {
+    grid-template-columns: repeat(8, 1fr);
+  }
 }
 </style>

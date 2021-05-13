@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container class="home-container">
     <div class="home-title">Memory<br />Verse</div>
     <section class="login-form-container">
       <form @submit.prevent="login" class="login-form">
@@ -52,14 +52,6 @@ export default {
 </script>
 
 <style>
-.home-container {
-  display: flex;
-  justify-content: center;
-  align-content: center;
-  flex-direction: column;
-  width: 100vw;
-}
-
 .login-form-container {
   margin: 3rem 1rem;
 }
@@ -135,7 +127,13 @@ a {
 
 @media only screen and (min-width: 768px) {
   .home-container {
-    width: 30vw;
+    max-width: 60vw !important;
+  }
+}
+
+@media only screen and (min-width: 1024px) {
+  .home-container {
+    max-width: 40vw !important;
   }
 }
 </style>

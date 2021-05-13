@@ -31,16 +31,17 @@
             v-for="(item, key) in collection"
             :key="key"
             class="my-collection-item"
+            @click="showCollection(item)"
           >
             <v-list-item-content>
               <v-list-item-title v-text="item.name"></v-list-item-title>
               <v-list-item-subtitle v-text="item.num"></v-list-item-subtitle>
             </v-list-item-content>
-            <v-list-item-action>
+            <!-- <v-list-item-action>
               <v-btn icon>
                 <span class="material-icons"> more_vert </span>
               </v-btn>
-            </v-list-item-action>
+            </v-list-item-action> -->
           </v-list-item>
         </v-list>
       </div>
@@ -50,14 +51,15 @@
           v-for="(item, key) in collection"
           :key="key"
           class="grid-collection-item"
+          @click="showCollection(item)"
         >
           <div>
             {{ item.name }}<br />
             {{ item.num }}
           </div>
-          <v-btn icon>
+          <!-- <v-btn icon>
             <span class="material-icons"> more_vert </span>
-          </v-btn>
+          </v-btn> -->
         </div>
       </div>
     </section>
@@ -91,6 +93,9 @@ export default {
     },
   },
   methods: {
+    showCollection(selectedCollection) {
+      console.log(selectedCollection);
+    },
     goToView(view) {
       this.$store.commit("setView", view);
     },

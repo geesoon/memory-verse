@@ -1,6 +1,6 @@
 <template>
   <section class="profile-container">
-    <div class="navBar">
+    <div class="profile-nav-bar">
       <span class="material-icons" @click="goToView('Home')"> arrow_back </span>
     </div>
     <div class="profilePic">
@@ -65,7 +65,7 @@ export default {
   width: 100%;
 }
 
-.navBar {
+.profile-nav-bar {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -122,9 +122,9 @@ export default {
   font-weight: bold;
 }
 
-@media only screen and (min-width: 600px) {
-  .profile-container {
-    width: 40vw;
+@media only screen and (min-width: 1024px) {
+  .profile-nav-bar {
+    display: none;
   }
 }
 </style>

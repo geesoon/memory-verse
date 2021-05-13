@@ -1,5 +1,5 @@
 <template>
-  <div class="answer-panel-container">
+  <v-container class="answer-panel-container">
     <div class="answer-panel-button">
       <div class="back-button" @click="goToMenu">
         <span class="material-icons"> expand_more </span>
@@ -11,29 +11,48 @@
         <div class="btn next-button" @click="nextVerse">
           <span class="material-icons"> skip_next </span>
         </div>
-        <div
+        <!-- <div
           id="auto-button"
           class="btn auto-off-button"
           @click="toggleAutoVerse"
         >
           <span class="material-icons" v-if="isAutoVerse"> toggle_on </span>
           <span class="material-icons" v-else> toggle_off </span>
-        </div>
+        </div> -->
         <div class="btn more-button" @click="isShowOptions = true">
           <span class="material-icons"> more_vert </span>
         </div>
         <v-bottom-sheet v-model="isShowOptions">
-          <v-sheet class="text-center" height="200px">
-            <v-btn class="mt-6" text color="red" @click="sheet = !sheet">
-              close
-            </v-btn>
-            <div class="py-3">
-              This is a bottom sheet using the controlled by v-model instead of
-              activator
-            </div>
+          <v-sheet height="200px">
+            <v-list class="option-container">
+              <v-list-item
+                v-for="(item, key) in this.getOptionItems"
+                :key="key"
+                @click="chooseOption(item.text)"
+              >
+                <v-list-item-icon>
+                  <span class="material-icons option-icon">
+                    {{ item.icon }}
+                  </span>
+                </v-list-item-icon>
+                <v-list-item-title class="option-text">{{
+                  item.text
+                }}</v-list-item-title>
+                <v-divider></v-divider>
+              </v-list-item>
+            </v-list>
           </v-sheet>
         </v-bottom-sheet>
       </div>
+      <v-snackbar v-model="isSnackbar" :timeout="timeout">
+        {{ snackbarMsg }}
+
+        <template v-slot:action="{ attrs }">
+          <v-btn color="white" text v-bind="attrs" @click="isSnackbar = false">
+            Close
+          </v-btn>
+        </template>
+      </v-snackbar>
     </div>
     <section v-if="isQuestionConstructed">
       <div class="question-outer-container">
@@ -91,7 +110,7 @@
       </div> -->
       <v-skeleton-loader
         type="image"
-        style="width: 100vw; height: 15rem"
+        class="question-block-skeleton"
       ></v-skeleton-loader>
       <v-row>
         <v-skeleton-loader
@@ -110,7 +129,7 @@
         ></v-skeleton-loader>
       </v-row>
     </section>
-  </div>
+  </v-container>
 </template>
 
 <script>
@@ -125,7 +144,11 @@ export default {
       isQuestionConstructed: false /**Indicator for complete question constructed */,
       isVerseCorrect: false /**Indicator for 100% */,
       isAutoVerse: false /**Indicator for auto toggle */,
-      // selectedBlankId: "",
+      isShowOptions: false,
+      selectedOption: "",
+      snackbarMsg: "",
+      timeout: 2000,
+      isSnackbar: false,
     };
   },
   computed: {
@@ -135,11 +158,49 @@ export default {
     getLevel() {
       return this.$store.getters.getVerseInfo.level;
     },
+    getOptionItems() {
+      let opts = [];
+      if (this.isAutoVerse) {
+        opts = [
+          { text: "Add to collection", icon: "playlist_add" },
+          { text: "Turn off auto-verse", icon: "toggle_on" },
+        ];
+      } else {
+        opts = [
+          { text: "Add to collection", icon: "playlist_add" },
+          { text: "Turn on auto-verse", icon: "toggle_off" },
+        ];
+      }
+      return opts;
+    },
   },
   components: {
     draggable,
   },
   methods: {
+    chooseOption(opt) {
+      switch (opt) {
+        case "Turn on auto-verse":
+          this.isAutoVerse = true;
+          this.snackbarMsg = "Auto-verse is on";
+          break;
+        case "Turn off auto-verse":
+          this.isAutoVerse = false;
+          this.snackbarMsg = "Auto-verse is off";
+          break;
+        case "Add to collection":
+          console.log("add to collection");
+          this.snackbarMsg = "Added to collection";
+          break;
+      }
+      setTimeout(() => {
+        this.isShowOptions = false;
+      }, 300);
+
+      setTimeout(() => {
+        this.isSnackbar = true;
+      }, 400);
+    },
     isSortable() {
       /**return false to disable block from sorting while user drag and to avoid vue-draggable from targeting the wrong block as it sorts */
       return false;
@@ -414,6 +475,11 @@ export default {
 </script>
 
 <style>
+.question-block-skeleton {
+  width: 95vw;
+  height: 15rem;
+}
+
 .answer-block-skeleton {
   width: 25vw;
   height: 3rem;
@@ -427,7 +493,7 @@ export default {
 
 .answer-panel-button {
   background-color: white;
-  padding: 1rem;
+  padding: 0.5rem 0rem;
   position: sticky;
   display: flex;
   flex-direction: row;
@@ -439,7 +505,6 @@ export default {
   width: 100vw;
   height: 100vh;
   text-align: center;
-  background-color: #f5f7f6;
 }
 
 .more-button,
@@ -475,6 +540,7 @@ export default {
   font-weight: bold !important;
 }
 
+.auto-on-button,
 .auto-off-button,
 .reset-button,
 .next-button {
@@ -567,8 +633,40 @@ export default {
   cursor: pointer;
 }
 
+.option-container {
+  width: 100vw;
+  height: 200px;
+}
+
+.option-text {
+  font-size: 1.2rem;
+}
+
+@media only screen and (min-width: 768px) {
+  .answer-container {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+  }
+
+  .answer-block {
+    box-shadow: 5px 5px;
+    margin: 0.5rem;
+    padding: 0.5rem;
+    background-color: lavender;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+  }
+}
 /* Desktop */
-@media only screen and (min-width: 600px) {
+@media only screen and (min-width: 1024px) {
+  .answer-panel-container {
+    width: 70vw;
+    height: 100%;
+  }
+
   .answer-panel-loading {
     width: 100%;
     height: 100%;
@@ -577,7 +675,17 @@ export default {
     align-content: flex-start;
     justify-content: flex-start;
     text-align: center;
-    background-color: #f5f7f6;
+  }
+
+  .question-block-skeleton {
+    width: 100%;
+    height: 15rem;
+  }
+
+  .answer-block-skeleton {
+    width: 25%;
+    height: 3rem;
+    margin: 1rem;
   }
 
   .back-button,
@@ -638,11 +746,6 @@ export default {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-  }
-
-  .answer-panel-container {
-    width: 70vw;
-    height: 100%;
   }
 
   .question-outer-container {
