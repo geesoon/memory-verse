@@ -37,11 +37,6 @@
               <v-list-item-title v-text="item.name"></v-list-item-title>
               <v-list-item-subtitle v-text="item.num"></v-list-item-subtitle>
             </v-list-item-content>
-            <!-- <v-list-item-action>
-              <v-btn icon>
-                <span class="material-icons"> more_vert </span>
-              </v-btn>
-            </v-list-item-action> -->
           </v-list-item>
         </v-list>
       </div>
@@ -56,9 +51,6 @@
           <div>
             {{ item.name }}
           </div>
-          <!-- <v-btn icon>
-            <span class="material-icons"> more_vert </span>
-          </v-btn> -->
         </div>
       </div>
     </section>
@@ -92,6 +84,7 @@ export default {
         .then((querySnapshot) => {
           querySnapshot.forEach((doc) => {
             this.collection.push({
+              id: doc.id,
               name: doc.data().name,
               last_review: doc.data().id,
               review_period: doc.data().review_period,
@@ -105,7 +98,8 @@ export default {
         });
     },
     showCollection(selectedCollection) {
-      console.log(selectedCollection);
+      this.$store.commit("setCollectionId", selectedCollection.id);
+      this.$store.commit("setView", "Collection");
     },
     goToView(view) {
       this.$store.commit("setView", view);

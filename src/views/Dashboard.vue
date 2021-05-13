@@ -1,8 +1,6 @@
 <template>
   <v-container class="dashboard-container">
-    <keep-alive>
-      <component :is="this.getCurrentView" class="content" />
-    </keep-alive>
+    <component :is="this.getCurrentView" class="content" />
     <!-- Mobile navigation drawer -->
     <v-bottom-navigation :value="value" grow fixed class="nav-bottom">
       <v-btn value="home" @click="goToView('home')">
@@ -10,9 +8,8 @@
         <span class="material-icons"> home </span>
       </v-btn>
 
-      <v-btn value="search" @click="goToView('search')">
-        <span>Search</span>
-        <span class="material-icons"> search </span>
+      <v-btn value="review" @click="goToView('review')">
+        <span>Review</span><span class="material-icons"> alarm </span>
       </v-btn>
 
       <v-btn value="library" @click="goToView('library')">
@@ -73,9 +70,10 @@
 
 <script>
 import Home from "../components/home.vue";
-import Search from "../components/search.vue";
+import Review from "../components/review.vue";
 import Library from "../components/library.vue";
 import Profile from "../components/profile.vue";
+import Collection from "../components/collection.vue";
 import firebase from "firebase";
 
 export default {
@@ -92,9 +90,10 @@ export default {
   },
   components: {
     Home,
-    Search,
+    Review,
     Library,
     Profile,
+    Collection,
   },
   methods: {
     goToView(view) {

@@ -5,6 +5,7 @@ const state = {
     email: "",
     id: "",
   },
+  selectedCollectionId: "",
 };
 
 const getters = {
@@ -16,6 +17,9 @@ const getters = {
   },
   getUserInfo(state) {
     return state.user;
+  },
+  getCollectionId(state) {
+    return state.selectedCollectionId;
   },
 };
 
@@ -29,6 +33,9 @@ const mutations = {
   setUser(state, user) {
     state.user.email = user.email;
     state.user.id = user.id;
+  },
+  setCollectionId(state, id) {
+    state.selectedCollectionId = id;
   },
   clearState(state) {
     state.view = "Home";

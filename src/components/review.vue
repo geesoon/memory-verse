@@ -1,15 +1,7 @@
 <template>
-  <section class="search-container">
-    <div class="search-title">Search</div>
-    <v-autocomplete
-      auto-select-first
-      clearable
-      solo
-      v-model="searchInput"
-      items="books"
-      placeholder="Search"
-    ></v-autocomplete>
-    <div class="search-tip-box" v-if="searchInput == ''">
+  <section class="review-container">
+    <div class="review-title">Review</div>
+    <div class="review-tip-box" v-if="searchInput == ''">
       <div>Looking for a verse?</div>
     </div>
   </section>
@@ -20,31 +12,30 @@ import bibleBooks from "../data/book.json";
 
 export default {
   data: () => ({
-    searchInput: "",
     books: bibleBooks.books,
   }),
 };
 </script>
 
 <style>
-.search-container {
+.review-container {
   margin: 0rem 1rem;
 }
 
-.search-title {
+.review-title {
   font-size: 2rem;
   font-weight: bold;
   margin: 2rem 0rem;
 }
 
-.search-tip-box {
+.review-tip-box {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 }
 
-.search-tip-box > div {
+.review-tip-box > div {
   flex: 1;
 }
 </style>
