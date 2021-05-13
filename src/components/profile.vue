@@ -1,7 +1,7 @@
 <template>
   <section class="profile-container">
     <div class="profile-nav-bar">
-      <span class="material-icons" @click="goToView('Home')"> arrow_back </span>
+      <span class="material-icons" @click="goBack()"> arrow_back </span>
     </div>
     <div class="profilePic">
       <div class="avatar">{{ this.getAvatarName }}</div>
@@ -23,10 +23,13 @@ export default {
     getAvatarName() {
       return this.$store.getters.getAvatarName;
     },
+    getPreviousView() {
+      return this.$store.getters.getPreviousView;
+    },
   },
   methods: {
-    goToView(view) {
-      this.$store.commit("setView", view);
+    goBack() {
+      this.$store.commit("setView", this.getPreviousView);
     },
     getUserEmail() {
       return firebase.auth().currentUser.email;

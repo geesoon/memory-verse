@@ -2,7 +2,7 @@
   <section>
     <v-toolbar flat light>
       <div class="collection-nav-bar">
-        <span class="material-icons" @click="goToView()"> arrow_back </span
+        <span class="material-icons" @click="goBack()"> arrow_back </span
         ><span class="material-icons" @click="isShowCollectionOptions = true">
           more_vert
         </span>
@@ -14,7 +14,25 @@
       </div>
       <div class="collection-subtitle">Last Review Date: {{ last_review }}</div>
       <div class="collection-subtitle">Review Period: {{ review_period }}</div>
-      <v-btn outlined x-small class="add-verse-btn"> Add verses </v-btn>
+      <v-btn
+        rounded
+        depressed
+        x-large
+        color="green"
+        class="review-all-btn"
+        @click="reviewAll()"
+        >REVIEW ALL</v-btn
+      >
+      <v-btn
+        outlined
+        rounded
+        x-small
+        color="green"
+        class="add-verse-btn"
+        @click="addVerseToCollection()"
+      >
+        ADD VERSES
+      </v-btn>
     </div>
     <div>
       <v-list subheader two-line class="list-view-collection">
@@ -40,7 +58,7 @@
 
     <!-- Edit Collection Options -->
     <v-bottom-sheet v-model="isShowCollectionOptions">
-      <v-sheet height="130px">
+      <v-sheet height="180px">
         <v-list class="option-container">
           <v-list-item
             v-for="(item, key) in collectionOptions"
@@ -100,6 +118,7 @@ export default {
     collectionOptions: [
       { text: "Delete Collection", icon: "clear" },
       { text: "Add verses", icon: "add_circle_outline" },
+      { text: "Change Review Period", icon: "alarm" },
     ],
     collectionItemOptions: [
       { text: "Remove from this Collection", icon: "remove_circle_outline" },
@@ -112,6 +131,9 @@ export default {
     },
     getUserId() {
       return this.$store.getters.getUserInfo.id;
+    },
+    getPreviousView() {
+      return this.$store.getters.getPreviousView;
     },
   },
   methods: {
@@ -154,12 +176,38 @@ export default {
     },
     goToAnswer(verse) {
       console.log("Go to review", verse);
+      let verseSplit = verse.split(" ");
+      let bookId = verseSplit[0];
+
+      let chapter = verseSplit[1].split(":")[0];
+      let verses = verseSplit[1].split(":")[1];
+
+      let selection = {
+        book: {
+          id: bookId,
+          name: "",
+        },
+        chapter: chapter,
+        verses: verses,
+      };
+      console.log(selection);
+      this.$store.commit("setSelection", selection);
+      this.$router.push("/answer");
     },
     chooseCollectionOption(opt) {
       console.log(opt);
     },
     chooseCollectionItemOption(opt) {
       console.log(opt);
+    },
+    goBack() {
+      this.$store.commit("setView", "Library");
+    },
+    addVerseToCollection() {
+      console.log("add verse");
+    },
+    reviewAll() {
+      /** Pass list of verses to answer panel */
     },
   },
   created() {
@@ -194,7 +242,11 @@ export default {
   font-size: 0.8rem;
 }
 
+.review-all-btn {
+  margin-top: 1rem;
+}
+
 .add-verse-btn {
-  margin: 2rem 0rem;
+  margin: 1rem 0rem;
 }
 </style>

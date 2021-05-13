@@ -340,6 +340,8 @@ export default {
           ? `${selection.book.id}.${selection.chapter}.${selection.verses}`
           : nextVerse;
       const header = new Headers();
+
+      /** Move this api-key to environment variable */
       header.append("api-key", "ea2400ebed2327b5e1b9595f416366e0");
 
       const request = new Request(
@@ -374,9 +376,15 @@ export default {
             chapter: "",
             next: "",
           };
-          updatedSelection.book.name = data.data.reference.split(" ")[0];
-          updatedSelection.verses = data.data.reference.split(":")[1];
-          updatedSelection.chapter = data.data.chapterId.split(".")[1];
+
+          let firstHalf = data.data.reference.split(":")[0];
+          let verse = data.data.reference.split(":")[1];
+          let chapter = firstHalf.split(" ").slice(-1).join("");
+          let book = firstHalf.split(" ").slice(0, -1).join(" ");
+
+          updatedSelection.book.name = book;
+          updatedSelection.verses = verse;
+          updatedSelection.chapter = chapter;
           updatedSelection.book.id = data.data.bookId;
           updatedSelection.next = data.data.next.id;
           this.$store.commit("setSelection", updatedSelection);

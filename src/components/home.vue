@@ -51,6 +51,7 @@
             v-for="(item, key) in collection"
             :key="key"
             class="collection-item"
+            @click="goToCollection(item)"
           >
             {{ item.name }}
           </div>
@@ -139,6 +140,10 @@ export default {
     goToView(view) {
       this.$store.commit("setView", view);
     },
+    goToCollection(item) {
+      this.$store.commit("setCollectionId", item.id);
+      this.$store.commit("setView", "Collection");
+    },
     showAllBook() {},
     changeRoute(rn) {
       this.$router.push(rn);
@@ -181,8 +186,9 @@ export default {
         .then((querySnapshot) => {
           querySnapshot.forEach((doc) => {
             this.collection.push({
+              id: doc.id,
               name: doc.data().name,
-              last_review: doc.data().id,
+              last_review: doc.data().last_review.seconds,
               review_period: doc.data().review_period,
             });
           });

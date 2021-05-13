@@ -1,5 +1,6 @@
 const state = {
   view: "Home",
+  previousView: "",
   avatarName: "",
   user: {
     email: "",
@@ -11,6 +12,9 @@ const state = {
 const getters = {
   getCurrentView(state) {
     return state.view;
+  },
+  getPreviousView(state) {
+    return state.previousView;
   },
   getAvatarName(state) {
     return state.avatarName;
@@ -25,6 +29,7 @@ const getters = {
 
 const mutations = {
   setView(state, view) {
+    state.previousView = state.view;
     state.view = view;
   },
   setAvatarName(state, name) {
