@@ -12,8 +12,8 @@
       <div class="collection-title">
         {{ name }}
       </div>
-      <div class="collection-subtitle">Last Review Date: {{ last_review }}</div>
-      <div class="collection-subtitle">Review Period: {{ review_period }}</div>
+      <div class="collection-subtitle">Last Review Date: {{ lastReview }}</div>
+      <div class="collection-subtitle">Review Period: {{ reviewPeriod }}</div>
       <v-btn
         rounded
         depressed
@@ -43,12 +43,28 @@
         >
           <v-list-item-content>
             <v-list-item-title
-              v-text="verse"
               @click="goToAnswer(verse)"
-            ></v-list-item-title>
+              v-if="verse.startVerse != verse.endVerse"
+              >{{ verse.book }} {{ verse.chapter }}:{{ verse.startVerse }}-{{
+                verse.endVerse
+              }}</v-list-item-title
+            >
+            <v-list-item-title
+              @click="goToAnswer(verse)"
+              v-else-if="verse.startVerse == '' && verse.endVerse == ''"
+              >{{ verse.book }} {{ verse.chapter }}</v-list-item-title
+            >
+            <v-list-item-title @click="goToAnswer(verse)" v-else
+              >{{ verse.book }} {{ verse.chapter }}:{{
+                verse.startVerse
+              }}</v-list-item-title
+            >
+            <v-list-item-subtitle>{{
+              verse.bibleVersion
+            }}</v-list-item-subtitle>
           </v-list-item-content>
           <v-btn icon style="z-index: 2">
-            <span class="material-icons" @click="isShowVerseOptions = true">
+            <span class="material-icons" @click="showVerseOptions(verse)">
               more_vert
             </span>
           </v-btn>
@@ -58,7 +74,7 @@
 
     <!-- Edit Collection Options -->
     <v-bottom-sheet v-model="isShowCollectionOptions">
-      <v-sheet height="180px">
+      <v-sheet height="240px">
         <v-list class="option-container">
           <v-list-item
             v-for="(item, key) in collectionOptions"
@@ -78,6 +94,22 @@
         </v-list>
       </v-sheet>
     </v-bottom-sheet>
+
+    <v-dialog v-model="isShowDeleteConfirmationDialog">
+      <v-card>
+        <v-card-title>Confirm delete collection?</v-card-title>
+        <v-card-text>Deleted collection cannot be restored.</v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn text @click="isShowDeleteConfirmationDialog = false"
+            >Cancel</v-btn
+          >
+          <v-btn depressed rounded color="red" @click="removeCollection()"
+            >Confirm</v-btn
+          >
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 
     <!-- Edit Collection Item Options -->
     <v-bottom-sheet v-model="isShowVerseOptions">
@@ -109,21 +141,24 @@ import firebase from "firebase";
 
 export default {
   data: () => ({
-    last_review: "",
-    review_period: "",
+    lastReview: "",
+    reviewPeriod: "",
     name: "",
     verses: [],
     isShowVerseOptions: false,
     isShowCollectionOptions: false,
     collectionOptions: [
-      { text: "Delete Collection", icon: "clear" },
-      { text: "Add verses", icon: "add_circle_outline" },
+      { text: "Add Verses", icon: "add_circle_outline" },
       { text: "Change Review Period", icon: "alarm" },
+      { text: "Edit Collection", icon: "edit" },
+      { text: "Delete Collection", icon: "clear" },
     ],
     collectionItemOptions: [
       { text: "Remove from this Collection", icon: "remove_circle_outline" },
       { text: "Add to other Collection", icon: "playlist_add" },
     ],
+    isShowDeleteConfirmationDialog: false,
+    editVerse: {},
   }),
   computed: {
     getCollectionId() {
@@ -146,33 +181,43 @@ export default {
         .doc(this.getCollectionId)
         .get()
         .then((querySnapshot) => {
-          let date = new Date(querySnapshot.data().last_review.seconds * 1000);
-          this.last_review = `${date.getDate()} / ${date.getMonth()} / ${date.getFullYear()}`;
-          this.review_period = querySnapshot.data().review_period;
+          if (querySnapshot.data().lastReview != "") {
+            let date = new Date(querySnapshot.data().lastReview.seconds * 1000);
+            this.lastReview = `${date.getDate()} / ${date.getMonth()} / ${date.getFullYear()}`;
+          } else {
+            this.lastReview = "None";
+          }
+          this.reviewPeriod = querySnapshot.data().reviewPeriod;
           this.name = querySnapshot.data().name;
+          this.verses = querySnapshot.data().verses;
         })
         .catch((error) => {
           console.log("Error getting users collection info", error);
         });
     },
-    getCollectionVerses() {
+    removeCollection() {
       const db = firebase.firestore();
+
       db.collection("users")
         .doc(this.getUserId)
         .collection("collection")
         .doc(this.getCollectionId)
-        .collection("verses")
-        .get()
-        .then((querySnapshot) => {
-          querySnapshot.forEach((doc) => {
-            this.verses = [...doc.data().reference];
-          });
+        .delete()
+        .then(() => {
+          console.log("Successfully deleted the collection");
+          this.$store.commit("setView", "Library");
         })
         .catch((error) => {
-          console.log("Error getting users collection", error);
+          console.log("Error getting users collection info", error);
         });
-
-      console.log(this.verses);
+    },
+    showVerseOptions(verse) {
+      this.editVerse.book = verse.book;
+      this.editVerse.chapter = verse.chapter;
+      this.editVerse.startVerse = verse.startVerse;
+      this.editVerse.endVerse = verse.endVerse;
+      this.editVerse.bibleVersion = verse.bibleVersion;
+      this.isShowVerseOptions = true;
     },
     goToAnswer(verse) {
       console.log("Go to review", verse);
@@ -196,9 +241,43 @@ export default {
     },
     chooseCollectionOption(opt) {
       console.log(opt);
+      if (opt == "Delete Collection") {
+        this.isShowDeleteConfirmationDialog = true;
+      }
     },
     chooseCollectionItemOption(opt) {
       console.log(opt);
+      if (opt == "Remove from this Collection") {
+        this.removeVerseFromCollection();
+      }
+    },
+    removeVerseFromCollection() {
+      // Filter out selected verse to operated on
+      this.verses = this.verses.filter((verse) => {
+        return (
+          verse.book != this.editVerse.book ||
+          verse.chapter != this.editVerse.chapter ||
+          verse.startVerse != this.editVerse.startVerse ||
+          verse.endVerse != this.editVerse.endVerse ||
+          verse.bibleVersion != this.editVerse.bibleVersion
+        );
+      });
+
+      const db = firebase.firestore();
+      db.collection("users")
+        .doc(this.getUserId)
+        .collection("collection")
+        .doc(this.getCollectionId)
+        .update({
+          verses: this.verses,
+        })
+        .then(() => {
+          console.log("Successfully remove verse from the collection");
+        })
+        .catch((error) => {
+          console.log("Error getting users collection info", error);
+        });
+      this.isShowVerseOptions = false;
     },
     goBack() {
       this.$store.commit("setView", "Library");
@@ -212,7 +291,6 @@ export default {
   },
   created() {
     this.getCollectionDetail();
-    this.getCollectionVerses();
   },
 };
 </script>

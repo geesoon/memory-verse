@@ -188,8 +188,8 @@ export default {
             this.collection.push({
               id: doc.id,
               name: doc.data().name,
-              last_review: doc.data().last_review.seconds,
-              review_period: doc.data().review_period,
+              lastReview: doc.data().lastReview.seconds,
+              reviewPeriod: doc.data().reviewPeriod,
             });
           });
         })

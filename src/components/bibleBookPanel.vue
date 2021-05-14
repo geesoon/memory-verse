@@ -22,7 +22,7 @@
             :key="book.id"
             @click="showBookChaptersPanel(book.id, 'OT')"
           >
-            {{ book.id }}
+            {{ book.abbreviation }}
           </div>
         </div>
         <div class="testament-title">
@@ -35,7 +35,7 @@
             :key="book.id"
             @click="showBookChaptersPanel(book.id, 'NT')"
           >
-            {{ book.id }}
+            {{ book.abbreviation }}
           </div>
         </div>
       </div>

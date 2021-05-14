@@ -1,9 +1,7 @@
 <template>
   <section class="review-container">
     <div class="review-title">Review</div>
-    <div class="review-tip-box" v-if="searchInput == ''">
-      <div>Looking for a verse?</div>
-    </div>
+    <div class="review-tip-box"></div>
   </section>
 </template>
 

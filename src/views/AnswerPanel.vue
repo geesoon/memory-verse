@@ -105,9 +105,6 @@
       </draggable>
     </section>
     <section class="answer-panel-loading" v-else>
-      <!-- <div>
-        <img src="../assets/book.gif" />
-      </div> -->
       <v-skeleton-loader
         type="image"
         class="question-block-skeleton"

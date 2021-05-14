@@ -19,59 +19,21 @@
       hide-overlay
       transition="dialog-bottom-transition"
     >
-      <v-card>
-        <v-card-title class="add-collection-title-bar">
-          <span>Add Collection</span>
-        </v-card-title>
-        <v-card-text>
-          <v-container>
-            <v-row>
-              <v-col cols="12" sm="6" md="4">
-                <v-text-field label="Collection name*" required></v-text-field>
-              </v-col>
-              <v-col cols="12" sm="6">
-                <v-select
-                  :items="['Everday', '3 days', '1 week', '2 weeks', '3 weeks']"
-                  label="Review Period*"
-                  required
-                ></v-select>
-              </v-col>
-              <v-col cols="12" sm="6">
-                <v-combobox
-                  v-model="verseToBeAdd"
-                  hide-selected
-                  label="Add Some Verses"
-                  small-chips
-                  multiple
-                  deletable-chips
-                >
-                  <template v-slot:no-data>
-                    <v-list-item>
-                      <v-list-item-content>
-                        <v-list-item-title style="overflow: wrap">
-                          Press <kbd>enter</kbd> to add
-                          <strong>{{ search }}</strong>
-                        </v-list-item-title>
-                      </v-list-item-content>
-                    </v-list-item>
-                  </template>
-                </v-combobox>
-              </v-col>
-            </v-row>
-          </v-container>
-          <small>*indicates required field</small>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" text @click="isAddCollection = false">
-            Close
-          </v-btn>
-          <v-btn color="blue darken-1" text @click="this.addCollection()">
-            Save
-          </v-btn>
-        </v-card-actions>
-      </v-card>
+      <add-new-collection
+        @closeDialog="refreshCollection()"
+        @success="addSuccess()"
+        @fail="addFail()"
+      />
     </v-dialog>
+    <v-snackbar v-model="isSnackbar" :timeout="timeout">
+      {{ snackbarMsg }}
+
+      <template v-slot:action="{ attrs }">
+        <v-btn color="white" text v-bind="attrs" @click="isSnackbar = false">
+          Close
+        </v-btn>
+      </template>
+    </v-snackbar>
     <section class="collection-container">
       <v-fab-transition>
         <v-btn class="fab-add-collection" color="#d5e37d" fab right>
@@ -126,18 +88,19 @@
 
 <script>
 import firebase from "firebase";
+import AddNewCollection from "./addNewCollection.vue";
 
 export default {
   data: () => ({
     collection: [],
     isGridView: false,
     isAddCollection: false,
-    verseToBeAdd: [],
+    snackbarMsg: "",
+    timeout: 2000,
+    isSnackbar: false,
   }),
-  watch: {
-    verseToBeAdd: function () {
-      console.log(this.verseToBeAdd);
-    },
+  components: {
+    AddNewCollection,
   },
   computed: {
     getAvatarName() {
@@ -148,11 +111,17 @@ export default {
     },
   },
   methods: {
-    addCollection() {
-      console.log("save new collection");
+    addSuccess() {
+      this.snackbarMsg = "Collection successfully added";
+      this.isSnackbar = true;
+    },
+    addFail() {
+      this.snackbarMsg = "Fail to add the collection";
+      this.isSnackbar = true;
     },
     getCollection() {
       const db = firebase.firestore();
+      this.collection = [];
 
       db.collection("users")
         .doc(this.getUserId)
@@ -163,8 +132,8 @@ export default {
             this.collection.push({
               id: doc.id,
               name: doc.data().name,
-              last_review: doc.data().id,
-              review_period: doc.data().review_period,
+              lastReview: doc.data().id,
+              reviewPeriod: doc.data().review_period,
             });
           });
 
@@ -183,6 +152,10 @@ export default {
     },
     changeRoute(rn) {
       this.$router.push(rn);
+    },
+    refreshCollection() {
+      this.getCollection();
+      this.isAddCollection = false;
     },
   },
   created() {
