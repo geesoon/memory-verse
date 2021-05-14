@@ -8,22 +8,17 @@
         <div class="btn reset-button" @click="resetQuestion">
           <span class="material-icons"> restart_alt </span>
         </div>
+        <div class="btn previous-button" @click="previousVerse">
+          <span class="material-icons"> skip_previous </span>
+        </div>
         <div class="btn next-button" @click="nextVerse">
           <span class="material-icons"> skip_next </span>
         </div>
-        <!-- <div
-          id="auto-button"
-          class="btn auto-off-button"
-          @click="toggleAutoVerse"
-        >
-          <span class="material-icons" v-if="isAutoVerse"> toggle_on </span>
-          <span class="material-icons" v-else> toggle_off </span>
-        </div> -->
         <div class="btn more-button" @click="isShowOptions = true">
           <span class="material-icons"> more_vert </span>
         </div>
         <v-bottom-sheet v-model="isShowOptions">
-          <v-sheet height="200px">
+          <v-sheet height="240px">
             <v-list class="option-container">
               <v-list-item
                 v-for="(item, key) in this.getOptionItems"
@@ -40,6 +35,24 @@
                 }}</v-list-item-title>
                 <v-divider></v-divider>
               </v-list-item>
+            </v-list>
+          </v-sheet>
+        </v-bottom-sheet>
+        <v-bottom-sheet v-model="isShowDifficulty">
+          <v-sheet height="160px">
+            <v-list class="option-container">
+              <v-list-item-group>
+                <v-list-item
+                  v-for="(item, key) in level"
+                  :key="key"
+                  @click="changeDifficulty(item)"
+                >
+                  <v-list-item-title class="option-text">{{
+                    item
+                  }}</v-list-item-title>
+                  <v-divider></v-divider>
+                </v-list-item>
+              </v-list-item-group>
             </v-list>
           </v-sheet>
         </v-bottom-sheet>
@@ -75,15 +88,13 @@
           </div>
         </div>
         <div class="progress">
-          <div
+          <v-progress-linear
             id="bar"
-            class="progress-bar progress-bar-striped in-progress"
-            role="progressbar"
-            style="width: 0%"
-            aria-valuenow="0"
-            aria-valuemin="0"
-            aria-valuemax="100"
-          ></div>
+            :value="score"
+            class="in-progress"
+            color="darkgreen"
+            background-color="white"
+          ></v-progress-linear>
         </div>
       </div>
       <!-- use blankLocation length as the key to force draggable to rerender everytime user drag and drop successfully -->
@@ -141,11 +152,14 @@ export default {
       isQuestionConstructed: false /**Indicator for complete question constructed */,
       isVerseCorrect: false /**Indicator for 100% */,
       isAutoVerse: true /**Indicator for auto toggle */,
+      isShowDifficulty: false,
       isShowOptions: false,
       selectedOption: "",
       snackbarMsg: "",
       timeout: 2000,
       isSnackbar: false,
+      score: 0,
+      level: ["Easy", "Medium", "Hard"],
     };
   },
   computed: {
@@ -159,11 +173,16 @@ export default {
       let opts = [];
       if (this.isAutoVerse) {
         opts = [
+          { text: "Change Difficulty", icon: "settings" },
+          { text: "Change Bible Version", icon: "book" },
           { text: "Add to collection", icon: "playlist_add" },
           { text: "Turn off auto-verse", icon: "toggle_on" },
         ];
       } else {
         opts = [
+          { text: "Change Difficulty", icon: "settings" },
+          { text: "Change Bible Version", icon: "book" },
+          { text: "Turn on auto-verse", icon: "toggle_off" },
           { text: "Add to collection", icon: "playlist_add" },
           { text: "Turn on auto-verse", icon: "toggle_off" },
         ];
@@ -175,42 +194,49 @@ export default {
     draggable,
   },
   methods: {
+    changeDifficulty(opt) {
+      this.$store.commit("setLevel", opt);
+      this.isShowDifficulty = false;
+      this.resetQuestion();
+    },
     chooseOption(opt) {
       switch (opt) {
         case "Turn on auto-verse":
           this.isAutoVerse = true;
           this.snackbarMsg = "Auto-verse is on";
+          setTimeout(() => {
+            this.isSnackbar = true;
+          }, 400);
           this.checkScore();
           break;
         case "Turn off auto-verse":
           this.isAutoVerse = false;
           this.snackbarMsg = "Auto-verse is off";
+          setTimeout(() => {
+            this.isSnackbar = true;
+          }, 400);
           break;
         case "Add to collection":
-          console.log("add to collection");
           this.snackbarMsg = "Added to collection";
+          setTimeout(() => {
+            this.isSnackbar = true;
+          }, 400);
           break;
+        case "Change Difficulty":
+          this.isShowDifficulty = true;
       }
-      setTimeout(() => {
-        this.isShowOptions = false;
-      }, 300);
-
-      setTimeout(() => {
-        this.isSnackbar = true;
-      }, 400);
+      this.isShowOptions = false;
     },
     isSortable() {
       /**return false to disable block from sorting while user drag and to avoid vue-draggable from targeting the wrong block as it sorts */
       return false;
     },
-    checkScore(score) {
+    checkScore() {
       /**Cater for auto button
        * Check if score is 100% if true then fetch the next verse automatically */
-      if (score == null) {
-        score = document.getElementById("bar").style.width.split("%")[0];
-      }
-      if (score == 100 && this.isAutoVerse == true) {
+      if (this.score == 100 && this.isAutoVerse == true) {
         setTimeout(() => {
+          this.score = 0;
           this.nextVerse();
         }, 500);
       }
@@ -236,12 +262,23 @@ export default {
     },
     nextVerse() {
       /**Reset the component data and fetch the next verse */
+      this.score = 0;
       this.verse = [];
       this.answer = [];
       this.blankLocation = [];
       this.isVerseCorrect = false;
       this.isQuestionConstructed = false;
       this.fetchVerse(this.getSelection.next);
+    },
+    previousVerse() {
+      /**Reset the component data and fetch the next verse */
+      this.score = 0;
+      this.verse = [];
+      this.answer = [];
+      this.blankLocation = [];
+      this.isVerseCorrect = false;
+      this.isQuestionConstructed = false;
+      this.fetchVerse(this.getSelection.previous);
     },
     resetQuestion() {
       /**Reset the question and the component data */
@@ -318,15 +355,8 @@ export default {
     },
     updateScore() {
       /**Update the score bar and score */
-      let score = this.calculateScore();
-      let bar = document.getElementById("bar");
-      bar.style.width = `${score}%`;
-      if (score == 100) {
-        bar.classList = "progress-bar progress-bar-striped finished";
-      } else {
-        bar.classList = "progress-bar progress-bar-striped in-progress";
-      }
-      this.checkScore(score);
+      this.score = this.calculateScore();
+      this.checkScore();
     },
     fetchVerse(nextVerse) {
       /**Fetch verse based on either the current verse selection or by next verse id */
@@ -372,6 +402,7 @@ export default {
             verses: "",
             chapter: "",
             next: "",
+            previous: "",
           };
 
           let firstHalf = data.data.reference.split(":")[0];
@@ -384,6 +415,7 @@ export default {
           updatedSelection.chapter = chapter;
           updatedSelection.book.id = data.data.bookId;
           updatedSelection.next = data.data.next.id;
+          updatedSelection.previous = data.data.previous.id;
           this.$store.commit("setSelection", updatedSelection);
 
           this.constructQuestion();
@@ -398,7 +430,6 @@ export default {
        * 25% blank for Medium
        * 50% blank for Hard
        */
-      console.log(this.getLevel);
       if (this.getLevel == "Easy") {
         replacePercentage = 0.1;
       } else if (this.getLevel == "Medium") {
@@ -504,6 +535,7 @@ export default {
 .back-button,
 .reset-button,
 .next-button,
+.previous-button,
 .auto-off-button {
   border: 1px solid black !important;
   padding: 0.5rem !important;
@@ -515,6 +547,7 @@ export default {
   cursor: pointer;
 }
 
+.previous-button:focus,
 .more-button:focus,
 .back-button:focus,
 .reset-button:focus,
@@ -536,7 +569,8 @@ export default {
 .auto-on-button,
 .auto-off-button,
 .reset-button,
-.next-button {
+.next-button,
+.previous-button {
   margin-right: 0.5rem;
 }
 
@@ -669,6 +703,7 @@ export default {
   .back-button,
   .reset-button,
   .next-button,
+  .previous-button,
   .auto-off-button {
     border: 1px solid black !important;
     padding: 0.5rem;
@@ -689,11 +724,13 @@ export default {
     font-weight: bold !important;
   }
 
+  .previous-button,
   .reset-button,
   .next-button {
     margin-right: 0.5rem;
   }
 
+  .previous-button:hover,
   .back-button:hover,
   .reset-button:hover,
   .next-button:hover {

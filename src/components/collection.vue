@@ -111,6 +111,24 @@
       </v-card>
     </v-dialog>
 
+    <!-- Change review period bottom sheet -->
+    <v-bottom-sheet v-model="isShowReviewPeriodOptions">
+      <v-sheet height="260px">
+        <v-list class="option-container">
+          <v-list-item
+            v-for="(item, key) in reviewPeriodOptions"
+            :key="key"
+            @click="changeReviewPeriod(item)"
+          >
+            <v-list-item-title class="option-text">{{
+              item
+            }}</v-list-item-title>
+            <v-divider></v-divider>
+          </v-list-item>
+        </v-list>
+      </v-sheet>
+    </v-bottom-sheet>
+
     <!-- Edit Collection Item Options -->
     <v-bottom-sheet v-model="isShowVerseOptions">
       <v-sheet height="130px">
@@ -158,6 +176,8 @@ export default {
       { text: "Add to other Collection", icon: "playlist_add" },
     ],
     isShowDeleteConfirmationDialog: false,
+    isShowReviewPeriodOptions: false,
+    reviewPeriodOptions: ["Everyday", "3 days", "1 week", "2 weeks", "3 weeks"],
     editVerse: {},
   }),
   computed: {
@@ -243,6 +263,9 @@ export default {
       console.log(opt);
       if (opt == "Delete Collection") {
         this.isShowDeleteConfirmationDialog = true;
+      } else if (opt == "Change Review Period") {
+        this.isShowReviewPeriodOptions = true;
+        this.isShowCollectionOptions = false;
       }
     },
     chooseCollectionItemOption(opt) {
@@ -275,7 +298,7 @@ export default {
           console.log("Successfully remove verse from the collection");
         })
         .catch((error) => {
-          console.log("Error getting users collection info", error);
+          console.log("Error removing verse from the collection", error);
         });
       this.isShowVerseOptions = false;
     },
@@ -287,6 +310,24 @@ export default {
     },
     reviewAll() {
       /** Pass list of verses to answer panel */
+    },
+    changeReviewPeriod(period) {
+      const db = firebase.firestore();
+      db.collection("users")
+        .doc(this.getUserId)
+        .collection("collection")
+        .doc(this.getCollectionId)
+        .update({
+          reviewPeriod: period,
+        })
+        .then(() => {
+          console.log("Successfully the collection's review period");
+        })
+        .catch((error) => {
+          console.log("Error to update the collection's review period", error);
+        });
+      this.isShowReviewPeriodOptions = false;
+      this.getCollectionDetail();
     },
   },
   created() {

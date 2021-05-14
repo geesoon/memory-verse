@@ -4,6 +4,7 @@ const state = {
     chapter: "",
     verses: "",
     next: "",
+    previous: "",
   },
   level: "Easy",
   isStartAlert: false,
@@ -26,6 +27,7 @@ const mutations = {
     state.selection.chapter = selection.chapter;
     state.selection.verses = selection.verses;
     state.selection.next = selection.next;
+    state.selection.previous = selection.previous;
   },
   setStartAlert(state, alert) {
     state.isStartAlert = alert;
@@ -43,6 +45,9 @@ const mutations = {
   setNext(state, next) {
     state.selection.next = next;
   },
+  setPrevious(state, previous) {
+    state.selection.previous = previous;
+  },
   setLevel(state, level) {
     state.level = level;
   },
@@ -52,6 +57,7 @@ const mutations = {
     state.selection.chapter = "";
     state.selection.verses = "";
     state.selection.next = "";
+    state.selection.previous = "";
     state.isStartAlert = false;
   },
 };
