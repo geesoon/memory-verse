@@ -3,13 +3,28 @@ import App from "./App.vue";
 import "./registerServiceWorker";
 import router from "./router";
 import store from "./store";
-import "bootstrap";
-import "bootstrap/dist/css/bootstrap.min.css";
+import firebase from "firebase";
+import vuetify from "./plugins/vuetify";
 
 Vue.config.productionTip = false;
+
+var firebaseConfig = {
+  apiKey: "AIzaSyATq45dS7FJsdZGoYQTLlWS3JbzK1G4SZc",
+  authDomain: "memory-verse-app.firebaseapp.com",
+  projectId: "memory-verse-app",
+  storageBucket: "memory-verse-app.appspot.com",
+  messagingSenderId: "467984320988",
+  appId: "1:467984320988:web:2b71fd8935a2869b30e719",
+  measurementId: "G-EZ0TKRW3T4",
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+firebase.analytics();
 
 new Vue({
   router,
   store,
+  vuetify,
   render: (h) => h(App),
 }).$mount("#app");
