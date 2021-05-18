@@ -290,7 +290,7 @@ export default {
       this.fetchVerse();
     },
     goToMenu() {
-      this.$router.replace("dashboard");
+      this.$router.replace({ name: "main" });
     },
     dragEnd(evt) {
       // Compare the drop location to all blank location, if match then replace else return to the answer pool

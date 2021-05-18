@@ -4,7 +4,7 @@
       <div class="my-collection-bar">
         <div
           class="avatar-container library-avatar"
-          @click="goToView('Profile')"
+          @click="changeRoute('profile')"
         >
           <div class="avatar-circle">{{ this.getAvatarName }}</div>
         </div>
@@ -88,7 +88,7 @@
 
 <script>
 import firebase from "firebase";
-import AddNewCollection from "./addNewCollection.vue";
+import AddNewCollection from "../components/addNewCollection.vue";
 
 export default {
   data: () => ({
@@ -145,13 +145,10 @@ export default {
     },
     showCollection(selectedCollection) {
       this.$store.commit("setCollectionId", selectedCollection.id);
-      this.$store.commit("setView", "Collection");
-    },
-    goToView(view) {
-      this.$store.commit("setView", view);
+      this.$router.push({ name: "collection" });
     },
     changeRoute(rn) {
-      this.$router.push(rn);
+      this.$router.push({ name: rn });
     },
     refreshCollection() {
       this.getCollection();

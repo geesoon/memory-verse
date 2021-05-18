@@ -8,25 +8,52 @@ Vue.use(VueRouter);
 const routes = [
   {
     path: "/",
-    name: "Login",
+    name: "login",
     component: Login,
   },
   {
     path: "/register",
-    name: "Register",
+    name: "register",
     component: () => import("../views/Register.vue"),
   },
   {
     path: "/dashboard",
-    name: "Dashboard",
+    name: "dashboard",
     component: () => import("../views/Dashboard.vue"),
     meta: {
       authRequired: true,
     },
+    children: [
+      {
+        path: "main",
+        name: "main",
+        component: () => import("../views/Home.vue"),
+      },
+      {
+        path: "profile",
+        name: "profile",
+        component: () => import("../views/Profile.vue"),
+      },
+      {
+        path: "review",
+        name: "review",
+        component: () => import("../views/Review.vue"),
+      },
+      {
+        path: "library",
+        name: "library",
+        component: () => import("../views/Library.vue"),
+      },
+      {
+        path: "collection",
+        name: "collection",
+        component: () => import("../views/Collection.vue"),
+      },
+    ],
   },
   {
     path: "/answer",
-    name: "AnswerPanel",
+    name: "answer",
     component: () => import("../views/AnswerPanel.vue"),
     meta: {
       authRequired: true,

@@ -61,8 +61,7 @@ export default {
               id: doc.id,
             });
           });
-
-          this.$router.push("/dashboard");
+          this.$router.replace("/dashboard/main");
         })
         .catch((error) => {
           console.log("Error getting users id", error);

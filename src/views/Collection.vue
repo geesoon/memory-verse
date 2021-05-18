@@ -2,7 +2,7 @@
   <section>
     <v-toolbar flat light>
       <div class="collection-nav-bar">
-        <span class="material-icons" @click="goBack()"> arrow_back </span
+        <span class="material-icons" @click="popRoute()"> arrow_back </span
         ><span class="material-icons" @click="isShowCollectionOptions = true">
           more_vert
         </span>
@@ -192,6 +192,9 @@ export default {
     },
   },
   methods: {
+    popRoute() {
+      this.$router.back();
+    },
     getCollectionDetail() {
       const db = firebase.firestore();
 
@@ -301,9 +304,6 @@ export default {
           console.log("Error removing verse from the collection", error);
         });
       this.isShowVerseOptions = false;
-    },
-    goBack() {
-      this.$store.commit("setView", "Library");
     },
     addVerseToCollection() {
       console.log("add verse");

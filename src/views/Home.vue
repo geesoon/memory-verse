@@ -1,10 +1,10 @@
 <template>
   <section>
     <div class="header-bar">
-      <div class="home-title-header" @click="goToView('Home')">
+      <div class="home-title-header" @click="changeRoute('dashboard')">
         Memory Verse
       </div>
-      <div class="avatar-container" @click="goToView('Profile')">
+      <div class="avatar-container" @click="changeRoute('profile')">
         <div class="avatar-circle">{{ this.getAvatarName }}</div>
       </div>
     </div>
@@ -102,8 +102,8 @@
 
 <script>
 import firebase from "firebase";
+import bibleBookPanel from "../components/bibleBookPanel";
 import booksChapter from "../data/book.json";
-import bibleBookPanel from "../components/bibleBookPanel.vue";
 
 export default {
   data: () => ({
@@ -127,6 +127,9 @@ export default {
     getUserId() {
       return this.$store.getters.getUserInfo.id;
     },
+    getUserEmail() {
+      return firebase.auth().currentUser.email;
+    },
   },
   watch: {
     level: function () {
@@ -142,11 +145,11 @@ export default {
     },
     goToCollection(item) {
       this.$store.commit("setCollectionId", item.id);
-      this.$store.commit("setView", "Collection");
+      this.$router.push({ name: "collection" });
     },
     showAllBook() {},
     changeRoute(rn) {
-      this.$router.push(rn);
+      this.$router.push({ name: rn.toLowerCase() });
     },
     startAnswering(ref) {
       this.$store.commit("setBook", { name: ref.name, id: ref.id });
@@ -199,16 +202,14 @@ export default {
     },
   },
   created() {
+    this.getCollection();
+    this.getRecent();
     let avatarName = firebase
       .auth()
       .currentUser.email.split("")[0]
       .toUpperCase();
     this.$store.commit("setAvatarName", avatarName);
     this.selectedBook = "";
-  },
-  mounted() {
-    this.getCollection();
-    this.getRecent();
   },
 };
 </script>
