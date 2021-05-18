@@ -1,7 +1,7 @@
 <template>
   <section class="profile-container">
     <div class="profile-nav-bar">
-      <span class="material-icons" @click="goBack()"> arrow_back </span>
+      <span class="material-icons" @click="popState()"> arrow_back </span>
     </div>
     <div class="profilePic">
       <div class="avatar">{{ this.getAvatarName }}</div>
@@ -28,8 +28,8 @@ export default {
     },
   },
   methods: {
-    goBack() {
-      this.$store.commit("setView", this.getPreviousView);
+    popState() {
+      this.$router.back();
     },
     getUserEmail() {
       return firebase.auth().currentUser.email;

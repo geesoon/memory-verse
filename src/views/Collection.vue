@@ -228,7 +228,7 @@ export default {
         .delete()
         .then(() => {
           console.log("Successfully deleted the collection");
-          this.$store.commit("setView", "Library");
+          this.$router.replace({ name: "library" });
         })
         .catch((error) => {
           console.log("Error getting users collection info", error);
@@ -243,12 +243,9 @@ export default {
       this.isShowVerseOptions = true;
     },
     goToAnswer(verse) {
-      console.log("Go to review", verse);
-      let verseSplit = verse.split(" ");
-      let bookId = verseSplit[0];
-
-      let chapter = verseSplit[1].split(":")[0];
-      let verses = verseSplit[1].split(":")[1];
+      let bookId = verse.id;
+      let chapter = verse.chapter;
+      let startVerse = verse.startVerse;
 
       let selection = {
         book: {
@@ -256,11 +253,10 @@ export default {
           name: "",
         },
         chapter: chapter,
-        verses: verses,
+        verses: startVerse,
       };
-      console.log(selection);
       this.$store.commit("setSelection", selection);
-      this.$router.push("/answer");
+      this.$router.replace("/answer");
     },
     chooseCollectionOption(opt) {
       console.log(opt);

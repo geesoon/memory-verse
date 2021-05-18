@@ -1,7 +1,7 @@
 <template>
   <section>
     <div class="header-bar">
-      <div class="home-title-header" @click="changeRoute('dashboard')">
+      <div class="home-title-header" @click="changeRoute('main')">
         Memory Verse
       </div>
       <div class="avatar-container" @click="changeRoute('profile')">
@@ -13,10 +13,6 @@
         <p>In the beginning, God created the heaven and the earth</p>
         <p style="text-align: right">- Gen 1:1</p>
       </div>
-      <!-- <v-skeleton-loader
-        type="image"
-        style="width: 30vw; height: 6rem"
-      ></v-skeleton-loader> -->
       <div class="difficulty">
         <div class="section-title">Difficulty</div>
         <v-btn-toggle
@@ -31,7 +27,7 @@
           <v-btn value="Hard"> Hard </v-btn>
         </v-btn-toggle>
       </div>
-      <div class="recent-memorized">
+      <div class="recent-memorized" v-if="recent.length == 0">
         <div class="section-title">Recently Memorized</div>
         <div class="recent-list">
           <div
@@ -44,7 +40,7 @@
           </div>
         </div>
       </div>
-      <div class="collection">
+      <div class="collection" v-if="collection.length != 0">
         <div class="section-title">Your Collection</div>
         <div class="collection-list">
           <div
@@ -60,7 +56,6 @@
       <div class="bible-books">
         <div class="bible-books-bar">
           <div class="section-title">Bible Books</div>
-          <!-- <div class="show-all-book-btn" @click="showAllBook"></div> -->
           <v-dialog
             v-model="isShowAllBook"
             width="500"
@@ -75,14 +70,12 @@
                 color="transparent"
                 v-bind="attrs"
                 v-on="on"
+                @click="showAllBook()"
               >
                 Show All
               </v-btn>
             </template>
-            <bible-book-panel
-              @closeDialog="isShowAllBook = false"
-              :book="selectedBook"
-            />
+            <bible-book-panel @closeDialog="isShowAllBook = false" />
           </v-dialog>
         </div>
         <div class="bible-books-list">
@@ -90,9 +83,9 @@
             v-for="n in 15"
             :key="n"
             class="book-item"
-            @click="showBookChapter(bibleBooks[n])"
+            @click="showBookChapter(bibleBooks[n - 1].id)"
           >
-            {{ bibleBooks[n].abbreviation }}
+            {{ bibleBooks[n - 1].abbreviation }}
           </div>
         </div>
       </div>
@@ -107,9 +100,9 @@ import booksChapter from "../data/book.json";
 
 export default {
   data: () => ({
-    selectedBook: "",
+    selectedBookId: "",
     isShowAllBook: false,
-    level: "Easy",
+    level: "",
     recent: [],
     collection: [],
     bibleBooks: booksChapter.books,
@@ -137,7 +130,9 @@ export default {
     },
   },
   methods: {
-    showBookChapter() {
+    showBookChapter(bookId) {
+      this.$store.commit("setBibleBookSelectionPanelView", "chapter");
+      this.$store.commit("setSelectedBookId", bookId);
       this.isShowAllBook = true;
     },
     goToView(view) {
@@ -147,9 +142,13 @@ export default {
       this.$store.commit("setCollectionId", item.id);
       this.$router.push({ name: "collection" });
     },
-    showAllBook() {},
+    showAllBook() {
+      this.$store.commit("setBibleBookSelectionPanelView", "book");
+    },
     changeRoute(rn) {
-      this.$router.push({ name: rn.toLowerCase() });
+      if (this.$route.name != rn) {
+        this.$router.push({ name: rn.toLowerCase() });
+      }
     },
     startAnswering(ref) {
       this.$store.commit("setBook", { name: ref.name, id: ref.id });
@@ -210,6 +209,7 @@ export default {
       .toUpperCase();
     this.$store.commit("setAvatarName", avatarName);
     this.selectedBook = "";
+    this.level = this.getLevel;
   },
 };
 </script>
@@ -273,6 +273,10 @@ export default {
 
 .difficulty {
   margin-bottom: 1rem;
+}
+
+.bible-books {
+  padding-bottom: 3rem;
 }
 
 .bible-books,

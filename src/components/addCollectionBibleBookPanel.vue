@@ -83,6 +83,10 @@
           </div>
         </div>
       </div>
+
+      <v-btn class="fab-add-collection" fab right @click="closeDialog()"
+        >Add</v-btn
+      >
     </v-container>
   </v-card>
 </template>
@@ -127,16 +131,19 @@ export default {
         this.$store.commit("setBibleBookSelectionPanelView", "chapter");
       }
     },
+    closeDialog() {
+      this.$emit("closeDialog");
+    },
     updateSelectionVerse(verseNum) {
       /**
        * Update the verse button text to the selected verse book:chapter:verse & reset the panel state
        */
       this.$store.commit("setVerses", verseNum);
-      this.$router.push("/answer");
+      // this.$emit("closeDialog");
     },
     resetPanelState() {
       this.$store.commit("resetSelection");
-      this.$emit("closeDialog");
+      this.closeDialog();
     },
     showChaptersVersesPanel(chapterNum) {
       /**
@@ -214,189 +221,3 @@ export default {
   },
 };
 </script>
-
-<style>
-.verse-nav-bar {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  height: 5vh;
-}
-
-/* Select book */
-.testament-title {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  padding: 0.5rem;
-  border-radius: 5px;
-  font-size: 1.5rem;
-  font-weight: bold;
-  text-align: start;
-}
-
-.books-overlay-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
-}
-
-.chapters-overlay-container,
-.verses-overlay-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: flex-start;
-}
-
-.books-list-container {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-}
-
-.verse-list-container,
-.chapter-list-container {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-}
-
-.books-title,
-.book-verses-title {
-  border-radius: 5px;
-  background-color: #d5e37d;
-  padding: 1rem;
-  margin: 0.5rem;
-  font-size: 1rem;
-  font-weight: bold;
-  text-align: left;
-  cursor: pointer;
-}
-
-.chapter-title-box:hover,
-.books-title:hover {
-  box-shadow: 10px 10px;
-  background-color: #d5e37d;
-  border-radius: 5px;
-  transition: 0.5s;
-}
-
-.book-verses-title {
-  font-size: 1.5rem !important;
-  background-color: #d5e37d;
-  padding: 0.5rem;
-  border-radius: 5px;
-  box-shadow: 10px 10px;
-}
-
-.verse-title-box,
-.chapter-title-box {
-  padding: 1rem;
-  margin: 0.5rem;
-  border: 2px solid black;
-  border-radius: 5px;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  border-radius: 5px;
-}
-
-.selection-panel-overlay {
-  width: 100vw;
-  overflow-y: scroll;
-  padding-bottom: 5rem;
-}
-
-/* General */
-.loading-container {
-  width: 100%;
-  text-align: center;
-}
-
-.selection-buttons {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-.panel-buttons {
-  margin: 0.5rem;
-  min-width: 100px;
-  width: 250px;
-}
-
-#verse-button {
-  border-radius: 5px;
-  border: 1px solid black;
-}
-
-#level-button:hover,
-#verse-button:hover,
-#start-button:hover {
-  box-shadow: 1px 1px 1px 1px black;
-}
-
-#level-button {
-  border-radius: 5px !important;
-  border: 1px solid black !important;
-}
-
-#start-button {
-  background-color: #d5e37d;
-  border-radius: 5px;
-  border: 1px solid black;
-}
-
-#level-dropdown {
-  width: 100%;
-  text-align: center;
-}
-
-#dropdown-item:focus {
-  background-color: lightgreen;
-}
-
-.dropdown-toggle::after {
-  display: none !important;
-}
-
-@media only screen and (min-width: 768px) {
-  .verse-list-container,
-  .chapter-list-container,
-  .books-list-container {
-    grid-gap: 0.5rem;
-    grid-template-columns: repeat(8, 1fr);
-  }
-}
-
-@media only screen and (min-width: 1024px) {
-  .verse-selection-container {
-    width: 50vw !important;
-  }
-
-  .verse-title-box:hover {
-    box-shadow: 10px 10px;
-    background-color: #d5e37d;
-    border-radius: 5px;
-    transition: 0.5s;
-  }
-
-  /* Select book */
-  .testament-title {
-    background-color: #d5e37d;
-    padding: 0.5rem;
-    border-radius: 5px;
-    box-shadow: 10px 10px;
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin: 1rem 0rem;
-    text-align: start;
-  }
-}
-</style>

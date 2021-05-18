@@ -211,7 +211,7 @@ export default {
 }
 
 .fab-add-collection {
-  position: absolute;
+  position: fixed;
   bottom: 5rem;
   right: 2rem;
   z-index: 4;

@@ -37,31 +37,38 @@
             ></v-select>
           </v-col>
           <v-col cols="12" md="12">
-            <v-combobox
-              outlined
-              v-model="newCollection.verseToBeAdd"
-              :search-input.sync="search"
-              hide-selected
-              label="Add Verse"
-              chips
-              multiple
-              persistent-hint
-              deletable-chips
-              placeholder="e.g. Jn 1:1"
+            <v-dialog
+              v-model="isShowAllBook"
+              width="500"
+              fullscreen
+              hide-overlay
+              transition="dialog-bottom-transition"
             >
-              <template v-slot:no-data>
-                <v-list-item>
-                  <v-list-item-content>
-                    <v-list-item-title style="overflow: wrap">
-                      Press <kbd>enter</kbd> to add
-                      <strong
-                        >{{ search }}- {{ newCollection.bibleVersion }}</strong
-                      >
-                    </v-list-item-title>
-                  </v-list-item-content>
-                </v-list-item>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  color="transparent"
+                  v-bind="attrs"
+                  v-on="on"
+                  @click="showAllBook()"
+                >
+                  Add Verses
+                </v-btn>
               </template>
-            </v-combobox>
+              <addCollectionBibleBookPanel
+                @closeDialog="updateVerseAdded()"
+              ></addCollectionBibleBookPanel>
+            </v-dialog>
+          </v-col>
+          <v-col cols="12" md="12">
+            <v-row
+              ><div v-for="(verse, key) in versesAdded" :key="key">
+                <v-chip
+                  >{{ verse.book.name }} {{ verse.chapter }}:{{
+                    verse.verses
+                  }}</v-chip
+                >
+              </div></v-row
+            >
           </v-col>
         </v-row>
       </v-container>
@@ -79,10 +86,13 @@
 
 <script>
 import firebase from "firebase";
+import bible from "../data/book.json";
+import addCollectionBibleBookPanel from "../components/addCollectionBibleBookPanel";
 
 export default {
   data: () => ({
-    search: "",
+    isShowAllBook: false,
+    versesAdded: [],
     newCollection: {
       name: "",
       reviewPeriod: "Everyday",
@@ -91,6 +101,9 @@ export default {
       formattedVerses: [],
     },
   }),
+  components: {
+    addCollectionBibleBookPanel,
+  },
   watch: {
     "newCollection.verseToBeAdd": function () {
       this.newCollection.verseToBeAdd[
@@ -106,8 +119,19 @@ export default {
     getUserId() {
       return this.$store.getters.getUserInfo.id;
     },
+    getSelectedVerse() {
+      return this.$store.getters.getVerseInfo.selection;
+    },
   },
   methods: {
+    updateVerseAdded() {
+      this.isShowAllBook = false;
+      this.versesAdded.push(this.getSelectedVerse);
+    },
+    showAllBook() {
+      this.isShowAllBook = true;
+      this.$store.commit("setBibleBookSelectionPanelView", "book");
+    },
     addCollection() {
       console.log(this.newCollection);
 
@@ -137,40 +161,61 @@ export default {
     formatVerseToAdd() {
       /**Construct verse object from array of string in verseToAdd to be added to the database*/
       let verses = [...this.newCollection.verseToBeAdd];
-      verses.forEach((ref) => {
-        let bibleVersion = "";
-        let chapter = "";
-        let startVerse = "";
-        let endVerse = "";
-        let book = "";
+      var format = /[!@#$%^&*()_+=[]{};'"|,.<>\/?]+/;
 
-        bibleVersion = ref.split("(")[1].split(")")[0];
-        // Book & Chapter
-        if (ref.search(":") == -1) {
-          console.log("Book & Chapter", ref);
-          book = ref.split(" (")[0].split(" ").slice(0, -1).join(" ");
-          chapter = ref.split(" (")[0].split(" ").slice(-1).join("");
-        } else if (ref.search("-") == -1) {
-          // Book Chapter:Verse
-          console.log("Book Chapter:Verse", ref);
-          book = ref.split(":")[0].split(" ").slice(0, -1).join(" ");
-          startVerse = ref.split(":")[1].split(" (")[0];
-          endVerse = startVerse;
-        } else {
-          // Book Chapter:StartVerse-EndVerse
-          console.log("Book Chapter:StartVerse-EndVerse", ref);
-          chapter = ref.split(":")[0].split(" ").slice(-1).join();
-          startVerse = ref.split(":")[1].split("-")[0];
-          endVerse = ref.split("-")[1].split(" ")[0];
-          book = ref.split(":")[0].split(" ").slice(0, -1).join(" ");
+      verses.forEach((ref) => {
+        console.log(ref);
+        console.log(format.test(ref));
+        if (!format.test(ref)) {
+          let bibleVersion = "";
+          let chapter = "";
+          let startVerse = "";
+          let endVerse = "";
+          let book = "";
+          let bookId = "";
+
+          bibleVersion = ref.split("(")[1].split(")")[0];
+          // Book & Chapter
+          if (ref.search(":") == -1 && ref.search("-") == -1) {
+            console.log("Book & Chapter", ref);
+            book = ref.split(" (")[0].split(" ").slice(0, -1).join(" ");
+            chapter = ref.split(" (")[0].split(" ").slice(-1).join("");
+            startVerse = endVerse = 1;
+          } else if (ref.search("-") == -1 && ref.search(":") != -1) {
+            // Book Chapter:Verse
+            console.log("Book Chapter:Verse", ref);
+            book = ref.split(":")[0].split(" ").slice(0, -1).join(" ");
+            startVerse = ref.split(":")[1].split(" (")[0];
+            chapter = ref.split(":")[0].split(" ").slice(-1).join();
+            endVerse = startVerse;
+          } else {
+            // Book Chapter:StartVerse-EndVerse
+            console.log("Book Chapter:StartVerse-EndVerse", ref);
+            chapter = ref.split(":")[0].split(" ").slice(-1).join();
+            startVerse = ref.split(":")[1].split("-")[0];
+            endVerse = ref.split("-")[1].split(" ")[0];
+            book = ref.split(":")[0].split(" ").slice(0, -1).join(" ");
+          }
+
+          bookId = bible.books.filter((item) => {
+            return (
+              item.abbreviation.toLowerCase() ==
+                book.split(" ").join("").toLowerCase() ||
+              item.name.toLowerCase() == book.toLowerCase()
+            );
+          });
+
+          if (bookId.length != 0) {
+            this.newCollection.formattedVerses.push({
+              id: bookId[0].id,
+              book: book,
+              chapter: chapter,
+              startVerse: startVerse,
+              endVerse: endVerse,
+              bibleVersion: bibleVersion,
+            });
+          }
         }
-        this.newCollection.formattedVerses.push({
-          book: book,
-          chapter: chapter,
-          startVerse: startVerse,
-          endVerse: endVerse,
-          bibleVersion: bibleVersion,
-        });
       });
     },
     closeDialog() {
