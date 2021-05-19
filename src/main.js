@@ -28,3 +28,9 @@ new Vue({
   vuetify,
   render: (h) => h(App),
 }).$mount("#app");
+
+// Reverse the order of collection item to make sure the latest one stay on top of the list
+Vue.filter("reverse", function (value) {
+  // slice to make a copy of array, then reverse the copy
+  return value.slice().reverse();
+});

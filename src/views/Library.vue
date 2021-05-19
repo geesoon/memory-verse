@@ -36,8 +36,8 @@
     </v-snackbar>
     <section class="collection-container">
       <v-fab-transition>
-        <v-btn class="fab-add-collection" color="#d5e37d" fab right>
-          <span class="material-icons" @click="isAddCollection = true">
+        <v-btn class="fab-add-collection" color="primary" fab right>
+          <span class="material-icons" @click="goToSelectVerse()">
             playlist_add
           </span>
         </v-btn>
@@ -111,6 +111,10 @@ export default {
     },
   },
   methods: {
+    goToSelectVerse() {
+      this.$store.commit("resetSelection");
+      this.isAddCollection = true;
+    },
     addSuccess() {
       this.snackbarMsg = "Collection successfully added";
       this.isSnackbar = true;
@@ -176,7 +180,7 @@ export default {
 
 .my-collection-item {
   margin: 1rem 0rem;
-  background: #d5e37d;
+  background: var(--primary);
   text-align: left;
   box-shadow: 8px 0px 0px 0px;
 }
@@ -206,7 +210,7 @@ export default {
   justify-content: space-between;
   align-items: flex-start;
   padding: 1.5rem 1rem;
-  background: #d5e37d;
+  background: var(--primary);
   box-shadow: 8px 0px 0px 0px;
 }
 
@@ -218,7 +222,7 @@ export default {
 }
 
 .add-collection-title-bar {
-  background: #d5e37d;
+  background: var(--primary);
   font-weight: bold;
   font-size: 1.3rem;
 }

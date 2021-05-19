@@ -86,9 +86,7 @@
       </div>
     </v-container>
     <div class="select-verse-bar">
-      <button class="select-verse-btn" @click="finishSelection()">
-        Select Verses
-      </button>
+      <button class="select-verse-btn" @click="finishSelection()">Add</button>
     </div>
   </v-card>
 </template>
@@ -131,7 +129,7 @@ export default {
       } else if (this.getSelection.book.id == "") {
         alert("Please select a book");
       } else {
-        this.$emit("closeDialog");
+        this.$emit("updateVerse");
         this.$emit("answer");
       }
     },
@@ -139,8 +137,11 @@ export default {
       if (this.getBibleBookSelectionPanelView == "book") {
         this.$emit("closeDialog");
       } else if (this.getBibleBookSelectionPanelView == "chapter") {
+        this.$store.commit("setChapter", "");
         this.$store.commit("setBibleBookSelectionPanelView", "book");
       } else {
+        this.$store.commit("setStartVerse", "");
+        this.$store.commit("setEndVerse", "");
         this.$store.commit("setBibleBookSelectionPanelView", "chapter");
       }
     },

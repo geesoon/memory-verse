@@ -23,16 +23,32 @@
         @click="reviewAll()"
         >REVIEW ALL</v-btn
       >
-      <v-btn
-        outlined
-        rounded
-        x-small
-        color="green"
-        class="add-verse-btn"
-        @click="addVerseToCollection()"
+      <v-dialog
+        v-model="isShowAddVersePanel"
+        width="500"
+        fullscreen
+        hide-overlay
+        transition="dialog-bottom-transition"
       >
-        ADD VERSES
-      </v-btn>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn
+            outlined
+            rounded
+            x-small
+            color="green"
+            class="add-verse-btn"
+            v-bind="attrs"
+            v-on="on"
+            @click="showAddVersePanel()"
+          >
+            ADD VERSES
+          </v-btn>
+        </template>
+        <addCollectionBibleBookPanel
+          @updateVerse="updateVerseAdded()"
+          @closeDialog="closeAddVersePanel()"
+        ></addCollectionBibleBookPanel>
+      </v-dialog>
     </div>
     <div>
       <v-list subheader two-line class="list-view-collection">
@@ -42,22 +58,25 @@
           class="my-collection-item"
         >
           <v-list-item-content>
+            <!-- book chapter:start -->
             <v-list-item-title
               @click="goToAnswer(verse)"
-              v-if="verse.startVerse != verse.endVerse"
-              >{{ verse.book }} {{ verse.chapter }}:{{ verse.startVerse }}-{{
-                verse.endVerse
+              v-if="verse.endVerse == '' && verse.startVerse != ''"
+              >{{ verse.book.name }} {{ verse.chapter }}:{{
+                verse.startVerse
               }}</v-list-item-title
             >
+            <!-- book chapter -->
             <v-list-item-title
               @click="goToAnswer(verse)"
               v-else-if="verse.startVerse == '' && verse.endVerse == ''"
-              >{{ verse.book }} {{ verse.chapter }}</v-list-item-title
+              >{{ verse.book.name }} {{ verse.chapter }}</v-list-item-title
             >
+            <!-- book chapter:start-end -->
             <v-list-item-title @click="goToAnswer(verse)" v-else
-              >{{ verse.book }} {{ verse.chapter }}:{{
+              >{{ verse.book.name }} {{ verse.chapter }}:{{
                 verse.startVerse
-              }}</v-list-item-title
+              }}-{{ verse.endVerse }}</v-list-item-title
             >
             <v-list-item-subtitle>{{
               verse.bibleVersion
@@ -74,7 +93,7 @@
 
     <!-- Edit Collection Options -->
     <v-bottom-sheet v-model="isShowCollectionOptions">
-      <v-sheet height="240px">
+      <v-sheet height="200px">
         <v-list class="option-container">
           <v-list-item
             v-for="(item, key) in collectionOptions"
@@ -156,6 +175,7 @@
 
 <script>
 import firebase from "firebase";
+import addCollectionBibleBookPanel from "../components/bibleBookPanel.vue";
 
 export default {
   data: () => ({
@@ -166,7 +186,6 @@ export default {
     isShowVerseOptions: false,
     isShowCollectionOptions: false,
     collectionOptions: [
-      { text: "Add Verses", icon: "add_circle_outline" },
       { text: "Change Review Period", icon: "alarm" },
       { text: "Edit Collection", icon: "edit" },
       { text: "Delete Collection", icon: "clear" },
@@ -179,7 +198,11 @@ export default {
     isShowReviewPeriodOptions: false,
     reviewPeriodOptions: ["Everyday", "3 days", "1 week", "2 weeks", "3 weeks"],
     editVerse: {},
+    isShowAddVersePanel: false,
   }),
+  components: {
+    addCollectionBibleBookPanel,
+  },
   computed: {
     getCollectionId() {
       return this.$store.getters.getCollectionId;
@@ -187,11 +210,45 @@ export default {
     getUserId() {
       return this.$store.getters.getUserInfo.id;
     },
-    getPreviousView() {
-      return this.$store.getters.getPreviousView;
+    getSelectedVerse() {
+      return this.$store.getters.getVerseInfo.selection;
     },
   },
   methods: {
+    closeAddVersePanel() {
+      this.$store.commit("resetSelection");
+      this.isShowAddVersePanel = false;
+    },
+    showAddVersePanel() {
+      this.isShowAddVersePanel = true;
+      this.$store.commit("resetSelection");
+      this.$store.commit("setBibleBookSelectionPanelView", "book");
+    },
+    updateVerseAdded() {
+      this.verses.push({
+        book: {
+          id: this.getSelectedVerse.book.id,
+          name: this.getSelectedVerse.book.name,
+        },
+        chapter: this.getSelectedVerse.chapter,
+        startVerse: this.getSelectedVerse.startVerse,
+        endVerse: this.getSelectedVerse.endVerse,
+        bibleVersion: this.getSelectedVerse.bibleVersion,
+      });
+      this.isShowAddVersePanel = false;
+      this.addVerseToCollection();
+    },
+    addVerseToCollection() {
+      const db = firebase.firestore();
+      db.collection("users")
+        .doc(this.getUserId)
+        .collection("collection")
+        .doc(this.getCollectionId)
+        .update({ verses: this.verses })
+        .catch((error) => {
+          console.log("Error adding verses to collection", error);
+        });
+    },
     popRoute() {
       this.$router.back();
     },
@@ -243,17 +300,17 @@ export default {
       this.isShowVerseOptions = true;
     },
     goToAnswer(verse) {
-      let bookId = verse.id;
-      let chapter = verse.chapter;
-      let startVerse = verse.startVerse;
-
       let selection = {
         book: {
-          id: bookId,
-          name: "",
+          id: verse.book.id,
+          name: verse.book.name,
         },
-        chapter: chapter,
-        verses: startVerse,
+        chapter: verse.chapter,
+        startVerse: verse.startVerse == "" ? 1 : verse.startVerse,
+        endVerse: verse.endVerse,
+        bibleVersion: verse.bibleVersion,
+        next: "",
+        previous: "",
       };
       this.$store.commit("setSelection", selection);
       this.$router.replace("/answer");
@@ -300,9 +357,6 @@ export default {
           console.log("Error removing verse from the collection", error);
         });
       this.isShowVerseOptions = false;
-    },
-    addVerseToCollection() {
-      console.log("add verse");
     },
     reviewAll() {
       /** Pass list of verses to answer panel */
