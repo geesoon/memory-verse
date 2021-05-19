@@ -77,13 +77,19 @@
             class="verse-title-box"
             v-for="verseNum in numOfVerses"
             :key="verseNum"
-            @click="updateSelectionVerse(verseNum)"
+            :id="`v${verseNum}`"
+            @click="updateSelectionVerse(verseNum, `v${verseNum}`)"
           >
             v{{ verseNum }}
           </div>
         </div>
       </div>
     </v-container>
+    <div class="select-verse-bar">
+      <button class="select-verse-btn" @click="finishSelection()">
+        Select Verses
+      </button>
+    </div>
   </v-card>
 </template>
 
@@ -101,6 +107,7 @@ export default {
       numOfVerses: "",
       isLoadingVerses: true /**Indicator for verse loading spinner */,
       isStartAlert: false /**Indicator for no-verse selected start */,
+      isStartVerse: true,
     };
   },
   computed: {
@@ -118,6 +125,16 @@ export default {
     },
   },
   methods: {
+    finishSelection() {
+      if (this.getSelection.chapter == "" && this.getSelection.book.id != "") {
+        alert("Please select a chapter");
+      } else if (this.getSelection.book.id == "") {
+        alert("Please select a book");
+      } else {
+        this.$emit("closeDialog");
+        this.$emit("answer");
+      }
+    },
     goBack() {
       if (this.getBibleBookSelectionPanelView == "book") {
         this.$emit("closeDialog");
@@ -127,12 +144,29 @@ export default {
         this.$store.commit("setBibleBookSelectionPanelView", "chapter");
       }
     },
-    updateSelectionVerse(verseNum) {
-      /**
-       * Update the verse button text to the selected verse book:chapter:verse & reset the panel state
-       */
-      this.$store.commit("setVerses", verseNum);
-      this.$router.push("/answer");
+    updateSelectionVerse(verseNum, blockId) {
+      if (this.isStartVerse) {
+        // Reset previous selection range
+        for (let i = 1; i <= this.numOfVerses; i++) {
+          document.getElementById(`v${i}`).classList = "verse-title-box";
+        }
+
+        // Set the new start range
+        document.getElementById(blockId).classList = "verse-title-box-active";
+        this.$store.commit("setStartVerse", verseNum);
+        this.isStartVerse = false;
+      } else {
+        // Set the new end range
+        let startVerse = this.getSelection.startVerse;
+        if (blockId.split("v")[1] > startVerse) {
+          for (let i = startVerse; i <= blockId.split("v")[1]; i++) {
+            document.getElementById(`v${i}`).classList =
+              "verse-title-box-active";
+          }
+          this.$store.commit("setEndVerse", verseNum);
+        }
+        this.isStartVerse = true;
+      }
     },
     resetPanelState() {
       this.$store.commit("resetSelection");
@@ -216,6 +250,26 @@ export default {
 </script>
 
 <style>
+.select-verse-bar {
+  position: fixed;
+  bottom: 0;
+  min-width: 100%;
+  background: whitesmoke;
+  text-align: center;
+  z-index: 4;
+  cursor: pointer;
+}
+
+.select-verse-btn {
+  font-size: 1.5rem;
+  min-width: 100%;
+  padding: 0.5rem 0rem;
+}
+
+.verse-selection-container {
+  margin-bottom: 3rem;
+}
+
 .verse-nav-bar {
   display: flex;
   flex-direction: row;
@@ -252,29 +306,37 @@ export default {
   align-items: flex-start;
 }
 
-.books-list-container {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-}
-
+.books-list-container,
 .verse-list-container,
 .chapter-list-container {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  max-width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+
+.books-title {
+  width: 4rem;
+  height: 4rem;
 }
 
 .books-title,
 .book-verses-title {
   border-radius: 5px;
   background-color: #d5e37d;
-  padding: 1rem;
   margin: 0.5rem;
   font-size: 1rem;
   font-weight: bold;
-  text-align: left;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
   cursor: pointer;
 }
 
+.verse-title-box-active,
 .chapter-title-box:hover,
 .books-title:hover {
   box-shadow: 10px 10px;
@@ -291,9 +353,11 @@ export default {
   box-shadow: 10px 10px;
 }
 
+.verse-title-box-active,
 .verse-title-box,
 .chapter-title-box {
-  padding: 1rem;
+  width: 3rem;
+  height: 3rem;
   margin: 0.5rem;
   border: 2px solid black;
   border-radius: 5px;
@@ -378,13 +442,6 @@ export default {
 @media only screen and (min-width: 1024px) {
   .verse-selection-container {
     width: 50vw !important;
-  }
-
-  .verse-title-box:hover {
-    box-shadow: 10px 10px;
-    background-color: #d5e37d;
-    border-radius: 5px;
-    transition: 0.5s;
   }
 
   /* Select book */

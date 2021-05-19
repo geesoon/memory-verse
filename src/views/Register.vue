@@ -1,5 +1,5 @@
 <template>
-  <div class="home-container">
+  <v-container class="home-container">
     <div class="register-header">
       <div class="home-title-top-left" @click="gotoHome">Memory Verse</div>
       <div class="register-info">
@@ -18,7 +18,7 @@
         <router-link to="/" class="sign-in-link">Log In</router-link></span
       >
     </div>
-  </div>
+  </v-container>
 </template>
 
 <script>

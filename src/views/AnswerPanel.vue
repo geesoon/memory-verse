@@ -364,7 +364,7 @@ export default {
 
       const verse =
         nextVerse == null
-          ? `${selection.book.id}.${selection.chapter}.${selection.verses}`
+          ? `${selection.book.id}.${selection.chapter}.${selection.startVerse}`
           : nextVerse;
       const header = new Headers();
 

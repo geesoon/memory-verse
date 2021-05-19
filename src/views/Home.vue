@@ -27,7 +27,7 @@
           <v-btn value="Hard"> Hard </v-btn>
         </v-btn-toggle>
       </div>
-      <div class="recent-memorized" v-if="recent.length == 0">
+      <div class="recent-memorized" v-if="recent.length != 0">
         <div class="section-title">Recently Memorized</div>
         <div class="recent-list">
           <div
@@ -75,7 +75,10 @@
                 Show All
               </v-btn>
             </template>
-            <bible-book-panel @closeDialog="isShowAllBook = false" />
+            <bible-book-panel
+              @closeDialog="isShowAllBook = false"
+              @answer="goToAnswer()"
+            />
           </v-dialog>
         </div>
         <div class="bible-books-list">
@@ -134,6 +137,10 @@ export default {
       this.$store.commit("setBibleBookSelectionPanelView", "chapter");
       this.$store.commit("setSelectedBookId", bookId);
       this.isShowAllBook = true;
+    },
+    goToAnswer() {
+      this.isShowAllBook = false;
+      this.$router.push("/answer");
     },
     goToView(view) {
       this.$store.commit("setView", view);

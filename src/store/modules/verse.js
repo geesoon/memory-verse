@@ -2,9 +2,11 @@ const state = {
   selection: {
     book: { id: "", name: "" },
     chapter: "",
-    verses: "",
+    startVerse: "",
+    endVerse: "",
     next: "",
     previous: "",
+    bibleVersion: "KJV",
   },
   level: "Easy",
   isStartAlert: false,
@@ -25,7 +27,8 @@ const mutations = {
     state.selection.book.id = selection.book.id;
     state.selection.book.name = selection.book.name;
     state.selection.chapter = selection.chapter;
-    state.selection.verses = selection.verses;
+    state.selection.startVerse = selection.startVerse;
+    state.selection.endVerse = selection.endVerse;
     state.selection.next = selection.next;
     state.selection.previous = selection.previous;
   },
@@ -39,8 +42,11 @@ const mutations = {
   setChapter(state, chapter) {
     state.selection.chapter = chapter;
   },
-  setVerses(state, verses) {
-    state.selection.verses = verses;
+  setStartVerse(state, verse) {
+    state.selection.startVerse = verse;
+  },
+  setEndVerse(state, verse) {
+    state.selection.endVerse = verse;
   },
   setNext(state, next) {
     state.selection.next = next;

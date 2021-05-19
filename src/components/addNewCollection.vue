@@ -61,13 +61,15 @@
           </v-col>
           <v-col cols="12" md="12">
             <v-row
-              ><div v-for="(verse, key) in versesAdded" :key="key">
-                <v-chip
-                  >{{ verse.book.name }} {{ verse.chapter }}:{{
-                    verse.verses
-                  }}</v-chip
-                >
-              </div></v-row
+              ><v-chip-group>
+                <v-chip v-for="(verse, key) in versesAdded" :key="key">
+                  <span v-if="verse.startVerse != '' && verse.endVerse != ''">
+                    {{ verse.book.name }} {{ verse.chapter }}:{{
+                      verse.startVerse
+                    }}-{{ verse.endVerse }}
+                  </span>
+                </v-chip>
+              </v-chip-group></v-row
             >
           </v-col>
         </v-row>
@@ -87,7 +89,7 @@
 <script>
 import firebase from "firebase";
 import bible from "../data/book.json";
-import addCollectionBibleBookPanel from "../components/addCollectionBibleBookPanel";
+import addCollectionBibleBookPanel from "../components/bibleBookPanel.vue";
 
 export default {
   data: () => ({
@@ -127,6 +129,8 @@ export default {
     updateVerseAdded() {
       this.isShowAllBook = false;
       this.versesAdded.push(this.getSelectedVerse);
+      this.$store.commit("resetSelection");
+      console.log(this.versesAdded);
     },
     showAllBook() {
       this.isShowAllBook = true;
@@ -219,14 +223,15 @@ export default {
       });
     },
     closeDialog() {
-      (this.search = ""),
-        (this.newCollection = {
-          name: "",
-          reviewPeriod: "Everyday",
-          bibleVersion: "KJV",
-          verseToBeAdd: [],
-          formattedVerses: [],
-        });
+      (this.search = ""), (this.versesAdded = []);
+      this.newCollection = {
+        name: "",
+        reviewPeriod: "Everyday",
+        bibleVersion: "KJV",
+        verseToBeAdd: [],
+        formattedVerses: [],
+      };
+      this.$store.commit("resetSelection");
       this.$emit("closeDialog");
     },
   },

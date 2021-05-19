@@ -109,13 +109,11 @@ a {
   flex-direction: column;
   justify-content: space-around;
   align-content: center;
-  /* margin: 4rem 1rem 4rem 1rem; */
   margin: 1rem;
 }
 
 .login-form > input {
   font-size: 1rem;
-  height: 8vh;
   border: 1px solid black;
   padding: 1rem;
   border-radius: 0.5rem;
@@ -130,7 +128,7 @@ a {
   margin: 0.5rem;
   border-radius: 0.5rem;
   background: #1877f2;
-  color: white;
+  color: white !important;
 }
 
 .guest-btn {
@@ -141,7 +139,7 @@ a {
   margin: 0.5rem;
   margin-bottom: 5rem;
   border-radius: 0.5rem;
-  color: white;
+  color: white !important;
   background: #42b72a;
 }
 
