@@ -93,7 +93,7 @@
 
     <!-- Edit Collection Options -->
     <v-bottom-sheet v-model="isShowCollectionOptions">
-      <v-sheet height="200px">
+      <v-sheet height="250px">
         <v-list class="option-container">
           <v-list-item
             v-for="(item, key) in collectionOptions"
@@ -186,6 +186,7 @@ export default {
     isShowVerseOptions: false,
     isShowCollectionOptions: false,
     collectionOptions: [
+      { text: "Flash Cards", icon: "style" },
       { text: "Change Review Period", icon: "alarm" },
       { text: "Edit Collection", icon: "edit" },
       { text: "Delete Collection", icon: "clear" },
@@ -316,12 +317,14 @@ export default {
       this.$router.replace("/answer");
     },
     chooseCollectionOption(opt) {
-      console.log(opt);
       if (opt == "Delete Collection") {
         this.isShowDeleteConfirmationDialog = true;
       } else if (opt == "Change Review Period") {
         this.isShowReviewPeriodOptions = true;
         this.isShowCollectionOptions = false;
+      } else if (opt == "Flash Cards") {
+        this.$store.commit("setCollectionVerses", this.verses);
+        this.$router.push({ name: "flashcard" });
       }
     },
     chooseCollectionItemOption(opt) {

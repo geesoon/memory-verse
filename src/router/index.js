@@ -52,6 +52,14 @@ const routes = [
     ],
   },
   {
+    path: "/flashcard",
+    name: "flashcard",
+    component: () => import("../views/FlashCard.vue"),
+    meta: {
+      authRequired: true,
+    },
+  },
+  {
     path: "/answer",
     name: "answer",
     component: () => import("../views/AnswerPanel.vue"),

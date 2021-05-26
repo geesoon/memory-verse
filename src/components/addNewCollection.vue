@@ -15,6 +15,9 @@
               dense
               outlined
             ></v-text-field>
+            <div v-if="this.error != ''" class="error-message">
+              {{ this.error }}
+            </div>
           </v-col>
           <v-col cols="12" md="6">
             <v-select
@@ -108,6 +111,7 @@ export default {
       reviewPeriod: "Everyday",
       verses: [],
     },
+    error: "",
   }),
   components: {
     addCollectionBibleBookPanel,
@@ -155,25 +159,36 @@ export default {
       this.$store.commit("setBibleBookSelectionPanelView", "book");
     },
     addCollection() {
-      const db = firebase.firestore();
-      db.collection("users")
-        .doc(this.getUserId)
-        .collection("collection")
-        .add({
-          lastReview: "",
-          name: this.collection.name,
-          reviewPeriod: this.collection.reviewPeriod,
-          verses: this.collection.verses,
-        })
-        .then(() => {
-          console.log("Document successfully written user-> collection");
-          this.$emit("success");
-        })
-        .catch((err) => {
-          console.log("Fail to write to doc", err);
-          this.$emit("fail");
-        });
-      this.closeAddCollectionDialog();
+      if (this.checkForm()) {
+        const db = firebase.firestore();
+        db.collection("users")
+          .doc(this.getUserId)
+          .collection("collection")
+          .add({
+            lastReview: "",
+            name: this.collection.name,
+            reviewPeriod: this.collection.reviewPeriod,
+            verses: this.collection.verses,
+          })
+          .then(() => {
+            console.log("Document successfully written user-> collection");
+            this.$emit("success");
+          })
+          .catch((err) => {
+            console.log("Fail to write to doc", err);
+            this.$emit("fail");
+          });
+        this.closeAddCollectionDialog();
+      }
+    },
+    checkForm() {
+      if (this.collection.name != "" && this.collection.reviewPeriod != "") {
+        this.error = "";
+        return true;
+      } else {
+        this.error = "Collection name cannot be empty.";
+        return false;
+      }
     },
     closeAddCollectionDialog() {
       this.collection = {
@@ -181,6 +196,7 @@ export default {
         reviewPeriod: "Everyday",
         verses: [],
       };
+      this.error = "";
       this.$store.commit("resetSelection");
       this.$emit("closeDialog");
     },
@@ -248,4 +264,9 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+.error-message {
+  color: red;
+  line-height: 0.5rem;
+}
+</style>

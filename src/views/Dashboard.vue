@@ -18,7 +18,7 @@
       </v-btn>
 
       <v-btn value="library" @click="changeRoute('library')">
-        <span>Library</span>
+        <span>Collection</span>
         <span class="material-icons"> library_books </span>
       </v-btn>
     </v-bottom-navigation>

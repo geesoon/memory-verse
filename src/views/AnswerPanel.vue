@@ -67,6 +67,9 @@
         </template>
       </v-snackbar>
     </div>
+    <section v-if="showFinishAllVerse">
+      Congratulation! You have finished all the verses.
+    </section>
     <section v-if="isQuestionConstructed">
       <div class="question-outer-container">
         <div class="question-container">
@@ -82,7 +85,7 @@
             <span class="question-verse-quote"
               >{{ this.getSelection.book.name }}
               {{ this.getSelection.chapter }}:{{
-                this.getSelection.verses
+                this.getSelection.startVerse
               }}</span
             >
           </div>
@@ -137,6 +140,23 @@
         ></v-skeleton-loader>
       </v-row>
     </section>
+    <section>
+      <v-dialog v-model="showFinishAllVerse">
+        <v-card elevation="2">
+          <v-card-title>
+            <span class="finish-message-title">
+              You have finished the verses.
+            </span>
+          </v-card-title>
+          <v-divider></v-divider>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn text @click="continueAnswering"> Continue </v-btn>
+            <v-btn text @click="goToHome"> Close </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </section>
   </v-container>
 </template>
 
@@ -160,6 +180,7 @@ export default {
       isSnackbar: false,
       score: 0,
       level: ["Easy", "Medium", "Hard"],
+      showFinishAllVerse: false,
     };
   },
   computed: {
@@ -194,6 +215,13 @@ export default {
     draggable,
   },
   methods: {
+    goToHome() {
+      this.$router.replace({ name: "main" });
+    },
+    continueAnswering() {
+      this.showFinishAllVerse = false;
+      console.log("enter into infinite verse mode");
+    },
     changeDifficulty(opt) {
       this.$store.commit("setLevel", opt);
       this.isShowDifficulty = false;
@@ -234,11 +262,23 @@ export default {
     checkScore() {
       /**Cater for auto button
        * Check if score is 100% if true then fetch the next verse automatically */
-      if (this.score == 100 && this.isAutoVerse == true) {
+      console.log(this.getSelection.startVerse);
+      console.log(this.getSelection.endVerse);
+      if (
+        this.score == 100 &&
+        this.isAutoVerse == true &&
+        this.getSelection.startVerse != this.getSelection.endVerse
+      ) {
+        this.showFinishAllVerse = false;
         setTimeout(() => {
           this.score = 0;
           this.nextVerse();
         }, 500);
+      } else if (
+        this.score == 100 &&
+        this.getSelection.startVerse == this.getSelection.endVerse
+      ) {
+        this.showFinishAllVerse = true;
       }
     },
     calculateScore() {
@@ -262,13 +302,15 @@ export default {
     },
     nextVerse() {
       /**Reset the component data and fetch the next verse */
-      this.score = 0;
-      this.verse = [];
-      this.answer = [];
-      this.blankLocation = [];
-      this.isVerseCorrect = false;
-      this.isQuestionConstructed = false;
-      this.fetchVerse(this.getSelection.next);
+      if (this.getSelection.startVerse != this.getSelection.endVerse) {
+        this.score = 0;
+        this.verse = [];
+        this.answer = [];
+        this.blankLocation = [];
+        this.isVerseCorrect = false;
+        this.isQuestionConstructed = false;
+        this.fetchVerse(this.getSelection.next);
+      }
     },
     previousVerse() {
       /**Reset the component data and fetch the next verse */
@@ -399,19 +441,21 @@ export default {
 
           let updatedSelection = {
             book: { name: "", id: "" },
-            verses: "",
+            startVers: "",
+            endVerse: "",
             chapter: "",
             next: "",
             previous: "",
           };
 
           let firstHalf = data.data.reference.split(":")[0];
-          let verse = data.data.reference.split(":")[1];
+          let startVerse = data.data.reference.split(":")[1];
           let chapter = firstHalf.split(" ").slice(-1).join("");
           let book = firstHalf.split(" ").slice(0, -1).join(" ");
 
           updatedSelection.book.name = book;
-          updatedSelection.verses = verse;
+          updatedSelection.startVerse = startVerse;
+          updatedSelection.endVerse = selection.endVerse;
           updatedSelection.chapter = chapter;
           updatedSelection.book.id = data.data.bookId;
           updatedSelection.next = data.data.next.id;
@@ -499,6 +543,11 @@ export default {
 </script>
 
 <style>
+.finish-message-title {
+  margin: 0.5rem;
+  word-break: break-all;
+}
+
 .question-block-skeleton {
   width: 95vw;
   height: 15rem;

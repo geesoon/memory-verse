@@ -180,7 +180,7 @@ export default {
 
 .my-collection-item {
   margin: 1rem 0rem;
-  background: var(--primary);
+  background: #d5e37d;
   text-align: left;
   box-shadow: 8px 0px 0px 0px;
 }

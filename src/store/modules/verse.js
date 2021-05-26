@@ -10,6 +10,7 @@ const state = {
   },
   level: "Easy",
   isStartAlert: false,
+  collectionVerses: [],
 };
 
 const getters = {
@@ -20,9 +21,16 @@ const getters = {
       isStartAlert: state.isStartAlert,
     };
   },
+  getCollectionVerses: (state) => {
+    return state.collectionVerses;
+  },
 };
 
 const mutations = {
+  setCollectionVerses(state, verses) {
+    state.collectionVerses = [];
+    state.collectionVerses = [...verses];
+  },
   setSelection(state, selection) {
     state.selection.book.id = selection.book.id;
     state.selection.book.name = selection.book.name;
@@ -66,6 +74,7 @@ const mutations = {
     state.selection.next = "";
     state.selection.previous = "";
     state.isStartAlert = false;
+    state.collectionVerses = [];
   },
 };
 
