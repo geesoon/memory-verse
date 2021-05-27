@@ -2,12 +2,15 @@ const state = {
   selection: {
     book: { id: "", name: "" },
     chapter: "",
-    verses: "",
+    startVerse: "",
+    endVerse: "",
     next: "",
     previous: "",
+    bibleVersion: "KJV",
   },
   level: "Easy",
   isStartAlert: false,
+  collectionVerses: [],
 };
 
 const getters = {
@@ -18,14 +21,22 @@ const getters = {
       isStartAlert: state.isStartAlert,
     };
   },
+  getCollectionVerses: (state) => {
+    return state.collectionVerses;
+  },
 };
 
 const mutations = {
+  setCollectionVerses(state, verses) {
+    state.collectionVerses = [];
+    state.collectionVerses = [...verses];
+  },
   setSelection(state, selection) {
     state.selection.book.id = selection.book.id;
     state.selection.book.name = selection.book.name;
     state.selection.chapter = selection.chapter;
-    state.selection.verses = selection.verses;
+    state.selection.startVerse = selection.startVerse;
+    state.selection.endVerse = selection.endVerse;
     state.selection.next = selection.next;
     state.selection.previous = selection.previous;
   },
@@ -39,8 +50,11 @@ const mutations = {
   setChapter(state, chapter) {
     state.selection.chapter = chapter;
   },
-  setVerses(state, verses) {
-    state.selection.verses = verses;
+  setStartVerse(state, verse) {
+    state.selection.startVerse = verse;
+  },
+  setEndVerse(state, verse) {
+    state.selection.endVerse = verse;
   },
   setNext(state, next) {
     state.selection.next = next;
@@ -55,10 +69,12 @@ const mutations = {
     state.selection.book.id = "";
     state.selection.book.name = "";
     state.selection.chapter = "";
-    state.selection.verses = "";
+    state.selection.startVerse = "";
+    state.selection.endVerse = "";
     state.selection.next = "";
     state.selection.previous = "";
     state.isStartAlert = false;
+    state.collectionVerses = [];
   },
 };
 

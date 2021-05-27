@@ -10,7 +10,10 @@
       </v-toolbar>
 
       <!-- Select Book -->
-      <div v-if="view == 'book'" class="books-overlay-container">
+      <div
+        v-if="this.getBibleBookSelectionPanelView == 'book'"
+        class="books-overlay-container"
+      >
         <div class="testament-title">
           <span class="material-icons"> book </span>
           Old Testament
@@ -20,7 +23,7 @@
             class="books-title"
             v-for="book in OTBooks"
             :key="book.id"
-            @click="showBookChaptersPanel(book.id, 'OT')"
+            @click="showBookChaptersPanel(book.id)"
           >
             {{ book.abbreviation }}
           </div>
@@ -33,7 +36,7 @@
             class="books-title"
             v-for="book in NTBooks"
             :key="book.id"
-            @click="showBookChaptersPanel(book.id, 'NT')"
+            @click="showBookChaptersPanel(book.id)"
           >
             {{ book.abbreviation }}
           </div>
@@ -41,7 +44,10 @@
       </div>
 
       <!-- Select Chapter -->
-      <div v-if="view == 'chapter'" class="chapters-overlay-container">
+      <div
+        v-if="this.getBibleBookSelectionPanelView == 'chapter'"
+        class="chapters-overlay-container"
+      >
         <div class="book-verses-title">{{ this.getSelection.book.name }}</div>
         <div class="chapter-list-container">
           <div
@@ -56,69 +62,112 @@
       </div>
 
       <!-- Select Verses -->
-      <div v-if="view == 'verse'" class="verses-overlay-container">
+      <div
+        v-if="this.getBibleBookSelectionPanelView == 'verse'"
+        class="verses-overlay-container"
+      >
         <div class="book-verses-title">
           {{ this.getSelection.book.name + " " + this.getSelection.chapter }}
         </div>
-        <div class="loading-container" v-if="isLoadingVerse">
+        <div class="loading-container" v-if="this.isLoadingVerses">
           <span class="material-icons"> pending </span>
         </div>
-        <div class="chapter-list-container" v-else>
+        <div class="verse-list-container" v-else>
           <div
             class="verse-title-box"
             v-for="verseNum in numOfVerses"
             :key="verseNum"
-            @click="updateSelectionVerse(verseNum)"
+            :id="`v${verseNum}`"
+            @click="updateSelectionVerse(verseNum, `v${verseNum}`)"
           >
             v{{ verseNum }}
           </div>
         </div>
       </div>
     </v-container>
+    <div class="select-verse-bar">
+      <button class="select-verse-btn" @click="finishSelection()">Add</button>
+    </div>
   </v-card>
 </template>
 
 <script>
-import booksChapter from "../data/book.json";
+import bible from "../data/book.json";
 
 export default {
   data() {
     return {
-      NTBooks: [] /**Array of new testament book name */,
-      OTBooks: [] /**Array of old testament book name */,
-      booksChapter:
-        booksChapter.books /**Stored json data locally to lower the number of queries needed to select a verse */,
+      NTBooks: [],
+      OTBooks: [],
+      bibleBooks:
+        bible.books /**Stored json data locally to lower the number of queries needed to select a verse */,
       numOfChapters: "",
       numOfVerses: "",
-      view: "book" /**Indicator of which selection view to display */,
       isLoadingVerses: true /**Indicator for verse loading spinner */,
       isStartAlert: false /**Indicator for no-verse selected start */,
+      isStartVerse: true,
     };
   },
   computed: {
     getSelection() {
       return this.$store.getters.getVerseInfo.selection;
     },
-  },
-  props: {
-    selectedBook: String,
+    getSelectedBookId() {
+      return this.$store.getters.getSelectedBookId;
+    },
+    getBibleBookSelectionPanelView() {
+      if (this.$store.getters.getBibleBookSelectionPanelView == "chapter") {
+        this.showBookChaptersPanel(this.getSelectedBookId);
+      }
+      return this.$store.getters.getBibleBookSelectionPanelView;
+    },
   },
   methods: {
-    goBack() {
-      if (this.view == "book") {
-        this.$emit("closeDialog");
-      } else if (this.view == "chapter") {
-        this.view = "book";
+    finishSelection() {
+      if (this.getSelection.chapter == "" && this.getSelection.book.id != "") {
+        alert("Please select a chapter");
+      } else if (this.getSelection.book.id == "") {
+        alert("Please select a book");
       } else {
-        this.view = "chapter";
+        this.$emit("updateVerse");
+        this.$emit("answer");
       }
     },
-    updateSelectionVerse(verseNum) {
-      /**
-       * Update the verse button text to the selected verse book:chapter:verse & reset the panel state
-       */
-      this.$store.commit("setVerses", verseNum);
-      this.$router.push("/answer");
+    goBack() {
+      if (this.getBibleBookSelectionPanelView == "book") {
+        this.$emit("closeDialog");
+      } else if (this.getBibleBookSelectionPanelView == "chapter") {
+        this.$store.commit("setChapter", "");
+        this.$store.commit("setBibleBookSelectionPanelView", "book");
+      } else {
+        this.$store.commit("setStartVerse", "");
+        this.$store.commit("setEndVerse", "");
+        this.$store.commit("setBibleBookSelectionPanelView", "chapter");
+      }
+    },
+    updateSelectionVerse(verseNum, blockId) {
+      if (this.isStartVerse) {
+        // Reset previous selection range
+        for (let i = 1; i <= this.numOfVerses; i++) {
+          document.getElementById(`v${i}`).classList = "verse-title-box";
+        }
+
+        // Set the new start range
+        document.getElementById(blockId).classList = "verse-title-box-active";
+        this.$store.commit("setStartVerse", verseNum);
+        this.isStartVerse = false;
+      } else {
+        // Set the new end range
+        let startVerse = this.getSelection.startVerse;
+        if (blockId.split("v")[1] > startVerse) {
+          for (let i = startVerse; i <= blockId.split("v")[1]; i++) {
+            document.getElementById(`v${i}`).classList =
+              "verse-title-box-active";
+          }
+          this.$store.commit("setEndVerse", verseNum);
+        }
+        this.isStartVerse = true;
+      }
     },
     resetPanelState() {
       this.$store.commit("resetSelection");
@@ -129,7 +178,7 @@ export default {
        * Fetch verses reference in the book:chapter
        */
       this.$store.commit("setChapter", chapterNum);
-      this.view = "verse";
+      this.$store.commit("setBibleBookSelectionPanelView", "verse");
       const header = new Headers();
       header.append("api-key", "ea2400ebed2327b5e1b9595f416366e0");
       const request = new Request(
@@ -153,7 +202,7 @@ export default {
           alert(e);
         });
     },
-    showBookChaptersPanel(bookId, testament) {
+    showBookChaptersPanel(bookId) {
       /**
        * Display the chapter selection panel based on the selected book
        */
@@ -162,43 +211,33 @@ export default {
         name: "",
       };
 
-      if (testament == "OT") {
-        this.numOfChapters = this.OTBooks.find((book) => {
-          return book.id === bookId;
-        }).length;
+      this.numOfChapters = this.bibleBooks.find((book) => {
+        return book.id === bookId;
+      }).length;
 
-        book.id = bookId;
-        book.name = this.OTBooks.find((book) => {
-          return book.id === bookId;
-        }).name;
-        this.$store.commit("setBook", book);
-      } else {
-        this.numOfChapters = this.NTBooks.find((book) => {
-          return book.id === bookId;
-        }).length;
+      book.id = bookId;
+      book.name = this.bibleBooks.find((book) => {
+        return book.id === bookId;
+      }).name;
 
-        book.id = bookId;
-        book.name = this.NTBooks.find((book) => {
-          return book.id === bookId;
-        }).name;
-        this.$store.commit("setBook", book);
-      }
-      this.view = "chapter";
+      this.$store.commit("setBook", book);
+      this.$store.commit("setSelectedBookId", book.id);
+      this.$store.commit("setBibleBookSelectionPanelView", "chapter");
     },
     parseData() {
       /**
        * Read bible books stored in local data/json into old and new testament arrays
        */
       let afterOT = false;
-      for (let i = 0; i < this.booksChapter.length; i++) {
+      for (let i = 0; i < this.bibleBooks.length; i++) {
         if (afterOT) {
-          this.NTBooks.push(this.booksChapter[i]);
+          this.NTBooks.push(this.bibleBooks[i]);
         } else {
-          if (this.booksChapter[i].id == "MAT") {
+          if (this.bibleBooks[i].id == "MAT") {
             afterOT = true;
-            this.NTBooks.push(this.booksChapter[i]);
+            this.NTBooks.push(this.bibleBooks[i]);
           } else {
-            this.OTBooks.push(this.booksChapter[i]);
+            this.OTBooks.push(this.bibleBooks[i]);
           }
         }
       }
@@ -212,6 +251,26 @@ export default {
 </script>
 
 <style>
+.select-verse-bar {
+  position: fixed;
+  bottom: 0;
+  min-width: 100%;
+  background: whitesmoke;
+  text-align: center;
+  z-index: 4;
+  cursor: pointer;
+}
+
+.select-verse-btn {
+  font-size: 1.5rem;
+  min-width: 100%;
+  padding: 0.5rem 0rem;
+}
+
+.verse-selection-container {
+  margin-bottom: 3rem;
+}
+
 .verse-nav-bar {
   display: flex;
   flex-direction: row;
@@ -240,37 +299,51 @@ export default {
   align-items: flex-start;
 }
 
-.books-list-container {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+.chapters-overlay-container,
+.verses-overlay-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.books-list-container,
+.verse-list-container,
+.chapter-list-container {
+  max-width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+
+.books-title {
+  width: 4rem;
+  height: 4rem;
 }
 
 .books-title,
 .book-verses-title {
   border-radius: 5px;
   background-color: #d5e37d;
-  padding: 1rem;
   margin: 0.5rem;
   font-size: 1rem;
   font-weight: bold;
-  text-align: left;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
   cursor: pointer;
 }
 
-.verse-title-box:hover,
+.verse-title-box-active,
+.chapter-title-box:hover,
 .books-title:hover {
   box-shadow: 10px 10px;
   background-color: #d5e37d;
   border-radius: 5px;
   transition: 0.5s;
-}
-
-/* Select chapter */
-.chapters-overlay-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
 }
 
 .book-verses-title {
@@ -281,19 +354,12 @@ export default {
   box-shadow: 10px 10px;
 }
 
-.chapter-list-container {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  align-items: center;
-}
-
+.verse-title-box-active,
 .verse-title-box,
 .chapter-title-box {
-  margin: 1rem;
   width: 3rem;
   height: 3rem;
+  margin: 0.5rem;
   border: 2px solid black;
   border-radius: 5px;
   text-align: center;
@@ -302,21 +368,6 @@ export default {
   justify-content: center;
   cursor: pointer;
   border-radius: 5px;
-}
-
-.chapter-title-box:hover {
-  font-size: 1.2rem;
-  font-weight: bold;
-  box-shadow: 5px 10px;
-  transition: 0.2s;
-}
-
-/* Select verse */
-.verses-overlay-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: flex-start;
 }
 
 .selection-panel-overlay {
@@ -381,6 +432,8 @@ export default {
 }
 
 @media only screen and (min-width: 768px) {
+  .verse-list-container,
+  .chapter-list-container,
   .books-list-container {
     grid-gap: 0.5rem;
     grid-template-columns: repeat(8, 1fr);

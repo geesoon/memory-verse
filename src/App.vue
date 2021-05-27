@@ -9,9 +9,6 @@
 <script>
 export default {
   name: "App",
-  data: () => ({
-    //
-  }),
 };
 </script>
 
@@ -19,6 +16,7 @@ export default {
 html {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
+  --primary: "#d5e37d";
 }
 
 html::-webkit-scrollbar {

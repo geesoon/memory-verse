@@ -1,21 +1,15 @@
 const state = {
-  view: "Home",
-  previousView: "",
   avatarName: "",
   user: {
     email: "",
     id: "",
   },
   selectedCollectionId: "",
+  view: "",
+  selectedBookId: "",
 };
 
 const getters = {
-  getCurrentView(state) {
-    return state.view;
-  },
-  getPreviousView(state) {
-    return state.previousView;
-  },
   getAvatarName(state) {
     return state.avatarName;
   },
@@ -25,13 +19,15 @@ const getters = {
   getCollectionId(state) {
     return state.selectedCollectionId;
   },
+  getBibleBookSelectionPanelView(state) {
+    return state.view;
+  },
+  getSelectedBookId(state) {
+    return state.selectedBookId;
+  },
 };
 
 const mutations = {
-  setView(state, view) {
-    state.previousView = state.view;
-    state.view = view;
-  },
   setAvatarName(state, name) {
     state.avatarName = name;
   },
@@ -42,8 +38,15 @@ const mutations = {
   setCollectionId(state, id) {
     state.selectedCollectionId = id;
   },
+  setBibleBookSelectionPanelView(state, view) {
+    state.view = view;
+  },
+  setSelectedBookId(state, id) {
+    state.selectedBookId = id;
+  },
   clearState(state) {
-    state.view = "Home";
+    state.view = "";
+    state.selectedBookId = "";
     state.avatarName = "";
     state.user.email = "";
     state.user.id = "";

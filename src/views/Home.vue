@@ -1,10 +1,10 @@
 <template>
   <section>
     <div class="header-bar">
-      <div class="home-title-header" @click="goToView('Home')">
+      <div class="home-title-header" @click="changeRoute('main')">
         Memory Verse
       </div>
-      <div class="avatar-container" @click="goToView('Profile')">
+      <div class="avatar-container" @click="changeRoute('profile')">
         <div class="avatar-circle">{{ this.getAvatarName }}</div>
       </div>
     </div>
@@ -13,10 +13,6 @@
         <p>In the beginning, God created the heaven and the earth</p>
         <p style="text-align: right">- Gen 1:1</p>
       </div>
-      <!-- <v-skeleton-loader
-        type="image"
-        style="width: 30vw; height: 6rem"
-      ></v-skeleton-loader> -->
       <div class="difficulty">
         <div class="section-title">Difficulty</div>
         <v-btn-toggle
@@ -31,7 +27,7 @@
           <v-btn value="Hard"> Hard </v-btn>
         </v-btn-toggle>
       </div>
-      <div class="recent-memorized">
+      <!-- <div class="recent-memorized" v-if="recent.length != 0">
         <div class="section-title">Recently Memorized</div>
         <div class="recent-list">
           <div
@@ -43,8 +39,8 @@
             {{ item.abbreviation }} {{ item.chapter }}:{{ item.verse }}
           </div>
         </div>
-      </div>
-      <div class="collection">
+      </div> -->
+      <div class="collection" v-if="collection.length != 0">
         <div class="section-title">Your Collection</div>
         <div class="collection-list">
           <div
@@ -60,7 +56,6 @@
       <div class="bible-books">
         <div class="bible-books-bar">
           <div class="section-title">Bible Books</div>
-          <!-- <div class="show-all-book-btn" @click="showAllBook"></div> -->
           <v-dialog
             v-model="isShowAllBook"
             width="500"
@@ -75,13 +70,14 @@
                 color="transparent"
                 v-bind="attrs"
                 v-on="on"
+                @click="showAllBook()"
               >
                 Show All
               </v-btn>
             </template>
             <bible-book-panel
               @closeDialog="isShowAllBook = false"
-              :book="selectedBook"
+              @answer="goToAnswer()"
             />
           </v-dialog>
         </div>
@@ -90,9 +86,9 @@
             v-for="n in 15"
             :key="n"
             class="book-item"
-            @click="showBookChapter(bibleBooks[n])"
+            @click="showBookChapter(bibleBooks[n - 1].id)"
           >
-            {{ bibleBooks[n].abbreviation }}
+            {{ bibleBooks[n - 1].abbreviation }}
           </div>
         </div>
       </div>
@@ -102,14 +98,14 @@
 
 <script>
 import firebase from "firebase";
+import bibleBookPanel from "../components/bibleBookPanel";
 import booksChapter from "../data/book.json";
-import bibleBookPanel from "../components/bibleBookPanel.vue";
 
 export default {
   data: () => ({
-    selectedBook: "",
+    selectedBookId: "",
     isShowAllBook: false,
-    level: "Easy",
+    level: "",
     recent: [],
     collection: [],
     bibleBooks: booksChapter.books,
@@ -127,6 +123,9 @@ export default {
     getUserId() {
       return this.$store.getters.getUserInfo.id;
     },
+    getUserEmail() {
+      return firebase.auth().currentUser.email;
+    },
   },
   watch: {
     level: function () {
@@ -134,19 +133,29 @@ export default {
     },
   },
   methods: {
-    showBookChapter() {
+    showBookChapter(bookId) {
+      this.$store.commit("setBibleBookSelectionPanelView", "chapter");
+      this.$store.commit("setSelectedBookId", bookId);
       this.isShowAllBook = true;
+    },
+    goToAnswer() {
+      this.isShowAllBook = false;
+      this.$router.push("/answer");
     },
     goToView(view) {
       this.$store.commit("setView", view);
     },
     goToCollection(item) {
       this.$store.commit("setCollectionId", item.id);
-      this.$store.commit("setView", "Collection");
+      this.$router.push({ name: "collection" });
     },
-    showAllBook() {},
+    showAllBook() {
+      this.$store.commit("setBibleBookSelectionPanelView", "book");
+    },
     changeRoute(rn) {
-      this.$router.push(rn);
+      if (this.$route.name != rn) {
+        this.$router.push({ name: rn.toLowerCase() });
+      }
     },
     startAnswering(ref) {
       this.$store.commit("setBook", { name: ref.name, id: ref.id });
@@ -154,28 +163,28 @@ export default {
       this.$store.commit("setVerses", ref.verse);
       this.$router.push("/answer");
     },
-    getRecent() {
-      const db = firebase.firestore();
-      console.log(this.getUserId);
-      db.collection("users")
-        .doc(this.getUserId)
-        .collection("history")
-        .get()
-        .then((querySnapshot) => {
-          querySnapshot.forEach((doc) => {
-            this.recent.push({
-              id: doc.data().id,
-              name: doc.data().name,
-              abbreviation: doc.data().abbreviation,
-              chapter: doc.data().chapter,
-              verse: doc.data().verse,
-            });
-          });
-        })
-        .catch((error) => {
-          console.log("Error getting users recent verse", error);
-        });
-    },
+    // getRecent() {
+    //   const db = firebase.firestore();
+    //   console.log(this.getUserId);
+    //   db.collection("users")
+    //     .doc(this.getUserId)
+    //     .collection("history")
+    //     .get()
+    //     .then((querySnapshot) => {
+    //       querySnapshot.forEach((doc) => {
+    //         this.recent.push({
+    //           id: doc.data().id,
+    //           name: doc.data().name,
+    //           abbreviation: doc.data().abbreviation,
+    //           chapter: doc.data().chapter,
+    //           verse: doc.data().verse,
+    //         });
+    //       });
+    //     })
+    //     .catch((error) => {
+    //       console.log("Error getting users recent verse", error);
+    //     });
+    // },
     getCollection() {
       const db = firebase.firestore();
 
@@ -199,16 +208,15 @@ export default {
     },
   },
   created() {
+    this.getCollection();
+    // this.getRecent();
     let avatarName = firebase
       .auth()
       .currentUser.email.split("")[0]
       .toUpperCase();
     this.$store.commit("setAvatarName", avatarName);
     this.selectedBook = "";
-  },
-  mounted() {
-    this.getCollection();
-    this.getRecent();
+    this.level = this.getLevel;
   },
 };
 </script>
@@ -272,6 +280,10 @@ export default {
 
 .difficulty {
   margin-bottom: 1rem;
+}
+
+.bible-books {
+  padding-bottom: 3rem;
 }
 
 .bible-books,
