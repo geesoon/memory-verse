@@ -25,7 +25,7 @@ html::-webkit-scrollbar {
 
 body {
   /* Disables pull-to-refresh but allows overscroll glow effects. */
-  overscroll-behavior-y: contain !important;
+  overscroll-behavior-y: auto !important;
 }
 
 .material-icons {
