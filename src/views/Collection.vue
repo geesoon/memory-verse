@@ -187,6 +187,7 @@ export default {
     isShowCollectionOptions: false,
     collectionOptions: [
       { text: "Flash Cards", icon: "style" },
+      { text: "Audio Review", icon: "mic" },
       { text: "Change Review Period", icon: "alarm" },
       { text: "Edit Collection", icon: "edit" },
       { text: "Delete Collection", icon: "clear" },
@@ -325,6 +326,9 @@ export default {
       } else if (opt == "Flash Cards") {
         this.$store.commit("setCollectionVerses", this.verses);
         this.$router.push({ name: "flashcard" });
+      } else if (opt == "Audio Review") {
+        this.$store.commit("setCollectionVerses", this.verses);
+        this.$router.push({ name: "audioreview" });
       }
     },
     chooseCollectionItemOption(opt) {

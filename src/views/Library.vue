@@ -209,8 +209,8 @@ export default {
   flex-direction: row;
   justify-content: space-between;
   align-items: flex-start;
-  padding: 1.5rem 1rem;
-  background: var(--primary);
+  padding: 2rem 2rem;
+  background: #d5e37d;
   box-shadow: 8px 0px 0px 0px;
 }
 

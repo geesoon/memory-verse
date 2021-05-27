@@ -13,7 +13,7 @@
         <p>In the beginning, God created the heaven and the earth</p>
         <p style="text-align: right">- Gen 1:1</p>
       </div>
-      <div class="difficulty">
+      <!-- <div class="difficulty">
         <div class="section-title">Difficulty</div>
         <v-btn-toggle
           v-model="level"
@@ -26,7 +26,7 @@
           <v-btn value="Medium"> Medium </v-btn>
           <v-btn value="Hard"> Hard </v-btn>
         </v-btn-toggle>
-      </div>
+      </div> -->
       <!-- <div class="recent-memorized" v-if="recent.length != 0">
         <div class="section-title">Recently Memorized</div>
         <div class="recent-list">
@@ -163,28 +163,6 @@ export default {
       this.$store.commit("setVerses", ref.verse);
       this.$router.push("/answer");
     },
-    // getRecent() {
-    //   const db = firebase.firestore();
-    //   console.log(this.getUserId);
-    //   db.collection("users")
-    //     .doc(this.getUserId)
-    //     .collection("history")
-    //     .get()
-    //     .then((querySnapshot) => {
-    //       querySnapshot.forEach((doc) => {
-    //         this.recent.push({
-    //           id: doc.data().id,
-    //           name: doc.data().name,
-    //           abbreviation: doc.data().abbreviation,
-    //           chapter: doc.data().chapter,
-    //           verse: doc.data().verse,
-    //         });
-    //       });
-    //     })
-    //     .catch((error) => {
-    //       console.log("Error getting users recent verse", error);
-    //     });
-    // },
     getCollection() {
       const db = firebase.firestore();
 
@@ -209,7 +187,6 @@ export default {
   },
   created() {
     this.getCollection();
-    // this.getRecent();
     let avatarName = firebase
       .auth()
       .currentUser.email.split("")[0]

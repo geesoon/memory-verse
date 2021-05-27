@@ -7,15 +7,22 @@
         color="primary"
         @click="isShowBackCard = !isShowBackCard"
       >
-        <div class="flash-card-container front">
-          <div class="front-card-title">
-            {{ this.getBibleVersion }}
+        <section>
+          <div class="flash-card-container front">
+            <div class="front-card-title">
+              {{ this.getBibleVersion }}
+            </div>
+            <div class="front-card-title">
+              {{ this.getReference }}
+            </div>
+            <div class="front-card-subtitle">Memorization</div>
           </div>
-          <div class="front-card-title">
-            {{ this.getReference }}
-          </div>
-          <div class="front-card-subtitle">Memorization</div>
-        </div>
+        </section>
+        <section>
+          <v-btn icon @click="recordVoice()">
+            <span class="material-icons mic-icon"> mic </span>
+          </v-btn>
+        </section>
         <section class="swiping-icons-container" v-show="isShowSwipingIcons">
           <span class="material-icons swipe-icon" id="swipe-back">
             arrow_back_ios
@@ -102,6 +109,26 @@ export default {
     },
   },
   methods: {
+    recordVoice() {
+      console.log("recording voice");
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        console.log("getUserMedia supported.");
+        navigator.mediaDevices
+          .getUserMedia(
+            // constraints - only audio needed for this app
+            {
+              audio: true,
+            }
+          )
+
+          // Error callback
+          .catch(function (err) {
+            console.log("The following getUserMedia error occurred: " + err);
+          });
+      } else {
+        console.log("getUserMedia not supported on your browser!");
+      }
+    },
     dragStart() {
       this.isShowSwipingIcons = true;
     },
@@ -192,6 +219,10 @@ export default {
   width: 100%;
 }
 
+.mic-icon {
+  font-size: 50px;
+}
+
 .swipe-icon {
   font-size: 80px;
   opacity: 0.7;
@@ -209,6 +240,10 @@ export default {
   margin: 1rem 0.5rem;
   height: 95vh;
   border-radius: 1rem !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
 }
 
 .flash-card-container {
