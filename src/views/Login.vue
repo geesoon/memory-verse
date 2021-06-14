@@ -19,6 +19,7 @@
         >
       </div>
     </section>
+    <loading-overlay :active="isLoading" :is-full-page="fullPage" />
   </v-container>
 </template>
 
@@ -30,13 +31,19 @@ export default {
     return {
       email: "",
       password: "",
+      isLoading: false,
+      fullPage: true,
     };
   },
   methods: {
+    onCancel() {
+      console.log("User cancelled the loader.");
+    },
     gotoHome() {
       this.$router.push({ path: "/" });
     },
     login() {
+      this.isLoading = true;
       firebase
         .auth()
         .signInWithEmailAndPassword(this.email, this.password)
@@ -45,6 +52,7 @@ export default {
         })
         .catch((error) => {
           alert(error.message);
+          this.isLoading = false;
         });
     },
     getUserId() {
@@ -61,6 +69,7 @@ export default {
               id: doc.id,
             });
           });
+          this.isLoading = false;
           this.$router.replace("/dashboard/main");
         })
         .catch((error) => {

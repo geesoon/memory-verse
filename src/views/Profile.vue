@@ -1,17 +1,22 @@
 <template>
-  <section class="profile-container">
-    <div class="profile-nav-bar">
-      <span class="material-icons" @click="popState()"> arrow_back </span>
-    </div>
-    <div class="profilePic">
-      <div class="avatar">{{ this.getAvatarName }}</div>
-      <!-- <div @click="updateProfilePic">Change</div> -->
-    </div>
-    <div class="profileInfo">
-      <div class="user-email">{{ this.getUserEmail() }}</div>
-      <div class="update-pw-btn" @click="updatePassword">Update Password</div>
-    </div>
-    <div class="logout-btn" @click="logout">Log Out</div>
+  <section>
+    <v-app-bar color="primary">
+      <div class="profile-nav-bar">
+        <span class="material-icons" @click="popState()"> arrow_back </span>
+      </div>
+    </v-app-bar>
+    <section class="profile-container">
+      <div class="profilePic">
+        <div class="avatar">{{ this.getAvatarName }}</div>
+        <!-- <div @click="updateProfilePic">Change</div> -->
+      </div>
+      <div class="profileInfo">
+        <div class="user-email">{{ this.getUserEmail() }}</div>
+        <div class="update-pw-btn" @click="updatePassword">Update Password</div>
+      </div>
+      <div class="logout-btn" @click="logout">Log Out</div>
+    </section>
+    <loading-overlay :active="isLoading" :is-full-page="fullPage" />
   </section>
 </template>
 
@@ -19,6 +24,12 @@
 import firebase from "firebase";
 
 export default {
+  data() {
+    return {
+      isLoading: false,
+      fullPage: true,
+    };
+  },
   computed: {
     getAvatarName() {
       return this.$store.getters.getAvatarName;
@@ -41,20 +52,25 @@ export default {
       console.log("update password");
     },
     logout() {
-      firebase
-        .auth()
-        .signOut()
-        .then(() => {
-          alert("Successfully logged out");
-          this.$router.push("/");
-          this.$store.commit("setView", "Home");
-          this.$store.commit("clearState");
-        })
-        .catch((error) => {
-          alert(error.message);
-          this.$router.push("/");
-          this.$store.commit("setView", "Home");
-        });
+      this.isLoading = true;
+      setTimeout(() => {
+        firebase
+          .auth()
+          .signOut()
+          .then(() => {
+            this.$store.commit("clearState");
+            this.$store.commit("resetSelection");
+            this.$router.push("/");
+            this.isLoading = false;
+          })
+          .catch((error) => {
+            alert(error.message);
+            this.$store.commit("clearState");
+            this.$store.commit("resetSelection");
+            this.$router.push("/");
+            this.isLoading = false;
+          });
+      }, 1000);
     },
   },
 };
@@ -66,7 +82,7 @@ export default {
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
-  width: 100%;
+  min-width: 100%;
 }
 
 .profile-nav-bar {

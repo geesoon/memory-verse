@@ -1,93 +1,89 @@
 <template>
-  <v-card>
-    <v-container class="verse-selection-container">
-      <!-- Verses Selection Overlay Panel -->
-      <v-toolbar flat light>
-        <div class="verse-nav-bar">
-          <span class="material-icons" @click="goBack()"> arrow_back </span>
-          <span class="material-icons" @click="resetPanelState()"> clear </span>
-        </div>
-      </v-toolbar>
+  <v-card class="verse-selection-container" flat>
+    <!-- Verses Selection Overlay Panel -->
+    <v-toolbar color="primary">
+      <div class="verse-nav-bar">
+        <span class="material-icons" @click="goBack()"> arrow_back </span>
+        <span class="material-icons" @click="resetPanelState()"> clear </span>
+      </div>
+    </v-toolbar>
 
-      <!-- Select Book -->
-      <div
-        v-if="this.getBibleBookSelectionPanelView == 'book'"
-        class="books-overlay-container"
-      >
-        <div class="testament-title">
-          <span class="material-icons"> book </span>
-          Old Testament
-        </div>
-        <div class="books-list-container">
-          <div
-            class="books-title"
-            v-for="book in OTBooks"
-            :key="book.id"
-            @click="showBookChaptersPanel(book.id)"
-          >
-            {{ book.abbreviation }}
-          </div>
-        </div>
-        <div class="testament-title">
-          <span class="material-icons"> book </span>New Testament
-        </div>
-        <div class="books-list-container">
-          <div
-            class="books-title"
-            v-for="book in NTBooks"
-            :key="book.id"
-            @click="showBookChaptersPanel(book.id)"
-          >
-            {{ book.abbreviation }}
-          </div>
+    <!-- Select Book -->
+    <div
+      v-if="this.getBibleBookSelectionPanelView == 'book'"
+      class="books-overlay-container"
+    >
+      <div class="testament-title">
+        <span class="material-icons"> book </span>
+        Old Testament
+      </div>
+      <div class="books-list-container">
+        <div
+          class="books-title"
+          v-for="book in OTBooks"
+          :key="book.id"
+          @click="showBookChaptersPanel(book.id)"
+        >
+          {{ book.abbreviation }}
         </div>
       </div>
-
-      <!-- Select Chapter -->
-      <div
-        v-if="this.getBibleBookSelectionPanelView == 'chapter'"
-        class="chapters-overlay-container"
-      >
-        <div class="book-verses-title">{{ this.getSelection.book.name }}</div>
-        <div class="chapter-list-container">
-          <div
-            class="chapter-title-box"
-            v-for="chapterNum in numOfChapters"
-            :key="chapterNum"
-            @click="showChaptersVersesPanel(chapterNum)"
-          >
-            {{ chapterNum }}
-          </div>
+      <div class="testament-title">
+        <span class="material-icons"> book </span>New Testament
+      </div>
+      <div class="books-list-container">
+        <div
+          class="books-title"
+          v-for="book in NTBooks"
+          :key="book.id"
+          @click="showBookChaptersPanel(book.id)"
+        >
+          {{ book.abbreviation }}
         </div>
       </div>
+    </div>
 
-      <!-- Select Verses -->
-      <div
-        v-if="this.getBibleBookSelectionPanelView == 'verse'"
-        class="verses-overlay-container"
-      >
-        <div class="book-verses-title">
-          {{ this.getSelection.book.name + " " + this.getSelection.chapter }}
-        </div>
-        <div class="loading-container" v-if="this.isLoadingVerses">
-          <span class="material-icons"> pending </span>
-        </div>
-        <div class="verse-list-container" v-else>
-          <div
-            class="verse-title-box"
-            v-for="verseNum in numOfVerses"
-            :key="verseNum"
-            :id="`v${verseNum}`"
-            @click="updateSelectionVerse(verseNum, `v${verseNum}`)"
-          >
-            v{{ verseNum }}
-          </div>
+    <!-- Select Chapter -->
+    <div
+      v-if="this.getBibleBookSelectionPanelView == 'chapter'"
+      class="chapters-overlay-container"
+    >
+      <div class="book-verses-title">{{ this.getSelection.book.name }}</div>
+      <div class="chapter-list-container">
+        <div
+          class="chapter-title-box"
+          v-for="chapterNum in numOfChapters"
+          :key="chapterNum"
+          @click="showChaptersVersesPanel(chapterNum)"
+        >
+          {{ chapterNum }}
         </div>
       </div>
-    </v-container>
+    </div>
+
+    <!-- Select Verses -->
+    <div
+      v-if="this.getBibleBookSelectionPanelView == 'verse'"
+      class="verses-overlay-container"
+    >
+      <div class="book-verses-title">
+        {{ this.getSelection.book.name + " " + this.getSelection.chapter }}
+      </div>
+      <div class="verse-list-container" v-if="!isLoadingVerses">
+        <div
+          class="verse-title-box"
+          v-for="verseNum in numOfVerses"
+          :key="verseNum"
+          :id="`v${verseNum}`"
+          @click="updateSelectionVerse(verseNum, `v${verseNum}`)"
+        >
+          v{{ verseNum }}
+        </div>
+      </div>
+    </div>
     <div class="select-verse-bar">
       <button class="select-verse-btn" @click="finishSelection()">Add</button>
     </div>
+    <loading-overlay :active="isLoadingVerses" :is-full-page="fullPage" />
   </v-card>
 </template>
 
@@ -103,9 +99,10 @@ export default {
         bible.books /**Stored json data locally to lower the number of queries needed to select a verse */,
       numOfChapters: "",
       numOfVerses: "",
-      isLoadingVerses: true /**Indicator for verse loading spinner */,
+      isLoadingVerses: false /**Indicator for verse loading spinner */,
       isStartAlert: false /**Indicator for no-verse selected start */,
       isStartVerse: true,
+      fullPage: true,
     };
   },
   computed: {
@@ -177,6 +174,8 @@ export default {
       /**
        * Fetch verses reference in the book:chapter
        */
+
+      this.isLoadingVerses = true;
       this.$store.commit("setChapter", chapterNum);
       this.$store.commit("setBibleBookSelectionPanelView", "verse");
       const header = new Headers();
@@ -199,6 +198,7 @@ export default {
           this.numOfVerses = data.data.length;
         })
         .catch((e) => {
+          this.isLoadingVerses = false;
           alert(e);
         });
     },
@@ -214,7 +214,6 @@ export default {
       this.numOfChapters = this.bibleBooks.find((book) => {
         return book.id === bookId;
       }).length;
-
       book.id = bookId;
       book.name = this.bibleBooks.find((book) => {
         return book.id === bookId;
@@ -262,7 +261,7 @@ export default {
 }
 
 .select-verse-btn {
-  font-size: 1.5rem;
+  font-size: 1rem;
   min-width: 100%;
   padding: 0.5rem 0rem;
 }

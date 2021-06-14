@@ -59,6 +59,7 @@
           <v-dialog
             v-model="isShowAllBook"
             width="500"
+            persistent
             fullscreen
             hide-overlay
             transition="dialog-bottom-transition"

@@ -1,100 +1,98 @@
 <template>
-  <v-card>
-    <v-card-title class="add-collection-title-bar">
-      <span>Add Collection</span>
-    </v-card-title>
-    <v-card-text>
-      <v-container>
-        <v-row>
-          <v-col cols="12" md="12">
-            <v-text-field
-              v-model="collection.name"
-              label="Collection name*"
-              required
-              clearable
-              dense
-              outlined
-            ></v-text-field>
-            <div v-if="this.error != ''" class="error-message">
-              {{ this.error }}
-            </div>
-          </v-col>
-          <v-col cols="12" md="6">
-            <v-select
-              v-model="collection.reviewPeriod"
-              outlined
-              dense
-              :items="['Everyday', '3 days', '1 week', '2 weeks', '3 weeks']"
-              label="Review Period*"
-              required
-            ></v-select>
-          </v-col>
-          <v-col cols="12" md="12">
-            <v-dialog
-              v-model="isShowAllBook"
-              width="500"
-              fullscreen
-              hide-overlay
-              transition="dialog-bottom-transition"
-            >
-              <template v-slot:activator="{ on, attrs }">
-                <v-btn
-                  color="primary"
-                  v-bind="attrs"
-                  v-on="on"
-                  @click="showAllBook()"
-                >
-                  Add Verses
-                </v-btn>
-              </template>
-              <addCollectionBibleBookPanel
-                @updateVerse="updateVerseAdded()"
-                @closeDialog="closeAddVersePanel()"
-              ></addCollectionBibleBookPanel>
-            </v-dialog>
-          </v-col>
-          <v-col cols="12" md="12">
-            <v-chip-group column>
-              <v-chip
-                v-for="(verse, key) in collection.verses"
-                :key="key"
-                close
-                @click:close="removeVerse(verse)"
-                color="primary"
+  <v-card flat>
+    <v-toolbar dense color="primary">
+      <v-toolbar-title>Add Collection</v-toolbar-title>
+    </v-toolbar>
+    <v-container>
+      <v-row>
+        <v-col cols="12" md="12">
+          <v-text-field
+            v-model="collection.name"
+            label="Collection name*"
+            required
+            clearable
+            dense
+            outlined
+            color="whitesmoke"
+          ></v-text-field>
+          <div v-if="this.error != ''" class="error-message">
+            {{ this.error }}
+          </div>
+        </v-col>
+        <v-col cols="12" md="6">
+          <v-select
+            v-model="collection.reviewPeriod"
+            outlined
+            dense
+            :items="['Everyday', '3 days', '1 week', '2 weeks', '3 weeks']"
+            label="Review Period*"
+            required
+            color="whitesmoke"
+          ></v-select>
+        </v-col>
+        <v-col cols="12" md="12">
+          <v-dialog
+            v-model="isShowAllBook"
+            width="500"
+            fullscreen
+            hide-overlay
+            transition="dialog-bottom-transition"
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                color="whitesmoke"
+                v-bind="attrs"
+                v-on="on"
+                @click="showAllBook()"
               >
-                <span v-if="verse.startVerse != '' && verse.endVerse != ''">
-                  {{ verse.book.name }} {{ verse.chapter }}:{{
-                    verse.startVerse
-                  }}-{{ verse.endVerse }} ({{ verse.bibleVersion }})
-                </span>
-                <span
-                  v-else-if="verse.endVerse == '' && verse.startVerse == ''"
-                >
-                  {{ verse.book.name }} {{ verse.chapter }} ({{
-                    verse.bibleVersion
-                  }})
-                </span>
-                <span v-else>
-                  {{ verse.book.name }} {{ verse.chapter }}:{{
-                    verse.startVerse
-                  }}
-                  ({{ verse.bibleVersion }})
-                </span>
-              </v-chip>
-            </v-chip-group>
-          </v-col>
-        </v-row>
-      </v-container>
-      <v-col cols="12">
-        <small>*indicates required field</small>
-      </v-col>
-    </v-card-text>
+                Add Verses
+              </v-btn>
+            </template>
+            <addCollectionBibleBookPanel
+              @updateVerse="updateVerseAdded()"
+              @closeDialog="closeAddVersePanel()"
+            ></addCollectionBibleBookPanel>
+          </v-dialog>
+        </v-col>
+        <v-col cols="12" md="12">
+          <v-chip-group column>
+            <v-chip
+              v-for="(verse, key) in collection.verses"
+              :key="key"
+              close
+              @click:close="removeVerse(verse)"
+              color="whitesmoke"
+            >
+              <span v-if="verse.startVerse != '' && verse.endVerse != ''">
+                {{ verse.book.name }} {{ verse.chapter }}:{{
+                  verse.startVerse
+                }}-{{ verse.endVerse }} ({{ verse.bibleVersion }})
+              </span>
+              <span v-else-if="verse.endVerse == '' && verse.startVerse == ''">
+                {{ verse.book.name }} {{ verse.chapter }} ({{
+                  verse.bibleVersion
+                }})
+              </span>
+              <span v-else>
+                {{ verse.book.name }} {{ verse.chapter }}:{{
+                  verse.startVerse
+                }}
+                ({{ verse.bibleVersion }})
+              </span>
+            </v-chip>
+          </v-chip-group>
+        </v-col>
+      </v-row>
+    </v-container>
+    <v-col cols="12">
+      <small>*indicates required field</small>
+    </v-col>
     <v-card-actions>
       <v-spacer></v-spacer>
-      <v-btn color="blue darken-1" text @click="closeAddCollectionDialog()">
+      <v-btn color="darken-1" text @click="closeAddCollectionDialog()">
         Close
       </v-btn>
-      <v-btn color="blue darken-1" text @click="addCollection()"> Save </v-btn>
+      <v-btn color="darken-1" text @click="addCollection()"> Save </v-btn>
     </v-card-actions>
   </v-card>
 </template>

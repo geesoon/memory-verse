@@ -5,6 +5,8 @@ import router from "./router";
 import store from "./store";
 import firebase from "firebase";
 import vuetify from "./plugins/vuetify";
+import Loading from "vue-loading-overlay";
+import "vue-loading-overlay/dist/vue-loading.css";
 
 Vue.config.productionTip = false;
 
@@ -21,6 +23,8 @@ var firebaseConfig = {
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 firebase.analytics();
+
+Vue.component("loading-overlay", Loading);
 
 new Vue({
   router,

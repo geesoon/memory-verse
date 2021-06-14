@@ -15,7 +15,6 @@
       v-model="isAddCollection"
       persistent
       fullscreen
-      scrollable
       hide-overlay
       transition="dialog-bottom-transition"
     >

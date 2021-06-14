@@ -1,13 +1,13 @@
 <template>
   <section>
-    <v-toolbar flat light>
+    <v-app-bar color="primary">
       <div class="collection-nav-bar">
         <span class="material-icons" @click="popRoute()"> arrow_back </span
         ><span class="material-icons" @click="isShowCollectionOptions = true">
           more_vert
         </span>
       </div>
-    </v-toolbar>
+    </v-app-bar>
     <div class="collection-info">
       <div class="collection-title">
         {{ name }}

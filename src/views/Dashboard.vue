@@ -1,5 +1,5 @@
 <template>
-  <v-container class="dashboard-container">
+  <section class="dashboard-container">
     <router-view></router-view>
     <!-- Mobile navigation drawer -->
     <v-bottom-navigation
@@ -68,7 +68,7 @@
         <v-list-item> </v-list-item>
       </v-list>
     </v-navigation-drawer>
-  </v-container>
+  </section>
 </template>
 
 <script>
