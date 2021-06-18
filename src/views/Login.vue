@@ -1,30 +1,54 @@
 <template>
   <v-container class="home-container">
-    <div class="home-title">Memory<br />Verse</div>
+    <div class="home-title">
+      Memory<br>Verse
+    </div>
     <section class="login-form-container">
-      <form @submit.prevent="login" class="login-form">
-        <input type="text" placeholder="Email" v-model="email" />
-        <input type="password" placeholder="Password" v-model="password" />
-        <button type="submit" class="login-btn">Log In</button>
-        <router-link to="/guests" class="guest-btn"
-          >Log In As Guest</router-link
+      <form
+        class="login-form"
+        @submit.prevent="login"
+      >
+        <input
+          v-model="email"
+          type="text"
+          placeholder="Email"
         >
+        <input
+          v-model="password"
+          type="password"
+          placeholder="Password"
+        >
+        <button
+          type="submit"
+          class="login-btn"
+        >
+          Log In
+        </button>
+        <router-link
+          to="/guests"
+          class="guest-btn"
+        >
+          Log In As Guest
+        </router-link>
       </form>
       <div class="sign-in-tip">
-        <span
-          >Don't have an account?
-          <router-link to="/register" class="sign-in-link"
-            >Create an account now</router-link
-          ></span
-        >
+        <span>Don't have an account?
+          <router-link
+            to="/register"
+            class="sign-in-link"
+          >Create an account now</router-link></span>
       </div>
     </section>
-    <loading-overlay :active="isLoading" :is-full-page="fullPage" />
+    <loading-overlay
+      :active="isLoading"
+      :is-full-page="fullPage"
+    />
   </v-container>
 </template>
 
 <script>
-import firebase from "firebase";
+import Auth from "../apis/auth";
+import Account from "../apis/account";
 
 export default {
   data() {
@@ -44,37 +68,17 @@ export default {
     },
     login() {
       this.isLoading = true;
-      firebase
-        .auth()
-        .signInWithEmailAndPassword(this.email, this.password)
-        .then(() => {
-          this.getUserId();
-        })
-        .catch((error) => {
-          alert(error.message);
-          this.isLoading = false;
-        });
-    },
-    getUserId() {
-      console.log("get user's id");
-      const db = firebase.firestore();
-      let logonEmail = firebase.auth().currentUser.email;
-      db.collection("users")
-        .where("email", "==", logonEmail)
-        .get()
-        .then((querySnapshot) => {
-          querySnapshot.forEach((doc) => {
-            this.$store.commit("setUser", {
-              email: this.email,
-              id: doc.id,
-            });
-          });
-          this.isLoading = false;
+      Auth.login(this.email, this.password).then((res) => {
+        console.log(res);
+        if (res.valid === true) {
+          let userId = Account.getUserId();
+          this.$store.commit("setUser", { email: this.email, id: userId });
           this.$router.replace("/dashboard/main");
-        })
-        .catch((error) => {
-          console.log("Error getting users id", error);
-        });
+          this.isLoading = false;
+        } else {
+          alert(res.error);
+        }
+      });
     },
   },
 };

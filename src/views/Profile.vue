@@ -1,17 +1,13 @@
 <template>
   <section>
-    <v-app-bar color="primary">
-      <div class="profile-nav-bar">
-        <span class="material-icons" @click="popState()"> arrow_back </span>
-      </div>
-    </v-app-bar>
+    <header-drawer />
     <section class="profile-container">
       <div class="profilePic">
         <div class="avatar">{{ this.getAvatarName }}</div>
         <!-- <div @click="updateProfilePic">Change</div> -->
       </div>
       <div class="profileInfo">
-        <div class="user-email">{{ this.getUserEmail() }}</div>
+        <div class="user-email">{{ this.getUserEmail }}</div>
         <div class="update-pw-btn" @click="updatePassword">Update Password</div>
       </div>
       <div class="logout-btn" @click="logout">Log Out</div>
@@ -21,7 +17,7 @@
 </template>
 
 <script>
-import firebase from "firebase";
+import HeaderDrawer from "../components/headerDrawer";
 
 export default {
   data() {
@@ -30,6 +26,9 @@ export default {
       fullPage: true,
     };
   },
+  components: {
+    HeaderDrawer,
+  },
   computed: {
     getAvatarName() {
       return this.$store.getters.getAvatarName;
@@ -37,13 +36,13 @@ export default {
     getPreviousView() {
       return this.$store.getters.getPreviousView;
     },
+    getUserEmail() {
+      return this.$store.getters.getUserEmail;
+    },
   },
   methods: {
     popState() {
       this.$router.back();
-    },
-    getUserEmail() {
-      return firebase.auth().currentUser.email;
     },
     updateProfilePic() {
       console.log("update profile pic");
@@ -54,22 +53,11 @@ export default {
     logout() {
       this.isLoading = true;
       setTimeout(() => {
-        firebase
-          .auth()
-          .signOut()
-          .then(() => {
-            this.$store.commit("clearState");
-            this.$store.commit("resetSelection");
-            this.$router.push("/");
-            this.isLoading = false;
-          })
-          .catch((error) => {
-            alert(error.message);
-            this.$store.commit("clearState");
-            this.$store.commit("resetSelection");
-            this.$router.push("/");
-            this.isLoading = false;
-          });
+        this.$store.commit("logout");
+        this.$store.commit("clearState");
+        this.$store.commit("resetSelection");
+        this.isLoading = false;
+        this.$router.replace("/");
       }, 1000);
     },
   },

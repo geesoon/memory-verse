@@ -1,7 +1,8 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import verseSelection from "./modules/verse";
-import dashboard from "./modules/dashboard";
+import Selection from "./modules/selection";
+import Memorization from "./modules/memorization";
+import User from "./modules/user";
 
 Vue.use(Vuex);
 
@@ -10,7 +11,8 @@ export default new Vuex.Store({
   mutations: {},
   actions: {},
   modules: {
-    dashboard,
-    verseSelection,
+    Selection,
+    Memorization,
+    User,
   },
 });

@@ -168,6 +168,7 @@ export default {
     },
     resetPanelState() {
       this.$store.commit("resetSelection");
+      this.$store.commit("clearSelectionPanel");
       this.$emit("closeDialog");
     },
     showChaptersVersesPanel(chapterNum) {

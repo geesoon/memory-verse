@@ -1,13 +1,14 @@
 <template>
   <section>
+    <header-drawer />
     <div class="header-bar">
       <div class="my-collection-bar">
-        <div
+        <!-- <div
           class="avatar-container library-avatar"
           @click="changeRoute('profile')"
         >
           <div class="avatar-circle">{{ this.getAvatarName }}</div>
-        </div>
+        </div> -->
         <div class="section-title">Your Collection</div>
       </div>
     </div>
@@ -33,7 +34,7 @@
         </v-btn>
       </template>
     </v-snackbar>
-    <section class="collection-container">
+    <section>
       <v-fab-transition>
         <v-btn class="fab-add-collection" color="primary" fab right>
           <span class="material-icons" @click="goToSelectVerse()">
@@ -88,6 +89,7 @@
 <script>
 import firebase from "firebase";
 import AddNewCollection from "../components/addNewCollection.vue";
+import HeaderDrawer from "../components/headerDrawer.vue";
 
 export default {
   data: () => ({
@@ -100,6 +102,7 @@ export default {
   }),
   components: {
     AddNewCollection,
+    HeaderDrawer,
   },
   computed: {
     getAvatarName() {
@@ -170,11 +173,6 @@ export default {
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-}
-
-.collection-container {
-  padding-top: 5rem;
-  margin: 0rem 1rem;
 }
 
 .my-collection-item {

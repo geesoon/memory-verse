@@ -9,8 +9,9 @@ const state = {
     bibleVersion: "KJV",
   },
   level: "Easy",
-  isStartAlert: false,
-  collectionVerses: [],
+  selectedCollectionId: "",
+  selectedBookId: "",
+  panelView: "",
 };
 
 const getters = {
@@ -18,19 +19,20 @@ const getters = {
     return {
       selection: state.selection,
       level: state.level,
-      isStartAlert: state.isStartAlert,
     };
   },
-  getCollectionVerses: (state) => {
-    return state.collectionVerses;
+  getCollectionId(state) {
+    return state.selectedCollectionId;
+  },
+  getBibleBookSelectionPanelView(state) {
+    return state.panelView;
+  },
+  getSelectedBookId(state) {
+    return state.selectedBookId;
   },
 };
 
 const mutations = {
-  setCollectionVerses(state, verses) {
-    state.collectionVerses = [];
-    state.collectionVerses = [...verses];
-  },
   setSelection(state, selection) {
     state.selection.book.id = selection.book.id;
     state.selection.book.name = selection.book.name;
@@ -39,9 +41,6 @@ const mutations = {
     state.selection.endVerse = selection.endVerse;
     state.selection.next = selection.next;
     state.selection.previous = selection.previous;
-  },
-  setStartAlert(state, alert) {
-    state.isStartAlert = alert;
   },
   setBook(state, book) {
     state.selection.book.id = book.id;
@@ -73,8 +72,17 @@ const mutations = {
     state.selection.endVerse = "";
     state.selection.next = "";
     state.selection.previous = "";
-    state.isStartAlert = false;
-    state.collectionVerses = [];
+    state.selectedBookId = "";
+    state.panelView = "";
+  },
+  setCollectionId(state, id) {
+    state.selectedCollectionId = id;
+  },
+  setBibleBookSelectionPanelView(state, panelView) {
+    state.panelView = panelView;
+  },
+  setSelectedBookId(state, id) {
+    state.selectedBookId = id;
   },
 };
 

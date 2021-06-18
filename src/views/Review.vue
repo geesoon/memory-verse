@@ -1,5 +1,6 @@
 <template>
   <section class="review-container">
+    <header-drawer />
     <div class="review-title">Review</div>
     <div class="review-tip-box">Stay Tuned</div>
   </section>
@@ -7,11 +8,15 @@
 
 <script>
 import bibleBooks from "../data/book.json";
+import headerDrawer from "../components/headerDrawer.vue";
 
 export default {
   data: () => ({
     books: bibleBooks.books,
   }),
+  components: {
+    headerDrawer,
+  },
 };
 </script>
 

@@ -203,7 +203,6 @@ export default {
         opts = [
           { text: "Change Difficulty", icon: "settings" },
           { text: "Change Bible Version", icon: "book" },
-          { text: "Turn on auto-verse", icon: "toggle_off" },
           { text: "Add to collection", icon: "playlist_add" },
           { text: "Turn on auto-verse", icon: "toggle_off" },
         ];
@@ -377,7 +376,7 @@ export default {
       this.retrieveBlankLocation();
     },
     resetListener(e) {
-      /**onclick listener attached to every answered block to remove from question container and attach back to the answer pool */
+      /** onclick listener attached to every answered block to remove from question container and attach back to the answer pool */
       var clickedAnsweredBlock = document.getElementById(e.target.id);
       console.log(clickedAnsweredBlock);
       //append answer back to answer container
