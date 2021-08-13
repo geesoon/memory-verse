@@ -1,5 +1,5 @@
 <template>
-  <v-container class="home-container">
+  <section class="register-container">
     <div class="register-header">
       <div class="home-title-top-left" @click="gotoHome">Memory Verse</div>
       <div class="register-info">
@@ -18,7 +18,7 @@
         <router-link to="/" class="sign-in-link">Log In</router-link></span
       >
     </div>
-  </v-container>
+  </section>
 </template>
 
 <script>
@@ -52,6 +52,15 @@ export default {
 </script>
 
 <style>
+.register-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-width: 100%;
+  min-height: 100%;
+}
+
 .sign-up {
   font-size: 1.5rem;
   font-weight: bold;
@@ -87,8 +96,10 @@ export default {
   flex-direction: column;
   justify-content: space-around;
   align-content: center;
-  margin: 4rem 1rem 4rem 1rem;
   height: 20vh;
+  width: 100%;
+  margin-top: 3rem;
+  margin-bottom: 3rem;
 }
 
 .register-form > input {
@@ -109,5 +120,32 @@ export default {
   border-radius: 0.5rem;
   background: #42b72a;
   color: white;
+}
+
+@media only screen and (min-width: 768px) {
+  .register-container {
+    max-width: 60vw !important;
+  }
+  .register-form {
+    width: 60vw;
+  }
+}
+
+@media only screen and (min-width: 1024px) {
+  .register-container {
+    max-width: 40vw !important;
+  }
+  .register-form {
+    width: 40vw;
+  }
+}
+
+@media only screen and (min-width: 1440px) {
+  .register-container {
+    max-width: 30vw !important;
+  }
+  .register-form {
+    width: 30vw;
+  }
 }
 </style>

@@ -1,9 +1,11 @@
 <template>
   <v-card class="verse-selection-container" flat>
     <!-- Verses Selection Overlay Panel -->
-    <v-toolbar color="primary">
+    <v-toolbar flat>
       <div class="verse-nav-bar">
-        <span class="material-icons" @click="goBack()"> arrow_back </span>
+        <div>
+          <span class="material-icons" @click="goBack()"> arrow_back </span>
+        </div>
         <span class="material-icons" @click="resetPanelState()"> clear </span>
       </div>
     </v-toolbar>
@@ -47,7 +49,11 @@
       v-if="this.getBibleBookSelectionPanelView == 'chapter'"
       class="chapters-overlay-container"
     >
-      <div class="book-verses-title">{{ this.getSelection.book.name }}</div>
+      <div class="book-verses-title">
+        <span>
+          {{ this.getSelection.book.name }}
+        </span>
+      </div>
       <div class="chapter-list-container">
         <div
           class="chapter-title-box"
@@ -66,7 +72,10 @@
       class="verses-overlay-container"
     >
       <div class="book-verses-title">
-        {{ this.getSelection.book.name + " " + this.getSelection.chapter }}
+        <span>
+          {{ this.getSelection.book.name + " " + this.getSelection.chapter }}
+        </span>
+        <button class="add-verse-btn" @click="finishSelection()">Add</button>
       </div>
       <div class="verse-list-container" v-if="!isLoadingVerses">
         <div
@@ -80,7 +89,10 @@
         </div>
       </div>
     </div>
-    <div class="select-verse-bar">
+    <div
+      class="select-verse-bar"
+      v-if="this.getBibleBookSelectionPanelView == 'verse'"
+    >
       <button class="select-verse-btn" @click="finishSelection()">Add</button>
     </div>
     <loading-overlay :active="isLoadingVerses" :is-full-page="fullPage" />
@@ -168,7 +180,6 @@ export default {
     },
     resetPanelState() {
       this.$store.commit("resetSelection");
-      this.$store.commit("clearSelectionPanel");
       this.$emit("closeDialog");
     },
     showChaptersVersesPanel(chapterNum) {
@@ -251,20 +262,25 @@ export default {
 </script>
 
 <style>
+.add-verse-btn {
+  display: none;
+}
+
 .select-verse-bar {
   position: fixed;
-  bottom: 0;
+  bottom: 5%;
   min-width: 100%;
-  background: whitesmoke;
   text-align: center;
   z-index: 4;
   cursor: pointer;
 }
 
 .select-verse-btn {
-  font-size: 1rem;
-  min-width: 100%;
+  font-size: 1.3rem;
+  min-width: 40%;
+  border-radius: 1rem;
   padding: 0.5rem 0rem;
+  background: #d5e37d;
 }
 
 .verse-selection-container {
@@ -278,6 +294,17 @@ export default {
   align-items: center;
   width: 100%;
   height: 5vh;
+}
+
+.verse-nav-bar > div {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-items: flex-start;
+}
+
+.verse-nav-bar > div > span {
+  margin-right: 1rem;
 }
 
 /* Select book */
@@ -303,7 +330,7 @@ export default {
 .verses-overlay-container {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
   align-items: flex-start;
 }
 
@@ -323,8 +350,7 @@ export default {
   height: 4rem;
 }
 
-.books-title,
-.book-verses-title {
+.books-title {
   border-radius: 5px;
   background-color: #d5e37d;
   margin: 0.5rem;
@@ -337,6 +363,18 @@ export default {
   cursor: pointer;
 }
 
+.book-verses-title {
+  margin: 0.5rem;
+  font-size: 1rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: row;
+  cursor: pointer;
+  min-width: 80%;
+}
+
 .verse-title-box-active,
 .chapter-title-box:hover,
 .books-title:hover {
@@ -346,12 +384,22 @@ export default {
   transition: 0.5s;
 }
 
-.book-verses-title {
+.book-verses-title > span {
   font-size: 1.5rem !important;
   background-color: #d5e37d;
   padding: 0.5rem;
   border-radius: 5px;
   box-shadow: 10px 10px;
+}
+
+.add-verse-btn {
+  background-color: #d5e37d;
+  padding: 1rem;
+  border-radius: 5px;
+}
+
+.add-verse-btn:hover {
+  opacity: 0.8;
 }
 
 .verse-title-box-active,
@@ -441,6 +489,14 @@ export default {
 }
 
 @media only screen and (min-width: 1024px) {
+  .select-verse-bar {
+    display: none;
+  }
+
+  .add-verse-btn {
+    display: block;
+  }
+
   .verse-selection-container {
     width: 50vw !important;
   }
@@ -455,6 +511,25 @@ export default {
     font-weight: bold;
     margin: 1rem 0rem;
     text-align: start;
+  }
+
+  .books-overlay-container,
+  .chapters-overlay-container,
+  .verses-overlay-container {
+    margin-top: 3rem;
+    align-items: center;
+  }
+
+  .books-list-container,
+  .verse-list-container,
+  .chapter-list-container {
+    max-width: 80%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    margin-top: 1rem;
   }
 }
 </style>

@@ -1,15 +1,15 @@
 import firebase from "firebase";
 
 export default {
-  getUserId() {
+  async getUserId(email) {
     const db = firebase.firestore();
-    let logonEmail = firebase.auth().currentUser.email;
-    db.collection("users")
-      .where("email", "==", logonEmail)
+    await db
+      .collection("users")
+      .where("email", "==", email)
       .limit(1)
       .get()
       .then((querySnapshot) => {
-        return querySnapshot;
+        return querySnapshot.docs[0].id;
       })
       .catch((error) => {
         console.log("Error getting users id", error);

@@ -1,6 +1,10 @@
 <template>
   <section>
-    <draggable @end="dragEnd" @start="dragStart" v-if="!isShowBackCard">
+    <draggable
+      v-if="!isShowBackCard"
+      @end="dragEnd"
+      @start="dragStart"
+    >
       <v-card
         elevation="2"
         class="flash-card"
@@ -10,24 +14,38 @@
         <section>
           <div class="flash-card-container front">
             <div class="front-card-title">
-              {{ this.getBibleVersion }}
+              {{ getBibleVersion }}
             </div>
             <div class="front-card-title">
-              {{ this.getReference }}
+              {{ getReference }}
             </div>
-            <div class="front-card-subtitle">Memorization</div>
+            <div class="front-card-subtitle">
+              Memorization
+            </div>
           </div>
         </section>
         <section>
-          <v-btn icon @click="recordVoice()">
+          <v-btn
+            icon
+            @click="recordVoice()"
+          >
             <span class="material-icons mic-icon"> mic </span>
           </v-btn>
         </section>
-        <section class="swiping-icons-container" v-show="isShowSwipingIcons">
-          <span class="material-icons swipe-icon" id="swipe-back">
+        <section
+          v-show="isShowSwipingIcons"
+          class="swiping-icons-container"
+        >
+          <span
+            id="swipe-back"
+            class="material-icons swipe-icon"
+          >
             arrow_back_ios
           </span>
-          <span class="material-icons swipe-icon" id="swipe-next">
+          <span
+            id="swipe-next"
+            class="material-icons swipe-icon"
+          >
             arrow_forward_ios
           </span>
         </section>
@@ -35,32 +53,43 @@
     </draggable>
 
     <v-card
+      v-else
       elevation="2"
       class="flash-card"
       color="primary"
       @click="isShowBackCard = !isShowBackCard"
-      v-else
     >
       <v-skeleton-loader
+        v-if="!isVerseReady"
         type="image"
         height="100%"
         width="100%"
-        v-if="!isVerseReady"
+      />
+      <div
+        v-else
+        class="flash-card-container"
       >
-      </v-skeleton-loader>
-      <div class="flash-card-container" v-else>
         <span>
-          {{ this.allVerses[this.indexCount] }}
+          {{ allVerses[indexCount] }}
         </span>
         <div class="reference">
-          {{ this.getReference }}
+          {{ getReference }}
         </div>
       </div>
-      <section class="swiping-icons-container" v-show="isShowSwipingIcons">
-        <span class="material-icons swipe-icon" id="swipe-back">
+      <section
+        v-show="isShowSwipingIcons"
+        class="swiping-icons-container"
+      >
+        <span
+          id="swipe-back"
+          class="material-icons swipe-icon"
+        >
           arrow_back_ios
         </span>
-        <span class="material-icons swipe-icon" id="swipe-next">
+        <span
+          id="swipe-next"
+          class="material-icons swipe-icon"
+        >
           arrow_forward_ios
         </span>
       </section>
@@ -72,6 +101,9 @@
 import draggable from "vuedraggable";
 
 export default {
+  components: {
+    draggable,
+  },
   data: () => ({
     allVerses: [],
     indexCount: 0,
@@ -79,9 +111,7 @@ export default {
     isShowSwipingIcons: false,
     isVerseReady: false,
   }),
-  components: {
-    draggable,
-  },
+  
   computed: {
     getCollectionVerses() {
       return this.$store.getters.getCollectionVerses;
@@ -107,6 +137,9 @@ export default {
     getSwipeNextCoordinate() {
       return document.getElementById("swipe-next").getBoundingClientRect();
     },
+  },
+  created() {
+    this.fetchVerses();
   },
   methods: {
     recordVoice() {
@@ -191,9 +224,6 @@ export default {
       this.isVerseReady = true;
       return completeVerse;
     },
-  },
-  created() {
-    this.fetchVerses();
   },
 };
 </script>

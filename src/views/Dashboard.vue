@@ -1,23 +1,25 @@
 <template>
-  <section class="dashboard-container">
-    <router-view></router-view>
+  <section class="home-container">
+    <!-- Side Nav Card -->
+    <header-drawer />
+
+    <!-- Main content -->
+    <router-view class="content-view"></router-view>
+
     <!-- Mobile navigation drawer -->
     <v-bottom-navigation
       :value="this.$route.name"
       grow
       fixed
+      mandatory
+      app
       class="nav-bottom"
     >
       <v-btn value="home" @click="changeRoute('main')">
         <span>Home</span>
         <span class="material-icons"> home </span>
       </v-btn>
-
-      <v-btn value="review" @click="changeRoute('review')">
-        <span>Review</span><span class="material-icons"> alarm </span>
-      </v-btn>
-
-      <v-btn value="library" @click="changeRoute('library')">
+      <v-btn @click="changeRoute('library')">
         <span>Collection</span>
         <span class="material-icons"> library_books </span>
       </v-btn>
@@ -32,7 +34,11 @@
 <script>
 import firebase from "firebase";
 
+import headerDrawer from "../components/headerDrawer";
 export default {
+  components: {
+    headerDrawer,
+  },
   methods: {
     changeRoute(rn) {
       if (this.$route.name != rn) {
@@ -51,8 +57,17 @@ export default {
 </script>
 
 <style>
-.dashboard-container {
-  padding: 0.5rem 1rem;
+.home-container {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.content-view {
+  min-width: 100vw;
+  max-width: 100vw;
+  padding: 0rem 1rem 1rem 1rem;
 }
 
 .v-avatar > span {
@@ -60,6 +75,18 @@ export default {
 }
 
 .nav-bottom {
-  height: 37px !important;
+  height: 39px !important;
+}
+
+@media only screen and (min-width: 1024px) {
+  .content-view {
+    min-width: 70vw;
+    max-width: 70vw;
+    margin-top: 3rem;
+    padding: 1rem;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px,
+      rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
+    border-radius: 1rem;
+  }
 }
 </style>

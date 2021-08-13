@@ -1,13 +1,13 @@
 <template>
-  <section>
+  <section class="flash-card-outer-container">
     <draggable @end="dragEnd" @start="dragStart" v-if="!isShowBackCard">
       <v-card
+        color="whitesmoke"
         elevation="2"
         class="flash-card"
-        color="primary"
         @click="isShowBackCard = !isShowBackCard"
       >
-        <div class="flash-card-container front">
+        <div class="flash-card-inner-container front">
           <div class="front-card-title">
             {{ this.getBibleVersion }}
           </div>
@@ -30,7 +30,7 @@
     <v-card
       elevation="2"
       class="flash-card"
-      color="primary"
+      color="whitesmoke"
       @click="isShowBackCard = !isShowBackCard"
       v-else
     >
@@ -41,7 +41,7 @@
         v-if="!isVerseReady"
       >
       </v-skeleton-loader>
-      <div class="flash-card-container" v-else>
+      <div class="flash-card-inner-container" v-else>
         <span>
           {{ this.allVerses[this.indexCount] }}
         </span>
@@ -172,6 +172,14 @@ export default {
 </script>
 
 <style>
+.flash-card-outer-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+}
+
 .v-skeleton-loader__image {
   height: 100% !important;
 }
@@ -206,17 +214,26 @@ export default {
 }
 
 .flash-card {
+  display: flex;
+  align-items: center;
   margin: 1rem 0.5rem;
-  height: 95vh;
+  min-height: 95vh;
+  background: var(--bg);
+  min-width: 90vw;
+  max-width: 90vw;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px,
+    rgba(0, 0, 0, 0.06) 0px 1px 2px 0px !important;
   border-radius: 1rem !important;
+  font-size: 1.2rem;
+  font-weight: bold;
 }
 
-.flash-card-container {
+.flash-card-inner-container {
   margin-top: 1rem 0rem;
-  overflow-y: scroll;
-  padding: 2rem;
-  height: 100%;
-  width: 100%;
+  overflow-y: hidden;
+  overflow-x: hidden;
+  padding: 4rem;
+  min-width: 100%;
   display: flex;
   align-items: center;
   flex-direction: column;
@@ -231,5 +248,14 @@ export default {
   text-align: end;
   width: 100%;
   margin: 1rem 0rem;
+}
+
+@media only screen and (min-width: 1024px) {
+  .flash-card {
+    min-width: 60vw;
+    max-width: 60vw;
+    font-size: 1.3rem;
+    font-weight: bold;
+  }
 }
 </style>

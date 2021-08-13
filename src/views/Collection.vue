@@ -1,13 +1,13 @@
 <template>
   <section>
-    <v-app-bar color="primary">
+    <v-toolbar flat>
       <div class="collection-nav-bar">
         <span class="material-icons" @click="popRoute()"> arrow_back </span
         ><span class="material-icons" @click="isShowCollectionOptions = true">
           more_vert
         </span>
       </div>
-    </v-app-bar>
+    </v-toolbar>
     <div class="collection-info">
       <div class="collection-title">
         {{ name }}
@@ -93,7 +93,7 @@
 
     <!-- Edit Collection Options -->
     <v-bottom-sheet v-model="isShowCollectionOptions">
-      <v-sheet height="250px">
+      <v-sheet height="300px">
         <v-list class="option-container">
           <v-list-item
             v-for="(item, key) in collectionOptions"

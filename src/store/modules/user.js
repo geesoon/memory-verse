@@ -33,14 +33,6 @@ const mutations = {
     state.user.email = "";
     state.user.id = "";
   },
-  logout() {
-    firebase
-      .auth()
-      .signOut()
-      .catch((error) => {
-        alert(error.message);
-      });
-  },
 };
 
 export default {

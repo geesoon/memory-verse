@@ -2,19 +2,21 @@ import firebase from "firebase";
 
 export default {
   async login(email, password) {
-    await firebase
-      .auth()
-      .signInWithEmailAndPassword(email, password)
-      .then((response) => {
-        return new Promise(() => {
-          return { res: response, valid: true };
-        });
-      })
-      .catch((error) => {
-        return {
-          valid: false,
-          error: error,
-        };
-      });
+    try {
+      let res = await firebase
+        .auth()
+        .signInWithEmailAndPassword(email, password);
+      return { valid: true, res: res };
+    } catch (err) {
+      return { valid: false, error: err.message };
+    }
+  },
+  async logout() {
+    try {
+      await firebase.auth().signOut();
+      return true;
+    } catch (err) {
+      return err;
+    }
   },
 };
