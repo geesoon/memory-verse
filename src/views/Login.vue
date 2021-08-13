@@ -1,14 +1,11 @@
 <template>
-  <v-container class="home-container">
+  <v-container class="login-container">
     <div class="home-title">Memory<br />Verse</div>
     <section class="login-form-container">
-      <form @submit.prevent="login" class="login-form">
-        <input type="text" placeholder="Email" v-model="email" />
-        <input type="password" placeholder="Password" v-model="password" />
+      <form class="login-form" @submit.prevent="login">
+        <input v-model="email" type="text" placeholder="Email" />
+        <input v-model="password" type="password" placeholder="Password" />
         <button type="submit" class="login-btn">Log In</button>
-        <router-link to="/guests" class="guest-btn"
-          >Log In As Guest</router-link
-        >
       </form>
       <div class="sign-in-tip">
         <span
@@ -19,10 +16,13 @@
         >
       </div>
     </section>
+    <loading-overlay :active="isLoading" :is-full-page="fullPage" />
   </v-container>
 </template>
 
 <script>
+// import Auth from "../apis/auth";
+// import Account from "../apis/account";
 import firebase from "firebase";
 
 export default {
@@ -30,42 +30,41 @@ export default {
     return {
       email: "",
       password: "",
+      isLoading: false,
+      fullPage: true,
     };
   },
   methods: {
+    onCancel() {
+      console.log("User cancelled the loader.");
+    },
     gotoHome() {
       this.$router.push({ path: "/" });
     },
-    login() {
-      firebase
-        .auth()
-        .signInWithEmailAndPassword(this.email, this.password)
-        .then(() => {
-          this.getUserId();
-        })
-        .catch((error) => {
-          alert(error.message);
-        });
-    },
-    getUserId() {
-      console.log("get user's id");
+    async login() {
+      this.isLoading = true;
       const db = firebase.firestore();
-      let logonEmail = firebase.auth().currentUser.email;
-      db.collection("users")
-        .where("email", "==", logonEmail)
-        .get()
-        .then((querySnapshot) => {
-          querySnapshot.forEach((doc) => {
-            this.$store.commit("setUser", {
-              email: this.email,
-              id: doc.id,
-            });
+      try {
+        await firebase
+          .auth()
+          .signInWithEmailAndPassword(this.email, this.password);
+        let userId = await db
+          .collection("users")
+          .where("email", "==", this.email)
+          .limit(1)
+          .get()
+          .then((querySnapshot) => {
+            return querySnapshot.docs[0].id;
+          })
+          .catch((error) => {
+            console.log("Error getting users id", error);
           });
-          this.$router.replace("/dashboard/main");
-        })
-        .catch((error) => {
-          console.log("Error getting users id", error);
-        });
+        this.$store.commit("setUser", { email: this.email, id: userId });
+        this.$router.replace("/dashboard/main");
+      } catch (err) {
+        alert(err);
+      }
+      this.isLoading = false;
     },
   },
 };
@@ -73,7 +72,7 @@ export default {
 
 <style>
 .login-form-container {
-  margin: 3rem 1rem;
+  margin: 3rem 0rem;
 }
 
 /* Memory Verse title */
@@ -127,7 +126,7 @@ a {
   padding: 1rem;
   margin: 0.5rem;
   border-radius: 0.5rem;
-  background: #1877f2;
+  background: var(--action);
   color: white !important;
 }
 
@@ -143,15 +142,29 @@ a {
   background: #42b72a;
 }
 
+.login-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-content: center;
+  min-height: 100%;
+}
+
 @media only screen and (min-width: 768px) {
-  .home-container {
+  .login-container {
     max-width: 60vw !important;
   }
 }
 
 @media only screen and (min-width: 1024px) {
-  .home-container {
+  .login-container {
     max-width: 40vw !important;
+  }
+}
+
+@media only screen and (min-width: 1440px) {
+  .login-container {
+    max-width: 30vw !important;
   }
 }
 </style>

@@ -13,10 +13,15 @@ export default {
 </script>
 
 <style>
+:root {
+  --primary: #d5e37d;
+  --bg: whitesmoke;
+  --action: #42b72a;
+}
+
 html {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
-  --primary: "#d5e37d";
 }
 
 html::-webkit-scrollbar {
@@ -25,7 +30,7 @@ html::-webkit-scrollbar {
 
 body {
   /* Disables pull-to-refresh but allows overscroll glow effects. */
-  overscroll-behavior-y: contain !important;
+  overscroll-behavior-y: auto !important;
 }
 
 .material-icons {

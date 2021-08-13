@@ -1,24 +1,30 @@
 <template>
-  <section class="profile-container">
-    <div class="profile-nav-bar">
-      <span class="material-icons" @click="popState()"> arrow_back </span>
-    </div>
-    <div class="profilePic">
-      <div class="avatar">{{ this.getAvatarName }}</div>
-      <!-- <div @click="updateProfilePic">Change</div> -->
-    </div>
-    <div class="profileInfo">
-      <div class="user-email">{{ this.getUserEmail() }}</div>
-      <div class="update-pw-btn" @click="updatePassword">Update Password</div>
-    </div>
-    <div class="logout-btn" @click="logout">Log Out</div>
+  <section>
+    <section class="profile-container">
+      <div class="profilePic">
+        <div class="avatar">{{ this.getAvatarName }}</div>
+        <!-- <div @click="updateProfilePic">Change</div> -->
+      </div>
+      <div class="profileInfo">
+        <div class="user-email">{{ this.getUserEmail }}</div>
+        <div class="update-pw-btn" @click="updatePassword">Update Password</div>
+      </div>
+      <div class="logout-btn" @click="logout">Log Out</div>
+    </section>
+    <loading-overlay :active="isLoading" :is-full-page="fullPage" />
   </section>
 </template>
 
 <script>
-import firebase from "firebase";
+import Auth from "../apis/auth";
 
 export default {
+  data() {
+    return {
+      isLoading: false,
+      fullPage: true,
+    };
+  },
   computed: {
     getAvatarName() {
       return this.$store.getters.getAvatarName;
@@ -26,13 +32,13 @@ export default {
     getPreviousView() {
       return this.$store.getters.getPreviousView;
     },
+    getUserEmail() {
+      return this.$store.getters.getUserEmail;
+    },
   },
   methods: {
     popState() {
       this.$router.back();
-    },
-    getUserEmail() {
-      return firebase.auth().currentUser.email;
     },
     updateProfilePic() {
       console.log("update profile pic");
@@ -40,21 +46,17 @@ export default {
     updatePassword() {
       console.log("update password");
     },
-    logout() {
-      firebase
-        .auth()
-        .signOut()
-        .then(() => {
-          alert("Successfully logged out");
-          this.$router.push("/");
-          this.$store.commit("setView", "Home");
-          this.$store.commit("clearState");
-        })
-        .catch((error) => {
-          alert(error.message);
-          this.$router.push("/");
-          this.$store.commit("setView", "Home");
-        });
+    async logout() {
+      this.isLoading = true;
+      let res = await Auth.logout();
+      if (res == true) {
+        this.$store.commit("clearUser");
+        this.$store.commit("resetSelection");
+        this.$router.replace("/");
+      } else {
+        alert(res.message);
+      }
+      this.isLoading = false;
     },
   },
 };
@@ -66,7 +68,7 @@ export default {
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
-  width: 100%;
+  min-width: 100%;
 }
 
 .profile-nav-bar {
@@ -89,7 +91,9 @@ export default {
   border-radius: 100%;
   width: 150px;
   height: 150px;
-  background: green;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px,
+    rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
+  background: whitesmoke;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -111,7 +115,7 @@ export default {
   padding: 1rem 3rem;
   margin: 1rem 0;
   cursor: pointer;
-  background: #1877f2;
+  background: var(--action);
   color: white;
   font-weight: bold;
 }
@@ -121,7 +125,7 @@ export default {
   padding: 1rem 3rem;
   margin: 1rem 0;
   cursor: pointer;
-  background: #42b72a;
+  background: var(--action);
   color: white;
   font-weight: bold;
 }

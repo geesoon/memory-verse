@@ -1,91 +1,43 @@
 <template>
-  <v-container class="dashboard-container">
-    <router-view></router-view>
+  <section class="home-container">
+    <!-- Side Nav Card -->
+    <header-drawer />
+
+    <!-- Main content -->
+    <router-view class="content-view"></router-view>
+
     <!-- Mobile navigation drawer -->
     <v-bottom-navigation
       :value="this.$route.name"
       grow
       fixed
+      mandatory
+      app
       class="nav-bottom"
     >
       <v-btn value="home" @click="changeRoute('main')">
         <span>Home</span>
         <span class="material-icons"> home </span>
       </v-btn>
-
-      <v-btn value="review" @click="changeRoute('review')">
-        <span>Review</span><span class="material-icons"> alarm </span>
-      </v-btn>
-
-      <v-btn value="library" @click="changeRoute('library')">
+      <v-btn @click="changeRoute('library')">
         <span>Collection</span>
         <span class="material-icons"> library_books </span>
       </v-btn>
+      <v-btn value="profile" @click="changeRoute('profile')">
+        <span>Profile</span>
+        <span class="material-icons"> account_circle </span>
+      </v-btn>
     </v-bottom-navigation>
-
-    <!-- Desktop navigation drawer -->
-    <v-navigation-drawer permanent expand-on-hover class="nav-side">
-      <v-list>
-        <v-list-item class="px-2">
-          <v-list-item-avatar @click="changeRoute('profile')">
-            <v-avatar color="green" size="36">
-              <span class="black--text headline">{{ this.getAvatarName }}</span>
-            </v-avatar>
-          </v-list-item-avatar>
-        </v-list-item>
-
-        <v-list-item link @click="changeRoute('profile')">
-          <v-list-item-content>
-            <v-list-item-subtitle>{{ this.getUserEmail }}</v-list-item-subtitle>
-          </v-list-item-content>
-        </v-list-item>
-      </v-list>
-
-      <v-divider></v-divider>
-
-      <v-list nav dense>
-        <v-list-item link @click="changeRoute('main')">
-          <v-list-item-icon>
-            <span class="material-icons"> home </span>
-          </v-list-item-icon>
-          <v-list-item-title>Dashboard</v-list-item-title>
-        </v-list-item>
-        <v-list-item link @click="changeRoute('review')">
-          <v-list-item-icon>
-            <span class="material-icons"> alarm </span>
-          </v-list-item-icon>
-          <v-list-item-title>Review</v-list-item-title>
-        </v-list-item>
-        <v-list-item link @click="changeRoute('library')">
-          <v-list-item-icon>
-            <span class="material-icons"> library_books </span>
-          </v-list-item-icon>
-          <v-list-item-title>Library</v-list-item-title>
-        </v-list-item>
-      </v-list>
-
-      <v-list>
-        <v-list-item> </v-list-item>
-      </v-list>
-    </v-navigation-drawer>
-  </v-container>
+  </section>
 </template>
 
 <script>
 import firebase from "firebase";
 
+import headerDrawer from "../components/headerDrawer";
 export default {
-  data: () => ({}),
-  computed: {
-    getAvatarName() {
-      return this.$store.getters.getAvatarName;
-    },
-    getUserId() {
-      return this.$store.getters.getUserInfo.id;
-    },
-    getUserEmail() {
-      return firebase.auth().currentUser.email;
-    },
+  components: {
+    headerDrawer,
   },
   methods: {
     changeRoute(rn) {
@@ -105,36 +57,36 @@ export default {
 </script>
 
 <style>
+.home-container {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.content-view {
+  min-width: 100vw;
+  max-width: 100vw;
+  padding: 0rem 1rem 1rem 1rem;
+}
+
 .v-avatar > span {
   cursor: pointer;
 }
 
-.content {
-  margin-bottom: 4rem;
-}
-
-.nav-side {
-  display: none !important;
-}
-
 .nav-bottom {
-  height: 37px !important;
+  height: 39px !important;
 }
 
 @media only screen and (min-width: 1024px) {
-  .dashboard-container {
-    max-width: 90vw !important;
-  }
-
-  .nav-bottom {
-    display: none !important;
-  }
-
-  .nav-side {
-    z-index: 4;
-    position: fixed;
-    left: 0;
-    display: block !important;
+  .content-view {
+    min-width: 70vw;
+    max-width: 70vw;
+    margin-top: 3rem;
+    padding: 1rem;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px,
+      rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
+    border-radius: 1rem;
   }
 }
 </style>

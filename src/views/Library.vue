@@ -1,21 +1,12 @@
 <template>
   <section>
-    <div class="header-bar">
-      <div class="my-collection-bar">
-        <div
-          class="avatar-container library-avatar"
-          @click="changeRoute('profile')"
-        >
-          <div class="avatar-circle">{{ this.getAvatarName }}</div>
-        </div>
-        <div class="section-title">Your Collection</div>
-      </div>
+    <div class="my-collection-bar">
+      <div class="section-title">Your Collection</div>
     </div>
     <v-dialog
       v-model="isAddCollection"
       persistent
       fullscreen
-      scrollable
       hide-overlay
       transition="dialog-bottom-transition"
     >
@@ -34,15 +25,16 @@
         </v-btn>
       </template>
     </v-snackbar>
-    <section class="collection-container">
+    <section>
       <v-fab-transition>
-        <v-btn class="fab-add-collection" color="primary" fab right>
+        <v-btn class="fab-add-collection" fab right>
           <span class="material-icons" @click="goToSelectVerse()">
             playlist_add
           </span>
         </v-btn>
       </v-fab-transition>
-      <div class="view-toggle">
+      <div v-if="collection.length == 0">No collection!</div>
+      <div v-else class="view-toggle">
         <span
           class="material-icons"
           v-if="!isGridView"
@@ -126,12 +118,14 @@ export default {
     getCollection() {
       const db = firebase.firestore();
       this.collection = [];
+      console.log(this.getUserId);
 
       db.collection("users")
         .doc(this.getUserId)
         .collection("collection")
         .get()
         .then((querySnapshot) => {
+          console.log(querySnapshot);
           querySnapshot.forEach((doc) => {
             this.collection.push({
               id: doc.id,
@@ -140,7 +134,6 @@ export default {
               reviewPeriod: doc.data().review_period,
             });
           });
-
           console.log(this.collection);
         })
         .catch((error) => {
@@ -171,18 +164,7 @@ export default {
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-}
-
-.collection-container {
-  padding-top: 5rem;
-  margin: 0rem 1rem;
-}
-
-.my-collection-item {
-  margin: 1rem 0rem;
-  background: #d5e37d;
-  text-align: left;
-  box-shadow: 8px 0px 0px 0px;
+  margin-top: 1rem;
 }
 
 .library-avatar {
@@ -209,9 +191,10 @@ export default {
   flex-direction: row;
   justify-content: space-between;
   align-items: flex-start;
-  padding: 1.5rem 1rem;
+  padding: 2rem 2rem;
   background: var(--primary);
-  box-shadow: 8px 0px 0px 0px;
+  border-radius: 0.5rem;
+  font-weight: bold;
 }
 
 .fab-add-collection {

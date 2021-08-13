@@ -1,107 +1,86 @@
 <template>
   <section>
-    <div class="header-bar">
-      <div class="home-title-header" @click="changeRoute('main')">
-        Memory Verse
+    <div class="mobile-home-header-bar">
+      <div class="header-logo-container">
+        <div class="home-title-header" @click="changeRoute('main')">
+          Memory Verse
+        </div>
       </div>
       <div class="avatar-container" @click="changeRoute('profile')">
-        <div class="avatar-circle">{{ this.getAvatarName }}</div>
+        <div class="avatar-circle">
+          {{ this.getAvatarName }}
+        </div>
       </div>
     </div>
-    <section style="padding-top: 5rem">
-      <div class="votd">
-        <p>In the beginning, God created the heaven and the earth</p>
-        <p style="text-align: right">- Gen 1:1</p>
-      </div>
-      <div class="difficulty">
-        <div class="section-title">Difficulty</div>
-        <v-btn-toggle
-          v-model="level"
-          tile
-          color="deep-yellow accent-3"
-          group
-          class="difficulty-list"
+    <div class="votd">
+      Let the word of Christ dwell in you richly...
+      <p style="text-align: right">- Col 3:16</p>
+    </div>
+    <div v-if="collection.length != 0" class="collection">
+      <div class="section-title">Your Collection</div>
+      <div class="collection-list">
+        <div
+          v-for="(item, key) in collection"
+          :key="key"
+          class="collection-item"
+          @click="goToCollection(item)"
         >
-          <v-btn value="Easy"> Easy </v-btn>
-          <v-btn value="Medium"> Medium </v-btn>
-          <v-btn value="Hard"> Hard </v-btn>
-        </v-btn-toggle>
-      </div>
-      <!-- <div class="recent-memorized" v-if="recent.length != 0">
-        <div class="section-title">Recently Memorized</div>
-        <div class="recent-list">
-          <div
-            v-for="(item, key) in recent"
-            :key="key"
-            class="recent-item"
-            @click="startAnswering(item)"
-          >
-            {{ item.abbreviation }} {{ item.chapter }}:{{ item.verse }}
-          </div>
-        </div>
-      </div> -->
-      <div class="collection" v-if="collection.length != 0">
-        <div class="section-title">Your Collection</div>
-        <div class="collection-list">
-          <div
-            v-for="(item, key) in collection"
-            :key="key"
-            class="collection-item"
-            @click="goToCollection(item)"
-          >
-            {{ item.name }}
-          </div>
+          {{ item.name }}
         </div>
       </div>
-      <div class="bible-books">
-        <div class="bible-books-bar">
-          <div class="section-title">Bible Books</div>
-          <v-dialog
-            v-model="isShowAllBook"
-            width="500"
-            fullscreen
-            hide-overlay
-            transition="dialog-bottom-transition"
-          >
-            <template v-slot:activator="{ on, attrs }">
-              <v-btn
-                depressed
-                x-small
-                color="transparent"
-                v-bind="attrs"
-                v-on="on"
-                @click="showAllBook()"
-              >
-                Show All
-              </v-btn>
-            </template>
-            <bible-book-panel
-              @closeDialog="isShowAllBook = false"
-              @answer="goToAnswer()"
-            />
-          </v-dialog>
-        </div>
-        <div class="bible-books-list">
-          <div
-            v-for="n in 15"
-            :key="n"
-            class="book-item"
-            @click="showBookChapter(bibleBooks[n - 1].id)"
-          >
-            {{ bibleBooks[n - 1].abbreviation }}
-          </div>
+    </div>
+    <div class="bible-books">
+      <div class="bible-books-bar">
+        <div class="section-title">Bible Books</div>
+        <v-dialog
+          v-model="isShowAllBook"
+          persistent
+          fullscreen
+          hide-overlay
+          transition="dialog-bottom-transition"
+        >
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              depressed
+              x-small
+              color="transparent"
+              v-bind="attrs"
+              v-on="on"
+              @click="showAllBook()"
+            >
+              Show All
+            </v-btn>
+          </template>
+          <bible-book-panel
+            @closeDialog="isShowAllBook = false"
+            @answer="goToAnswer()"
+          />
+        </v-dialog>
+      </div>
+      <div class="bible-books-list">
+        <div
+          v-for="n in 15"
+          :key="n"
+          class="book-item"
+          @click="showBookChapter(bibleBooks[n - 1].id)"
+        >
+          {{ bibleBooks[n - 1].abbreviation }}
         </div>
       </div>
-    </section>
+    </div>
   </section>
 </template>
 
 <script>
 import firebase from "firebase";
+import Collection from "../apis/collection";
 import bibleBookPanel from "../components/bibleBookPanel";
 import booksChapter from "../data/book.json";
 
 export default {
+  components: {
+    bibleBookPanel,
+  },
   data: () => ({
     selectedBookId: "",
     isShowAllBook: false,
@@ -110,9 +89,6 @@ export default {
     collection: [],
     bibleBooks: booksChapter.books,
   }),
-  components: {
-    bibleBookPanel,
-  },
   computed: {
     getAvatarName() {
       return this.$store.getters.getAvatarName;
@@ -132,7 +108,20 @@ export default {
       this.$store.commit("setLevel", this.level);
     },
   },
+  created() {
+    this.getCollection();
+    let avatarName = firebase
+      .auth()
+      .currentUser.email.split("")[0]
+      .toUpperCase();
+    this.$store.commit("setAvatarName", avatarName);
+    this.selectedBook = "";
+    this.level = this.getLevel;
+  },
   methods: {
+    toggleDrawer() {
+      this.$emit("toggleDrawer");
+    },
     showBookChapter(bookId) {
       this.$store.commit("setBibleBookSelectionPanelView", "chapter");
       this.$store.commit("setSelectedBookId", bookId);
@@ -163,123 +152,46 @@ export default {
       this.$store.commit("setVerses", ref.verse);
       this.$router.push("/answer");
     },
-    // getRecent() {
-    //   const db = firebase.firestore();
-    //   console.log(this.getUserId);
-    //   db.collection("users")
-    //     .doc(this.getUserId)
-    //     .collection("history")
-    //     .get()
-    //     .then((querySnapshot) => {
-    //       querySnapshot.forEach((doc) => {
-    //         this.recent.push({
-    //           id: doc.data().id,
-    //           name: doc.data().name,
-    //           abbreviation: doc.data().abbreviation,
-    //           chapter: doc.data().chapter,
-    //           verse: doc.data().verse,
-    //         });
-    //       });
-    //     })
-    //     .catch((error) => {
-    //       console.log("Error getting users recent verse", error);
-    //     });
-    // },
-    getCollection() {
-      const db = firebase.firestore();
-
-      db.collection("users")
-        .doc(this.getUserId)
-        .collection("collection")
-        .get()
-        .then((querySnapshot) => {
-          querySnapshot.forEach((doc) => {
-            this.collection.push({
-              id: doc.id,
-              name: doc.data().name,
-              lastReview: doc.data().lastReview.seconds,
-              reviewPeriod: doc.data().reviewPeriod,
-            });
-          });
-        })
-        .catch((error) => {
-          console.log("Error getting users collection", error);
-        });
+    async getCollection() {
+      let res = await Collection.getCollection(this.getUserId);
+      if (res.valid) {
+        this.collection = res.res;
+      } else {
+        this.collection = [];
+      }
     },
-  },
-  created() {
-    this.getCollection();
-    // this.getRecent();
-    let avatarName = firebase
-      .auth()
-      .currentUser.email.split("")[0]
-      .toUpperCase();
-    this.$store.commit("setAvatarName", avatarName);
-    this.selectedBook = "";
-    this.level = this.getLevel;
   },
 };
 </script>
 
 <style>
-.header-bar {
-  position: fixed;
-  top: 0;
+/* Share between library and collection */
+.my-collection-item {
+  margin: 1rem 0rem;
+  background: #d5e37d;
+  text-align: left;
+  border-radius: 0.5rem;
+  font-weight: bold;
+}
+
+.mobile-home-header-bar {
   display: flex;
   flex-direction: row;
+  align-items: center;
   justify-content: space-between;
-  align-items: center;
-  width: 100vw;
-  z-index: 2;
-  background-color: white;
-  padding: 1rem 2rem 1rem 0rem;
-}
-
-.avatar-container {
-  text-align: center;
-}
-
-.avatar-circle {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: #42b72a;
-  border-radius: 100%;
-  width: 45px;
-  height: 45px;
-  font-weight: bold;
-  font-size: 1.5rem;
-  cursor: pointer;
-}
-
-.home-title-header {
-  padding: 0.5rem;
-  font-size: 1rem;
-  font-weight: bold;
-  text-align: center;
-  border: 1px solid black;
-  border-radius: 0.5rem;
-  box-shadow: 8px 5px;
-  cursor: pointer;
+  margin: 1rem 0rem;
 }
 
 .votd {
   font-size: 1.3rem;
-  font-weight: 300;
-  background: #1877f2;
+  background: whitesmoke;
   border-radius: 0.5rem;
-  padding: 0.5rem 1rem;
-  opacity: 0.9;
-  margin: 0.5rem 0rem;
+  padding: 2rem;
 }
 
 .section-title {
   font-size: 1.5rem;
   font-weight: bold;
-}
-
-.difficulty {
-  margin-bottom: 1rem;
 }
 
 .bible-books {
@@ -293,21 +205,17 @@ export default {
 }
 
 .bible-books-list,
-.collection-list,
-.recent-list,
-.difficulty-list {
+.collection-list {
   margin-top: 1rem;
 }
 
-.collection-list,
-.recent-list {
+.collection-list {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: flex-start;
   overflow-x: scroll;
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+  overflow-y: hidden;
 }
 
 .bible-books-list {
@@ -317,14 +225,16 @@ export default {
 }
 
 .bible-books-list::-webkit-scrollbar,
-.collection-list::-webkit-scrollbar,
-.recent-list::-webkit-scrollbar {
-  display: none; /* chrome */
+.collection-list::-webkit-scrollbar {
+  display: none;
 }
 
-.collection-item,
-.recent-item {
-  padding: 1rem 2rem;
+.collection-item {
+  min-width: 8rem;
+  max-width: 8rem;
+  min-height: 8rem;
+  max-height: 8rem;
+  padding: 1rem;
   margin: 0rem 0.5rem;
   border-radius: 0.5rem;
   background: #d5e37d;
@@ -332,13 +242,6 @@ export default {
   font-weight: bold;
   text-align: center;
   cursor: pointer;
-  height: 6rem;
-}
-
-/* Truncate collection name */
-.collection-item {
-  border-radius: 0px !important;
-  box-shadow: 8px 8px 0px 0px;
 }
 
 .book-item {
@@ -349,6 +252,11 @@ export default {
   font-weight: bold;
   text-align: center;
   cursor: pointer;
+}
+
+.collection-item:hover,
+.book-item:hover {
+  opacity: 0.8;
 }
 
 .bible-books-bar {
@@ -370,9 +278,12 @@ export default {
 }
 
 @media only screen and (min-width: 1024px) {
-  .avatar-container {
+  .mobile-home-header-bar {
     display: none;
   }
+}
+
+@media only screen and (min-width: 1440px) {
   .bible-books-list {
     grid-template-columns: repeat(8, 1fr);
   }

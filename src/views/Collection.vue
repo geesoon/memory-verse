@@ -1,6 +1,6 @@
 <template>
   <section>
-    <v-toolbar flat light>
+    <v-toolbar flat>
       <div class="collection-nav-bar">
         <span class="material-icons" @click="popRoute()"> arrow_back </span
         ><span class="material-icons" @click="isShowCollectionOptions = true">
@@ -93,7 +93,7 @@
 
     <!-- Edit Collection Options -->
     <v-bottom-sheet v-model="isShowCollectionOptions">
-      <v-sheet height="250px">
+      <v-sheet height="300px">
         <v-list class="option-container">
           <v-list-item
             v-for="(item, key) in collectionOptions"
@@ -187,6 +187,7 @@ export default {
     isShowCollectionOptions: false,
     collectionOptions: [
       { text: "Flash Cards", icon: "style" },
+      { text: "Audio Review", icon: "mic" },
       { text: "Change Review Period", icon: "alarm" },
       { text: "Edit Collection", icon: "edit" },
       { text: "Delete Collection", icon: "clear" },
@@ -325,6 +326,9 @@ export default {
       } else if (opt == "Flash Cards") {
         this.$store.commit("setCollectionVerses", this.verses);
         this.$router.push({ name: "flashcard" });
+      } else if (opt == "Audio Review") {
+        this.$store.commit("setCollectionVerses", this.verses);
+        this.$router.push({ name: "audioreview" });
       }
     },
     chooseCollectionItemOption(opt) {
