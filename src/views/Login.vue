@@ -2,11 +2,25 @@
   <v-container class="login-container">
     <div class="home-title">Memory<br />Verse</div>
     <section class="login-form-container">
-      <form class="login-form" @submit.prevent="login">
-        <input v-model="email" type="text" placeholder="Email" />
-        <input v-model="password" type="password" placeholder="Password" />
-        <button type="submit" class="login-btn">Log In</button>
-      </form>
+      <v-form class="login-form" @submit.prevent="login" v-if="!isLoading">
+        <v-text-field label="Email" v-model="email"></v-text-field>
+        <v-text-field
+          :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+          :type="showPassword ? 'text' : 'password'"
+          label="Password"
+          @click:append="showPassword = !showPassword"
+          v-model="password"
+        ></v-text-field>
+        <br />
+        <v-btn depressed color="action" @click="login">Log In</v-btn>
+      </v-form>
+      <div v-else style="text-align: center">
+        <p>Logging you in...</p>
+        <v-progress-circular
+          indeterminate
+          color="primary"
+        ></v-progress-circular>
+      </div>
       <div class="sign-in-tip">
         <span
           >Don't have an account?
@@ -16,7 +30,8 @@
         >
       </div>
     </section>
-    <loading-overlay :active="isLoading" :is-full-page="fullPage" />
+
+    <!-- <loading-overlay :active="isLoading" :is-full-page="fullPage" /> -->
   </v-container>
 </template>
 
@@ -32,6 +47,12 @@ export default {
       password: "",
       isLoading: false,
       fullPage: true,
+      rules: {
+        required: (value) => !!value || "Required.",
+        min: (v) => v.length >= 8 || "Min 8 characters",
+        emailMatch: () => `The email and password you entered don't match`,
+      },
+      showPassword: false,
     };
   },
   methods: {
@@ -72,14 +93,18 @@ export default {
 
 <style>
 .login-form-container {
-  margin: 3rem 0rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 1rem;
 }
 
 /* Memory Verse title */
 .home-title {
-  margin: 1rem;
-  padding: 1rem;
-  font-size: 3rem;
+  margin: 1rem 3rem;
+  padding: 0.5rem;
+  font-size: 2rem;
   font-weight: bold;
   text-align: center;
   border: 1px solid black;
@@ -95,7 +120,7 @@ a {
 
 .sign-in-tip {
   text-align: center;
-  margin: 1rem 0rem;
+  margin: 3rem 0rem;
   font-size: 0.8rem;
 }
 
@@ -108,7 +133,7 @@ a {
   flex-direction: column;
   justify-content: space-around;
   align-content: center;
-  margin: 1rem;
+  width: 100%;
 }
 
 .login-form > input {
@@ -119,35 +144,13 @@ a {
   margin: 0.5rem;
 }
 
-.login-btn {
-  font-size: 1rem;
-  border: none;
-  font-weight: bold;
-  padding: 1rem;
-  margin: 0.5rem;
-  border-radius: 0.5rem;
-  background: var(--action);
-  color: white !important;
-}
-
-.guest-btn {
-  font-size: 1rem;
-  border: none;
-  font-weight: bold;
-  padding: 1rem;
-  margin: 0.5rem;
-  margin-bottom: 5rem;
-  border-radius: 0.5rem;
-  color: white !important;
-  background: #42b72a;
-}
-
 .login-container {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-content: center;
   min-height: 100%;
+  max-width: 100%;
 }
 
 @media only screen and (min-width: 768px) {

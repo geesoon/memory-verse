@@ -4,7 +4,7 @@
     <header-drawer />
 
     <!-- Main content -->
-    <router-view class="content-view"></router-view>
+    <router-view class="content-view" :key="$route.fullPath"></router-view>
 
     <!-- Mobile navigation drawer -->
     <v-bottom-navigation
@@ -13,6 +13,7 @@
       fixed
       mandatory
       app
+      flat
       class="nav-bottom"
     >
       <v-btn value="home" @click="changeRoute('main')">

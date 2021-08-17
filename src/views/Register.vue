@@ -7,11 +7,26 @@
         <p>Create your own verse collection with an account.</p>
       </div>
     </div>
-    <form @submit.prevent="register" class="register-form">
-      <input type="text" placeholder="Email" v-model="email" />
-      <input type="password" placeholder="Password" v-model="password" />
-      <button>Sign Up</button>
-    </form>
+    <v-form @submit.prevent="register" class="register-form" v-if="!isLoading">
+      <v-text-field
+        label="Email"
+        v-model="email"
+        :rules="[rules.email]"
+      ></v-text-field>
+      <v-text-field
+        :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+        :type="showPassword ? 'text' : 'password'"
+        :rules="[rules.required, rules.min]"
+        label="Password"
+        @click:append="showPassword = !showPassword"
+        v-model="password"
+      ></v-text-field>
+      <v-btn depressed @click="register" color="action">Sign Up</v-btn>
+    </v-form>
+    <div v-else style="text-align: center">
+      <p>Registering...</p>
+      <v-progress-circular indeterminate color="primary"></v-progress-circular>
+    </div>
     <div class="sign-in-tip">
       <span
         >Already have an account?
@@ -29,6 +44,16 @@ export default {
     return {
       email: "",
       password: "",
+      showPassword: false,
+      rules: {
+        required: (value) => !!value || "Required.",
+        min: (v) => v.length >= 8 || "Min 8 characters",
+        email: (value) => {
+          const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+          return pattern.test(value) || "Invalid e-mail.";
+        },
+      },
+      isLoading: false,
     };
   },
   methods: {
@@ -36,11 +61,16 @@ export default {
       this.$router.push({ path: "/" });
     },
     register() {
+      this.isLoading = true;
+      setTimeout(() => {
+        console.log("waiting");
+      }, 200);
       firebase
         .auth()
         .createUserWithEmailAndPassword(this.email, this.password)
         .then(() => {
           alert("Successfully registered! Please login.");
+          this.isLoading = false;
           this.$router.push("/");
         })
         .catch((error) => {
@@ -57,6 +87,7 @@ export default {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  max-width: 100%;
   min-width: 100%;
   min-height: 100%;
 }
@@ -98,6 +129,7 @@ export default {
   align-content: center;
   height: 20vh;
   width: 100%;
+  padding: 0rem 1rem;
   margin-top: 3rem;
   margin-bottom: 3rem;
 }

@@ -17,10 +17,9 @@
       <div>
         <v-text-field
           v-model="collection.name"
-          label="Collection name*"
+          label="Name"
           required
           clearable
-          outlined
           color="whitesmoke"
         ></v-text-field>
         <div v-show="this.error != ''" class="error-message">
@@ -30,14 +29,12 @@
       <div>
         <v-select
           v-model="collection.reviewPeriod"
-          outlined
           :items="['Everyday', '3 days', '1 week', '2 weeks', '3 weeks']"
-          label="Review Period*"
+          label="Review Period"
           required
           color="whitesmoke"
         ></v-select>
       </div>
-      <div><small>*indicates required field</small></div>
       <br />
       <div>
         <v-dialog
@@ -179,6 +176,7 @@ export default {
             console.log("Fail to write to doc", err);
             this.$emit("fail");
           });
+        this.$forceUpdate();
         this.closeAddCollectionDialog();
       }
     },
