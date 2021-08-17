@@ -29,7 +29,7 @@
         </div>
       </div>
     </div>
-    <div class="bible-books">
+    <!-- <div class="bible-books">
       <div class="bible-books-bar">
         <div class="section-title">Bible Books</div>
         <v-dialog
@@ -67,20 +67,20 @@
           {{ bibleBooks[n - 1].abbreviation }}
         </div>
       </div>
-    </div>
+    </div> -->
   </section>
 </template>
 
 <script>
 import firebase from "firebase";
 import Collection from "../apis/collection";
-import bibleBookPanel from "../components/bibleBookPanel";
+// import bibleBookPanel from "../components/bibleBookPanel";
 import booksChapter from "../data/book.json";
 
 export default {
-  components: {
-    bibleBookPanel,
-  },
+  // components: {
+  //   bibleBookPanel,
+  // },
   data: () => ({
     selectedBookId: "",
     isShowAllBook: false,

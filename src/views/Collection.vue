@@ -18,14 +18,13 @@
         rounded
         depressed
         x-large
-        color="green"
+        color="action"
         class="review-all-btn"
         @click="reviewAll()"
-        >REVIEW ALL</v-btn
+        >Review All</v-btn
       >
       <v-dialog
         v-model="isShowAddVersePanel"
-        width="500"
         fullscreen
         hide-overlay
         transition="dialog-bottom-transition"
@@ -34,14 +33,13 @@
           <v-btn
             outlined
             rounded
-            x-small
             color="green"
-            class="add-verse-btn"
+            class="add-collection-verse-btn"
             v-bind="attrs"
             v-on="on"
             @click="showAddVersePanel()"
           >
-            ADD VERSES
+            Add Verse
           </v-btn>
         </template>
         <addCollectionBibleBookPanel
@@ -422,7 +420,7 @@ export default {
   margin-top: 1rem;
 }
 
-.add-verse-btn {
+.add-collection-verse-btn {
   margin: 1rem 0rem;
 }
 </style>
