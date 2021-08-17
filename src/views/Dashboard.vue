@@ -5,7 +5,6 @@
 
     <!-- Main content -->
     <router-view class="content-view" :key="$route.fullPath"></router-view>
-
     <!-- Mobile navigation drawer -->
     <v-bottom-navigation
       :value="this.$route.name"

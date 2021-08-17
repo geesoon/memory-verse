@@ -30,7 +30,6 @@
         >
       </div>
     </section>
-
     <!-- <loading-overlay :active="isLoading" :is-full-page="fullPage" /> -->
   </v-container>
 </template>
@@ -151,6 +150,14 @@ a {
   align-content: center;
   min-height: 100%;
   max-width: 100%;
+}
+
+.login-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-content: center;
+  min-height: 100%;
 }
 
 @media only screen and (min-width: 768px) {
