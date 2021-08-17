@@ -1,8 +1,8 @@
 {
-        "name": "Memory Verse",
-        "short_name": "MemoryVerse",
-        "theme_color": "#E6E6FA",
-        "background_color": "#E6E6FA",
+        "name": "MemoVerse",
+        "short_name": "MemoVerse",
+        "theme_color": "#FFFFFF",
+        "background_color": "#FFFFFF",
         "display": "standalone",
         "scope": ".",
         "start_url": "./",
