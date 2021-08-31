@@ -88,6 +88,12 @@
           v{{ verseNum }}
         </div>
       </div>
+      <div v-else class="verse-loading-container">
+        <v-progress-circular
+          indeterminate
+          color="primary"
+        ></v-progress-circular>
+      </div>
     </div>
     <div
       class="select-verse-bar"
@@ -95,7 +101,6 @@
     >
       <button class="select-verse-btn" @click="finishSelection()">Add</button>
     </div>
-    <loading-overlay :active="isLoadingVerses" :is-full-page="fullPage" />
   </v-card>
 </template>
 
@@ -201,17 +206,23 @@ export default {
       fetch(request)
         .then((response) => {
           if (response.ok) {
-            this.isLoadingVerses = false;
+            // this.isLoadingVerses = false;
             return response.json();
           } else
-            throw new Error("Fail to retrieve verses, please refresh the page");
+            this.$store.dispatch("setAlert", {
+              message: "Fail to retrieve verses, please refresh the page",
+              type: "warning",
+            });
         })
         .then((data) => {
           this.numOfVerses = data.data.length;
         })
-        .catch((e) => {
-          this.isLoadingVerses = false;
-          alert(e);
+        .catch((error) => {
+          // this.isLoadingVerses = false;
+          this.$store.dispatch("setAlert", {
+            message: error,
+            type: "warning",
+          });
         });
     },
     showBookChaptersPanel(bookId) {
@@ -262,6 +273,11 @@ export default {
 </script>
 
 <style>
+.verse-loading-container {
+  width: 100vw;
+  text-align: center;
+}
+
 .add-verse-btn {
   display: none;
 }
@@ -280,7 +296,7 @@ export default {
   min-width: 40%;
   border-radius: 1rem;
   padding: 0.5rem 0rem;
-  background: #d5e37d;
+  background: var(--primary);
 }
 
 .verse-selection-container {
@@ -352,7 +368,7 @@ export default {
 
 .books-title {
   border-radius: 5px;
-  background-color: #d5e37d;
+  background-color: var(--primary);
   margin: 0.5rem;
   font-size: 1rem;
   font-weight: bold;
@@ -379,21 +395,21 @@ export default {
 .chapter-title-box:hover,
 .books-title:hover {
   box-shadow: 10px 10px;
-  background-color: #d5e37d;
+  background-color: var(--primary);
   border-radius: 5px;
   transition: 0.5s;
 }
 
 .book-verses-title > span {
   font-size: 1.5rem !important;
-  background-color: #d5e37d;
+  background-color: var(--primary);
   padding: 0.5rem;
   border-radius: 5px;
   box-shadow: 10px 10px;
 }
 
 .add-verse-btn {
-  background-color: #d5e37d;
+  background-color: var(--primary);
   padding: 1rem;
   border-radius: 5px;
 }
@@ -461,7 +477,7 @@ export default {
 }
 
 #start-button {
-  background-color: #d5e37d;
+  background-color: var(--primary);
   border-radius: 5px;
   border: 1px solid black;
 }
@@ -503,7 +519,7 @@ export default {
 
   /* Select book */
   .testament-title {
-    background-color: #d5e37d;
+    background-color: var(--primary);
     padding: 0.5rem;
     border-radius: 5px;
     box-shadow: 10px 10px;

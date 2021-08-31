@@ -30,6 +30,7 @@
     <div class="sign-in-tip">
       <span
         >Already have an account?
+        <br />
         <router-link to="/" class="sign-in-link">Log In</router-link></span
       >
     </div>
@@ -62,20 +63,23 @@ export default {
     },
     register() {
       this.isLoading = true;
-      setTimeout(() => {
-        console.log("waiting");
-      }, 200);
       firebase
         .auth()
         .createUserWithEmailAndPassword(this.email, this.password)
         .then(() => {
-          alert("Successfully registered! Please login.");
-          this.isLoading = false;
+          this.$store.dispatch("setAlert", {
+            message: "Successfully registered! Please login.",
+            type: "success",
+          });
           this.$router.push("/");
         })
         .catch((error) => {
-          alert(error.message);
+          this.$store.dispatch("setAlert", {
+            message: error.message,
+            type: "warning",
+          });
         });
+      this.isLoading = false;
     },
   },
 };
@@ -110,7 +114,7 @@ export default {
   font-weight: bold;
   text-align: center;
   border: 1px solid black;
-  border-radius: 0.5rem;
+  border-radius: var(--rounded);
   box-shadow: 10px 10px;
   cursor: pointer;
 }
@@ -139,7 +143,7 @@ export default {
   height: 8vh;
   border: 1px solid black;
   padding: 1rem;
-  border-radius: 0.5rem;
+  border-radius: var(--rounded);
   margin: 0.5rem;
 }
 
@@ -149,8 +153,8 @@ export default {
   border: none;
   padding: 1rem;
   margin: 0.5rem;
-  border-radius: 0.5rem;
-  background: #42b72a;
+  border-radius: var(--rounded);
+  background: var(--action);
   color: white;
 }
 

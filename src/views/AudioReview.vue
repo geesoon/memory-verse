@@ -1,10 +1,6 @@
 <template>
   <section>
-    <draggable
-      v-if="!isShowBackCard"
-      @end="dragEnd"
-      @start="dragStart"
-    >
+    <draggable v-if="!isShowBackCard" @end="dragEnd" @start="dragStart">
       <v-card
         elevation="2"
         class="flash-card"
@@ -19,33 +15,19 @@
             <div class="front-card-title">
               {{ getReference }}
             </div>
-            <div class="front-card-subtitle">
-              Memorization
-            </div>
+            <div class="front-card-subtitle">Memorization</div>
           </div>
         </section>
         <section>
-          <v-btn
-            icon
-            @click="recordVoice()"
-          >
+          <v-btn icon @click="recordVoice()">
             <span class="material-icons mic-icon"> mic </span>
           </v-btn>
         </section>
-        <section
-          v-show="isShowSwipingIcons"
-          class="swiping-icons-container"
-        >
-          <span
-            id="swipe-back"
-            class="material-icons swipe-icon"
-          >
+        <section v-show="isShowSwipingIcons" class="swiping-icons-container">
+          <span id="swipe-back" class="material-icons swipe-icon">
             arrow_back_ios
           </span>
-          <span
-            id="swipe-next"
-            class="material-icons swipe-icon"
-          >
+          <span id="swipe-next" class="material-icons swipe-icon">
             arrow_forward_ios
           </span>
         </section>
@@ -65,10 +47,7 @@
         height="100%"
         width="100%"
       />
-      <div
-        v-else
-        class="flash-card-container"
-      >
+      <div v-else class="flash-card-container">
         <span>
           {{ allVerses[indexCount] }}
         </span>
@@ -76,20 +55,11 @@
           {{ getReference }}
         </div>
       </div>
-      <section
-        v-show="isShowSwipingIcons"
-        class="swiping-icons-container"
-      >
-        <span
-          id="swipe-back"
-          class="material-icons swipe-icon"
-        >
+      <section v-show="isShowSwipingIcons" class="swiping-icons-container">
+        <span id="swipe-back" class="material-icons swipe-icon">
           arrow_back_ios
         </span>
-        <span
-          id="swipe-next"
-          class="material-icons swipe-icon"
-        >
+        <span id="swipe-next" class="material-icons swipe-icon">
           arrow_forward_ios
         </span>
       </section>
@@ -111,7 +81,7 @@ export default {
     isShowSwipingIcons: false,
     isVerseReady: false,
   }),
-  
+
   computed: {
     getCollectionVerses() {
       return this.$store.getters.getCollectionVerses;
@@ -236,7 +206,7 @@ export default {
 .flash-card-skeleton {
   width: 100%;
   height: 100% !important;
-  border-radius: 1rem;
+  border-radius: var(--rounded);
 }
 
 .swiping-icons-container {
@@ -269,7 +239,7 @@ export default {
 .flash-card {
   margin: 1rem 0.5rem;
   height: 95vh;
-  border-radius: 1rem !important;
+  border-radius: var(--rounded) !important;
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;

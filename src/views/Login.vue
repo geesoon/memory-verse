@@ -16,27 +16,22 @@
       </v-form>
       <div v-else style="text-align: center">
         <p>Logging you in...</p>
-        <v-progress-circular
-          indeterminate
-          color="primary"
-        ></v-progress-circular>
+        <v-progress-circular indeterminate></v-progress-circular>
       </div>
       <div class="sign-in-tip">
         <span
           >Don't have an account?
+          <br />
           <router-link to="/register" class="sign-in-link"
             >Create an account now</router-link
           ></span
         >
       </div>
     </section>
-    <!-- <loading-overlay :active="isLoading" :is-full-page="fullPage" /> -->
   </v-container>
 </template>
 
 <script>
-// import Auth from "../apis/auth";
-// import Account from "../apis/account";
 import firebase from "firebase";
 
 export default {
@@ -55,9 +50,6 @@ export default {
     };
   },
   methods: {
-    onCancel() {
-      console.log("User cancelled the loader.");
-    },
     gotoHome() {
       this.$router.push({ path: "/" });
     },
@@ -77,14 +69,22 @@ export default {
             return querySnapshot.docs[0].id;
           })
           .catch((error) => {
-            console.log("Error getting users id", error);
+            console.error(error);
+            this.$store.dispatch("setAlert", {
+              message: error,
+              type: "warning",
+            });
           });
         this.$store.commit("setUser", { email: this.email, id: userId });
         this.$router.replace("/dashboard/main");
-      } catch (err) {
-        alert(err);
+      } catch (error) {
+        console.error(error);
+        this.$store.dispatch("setAlert", {
+          message: error,
+          type: "warning",
+        });
+        this.isLoading = false;
       }
-      this.isLoading = false;
     },
   },
 };
@@ -139,7 +139,7 @@ a {
   font-size: 1rem;
   border: 1px solid black;
   padding: 1rem;
-  border-radius: 0.5rem;
+  border-radius: var(--rounded);
   margin: 0.5rem;
 }
 

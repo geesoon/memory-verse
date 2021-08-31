@@ -13,7 +13,6 @@ const state = {
   selectedBookId: "",
   panelView: "",
 };
-
 const getters = {
   getVerseInfo: (state) => {
     return {

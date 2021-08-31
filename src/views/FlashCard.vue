@@ -187,7 +187,7 @@ export default {
 .flash-card-skeleton {
   width: 100%;
   height: 100% !important;
-  border-radius: 1rem;
+  border-radius: var(--rounded);
 }
 
 .swiping-icons-container {
@@ -218,12 +218,12 @@ export default {
   align-items: center;
   margin: 1rem 0.5rem;
   min-height: 95vh;
-  background: var(--bg);
+  background: var(--background);
   min-width: 90vw;
   max-width: 90vw;
   box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px,
     rgba(0, 0, 0, 0.06) 0px 1px 2px 0px !important;
-  border-radius: 1rem !important;
+  border-radius: var(--rounded) !important;
   font-size: 1.2rem;
   font-weight: bold;
 }

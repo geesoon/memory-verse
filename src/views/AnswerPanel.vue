@@ -529,6 +529,7 @@ export default {
     window.addEventListener("resize", this.retrieveBlankLocation);
 
     // Cater for minimum loading gif
+    // Fetch verses from collection
     setTimeout(() => {
       this.fetchVerse();
     }, 500);
@@ -661,17 +662,16 @@ export default {
 
 .question-word {
   margin: 0.3rem;
-  font-size: 1rem;
+  font-size: 0.8rem;
   font-weight: bold;
 }
 
 .question-word-blank {
-  width: 5rem;
+  width: 3rem;
   background-color: lightgray;
   border-radius: 10px;
   margin: 0.5rem;
-  height: 1.5rem;
-  box-shadow: 5px 5px gray;
+  height: 1rem;
 }
 
 .question-word-blank:hover {
@@ -688,25 +688,25 @@ export default {
 
 .question-verse-quote {
   margin: 0.5rem;
-  font-size: 1rem;
+  font-size: 0.8rem;
   font-weight: bold;
 }
 
 .answer-container {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
 }
 
 .answer-block {
-  box-shadow: 5px 5px;
   margin: 0.5rem;
   padding: 0.5rem;
   background-color: lavender;
   border-radius: 10px;
   text-align: center;
-  font-size: 1rem;
+  font-size: 0.8rem;
   font-weight: bold;
   cursor: pointer;
+  box-shadow: 5px 5px lightgray;
 }
 
 .option-container {
@@ -716,14 +716,6 @@ export default {
 
 .option-text {
   font-size: 1.2rem;
-}
-
-/* Desktop  */
-@media only screen and (min-width: 1024px) {
-  .answer-panel-container {
-    width: 70vw;
-    height: 100%;
-  }
 }
 
 /* Tablet */
@@ -823,21 +815,19 @@ export default {
     display: flex;
     flex-wrap: wrap;
     flex-direction: row;
-    margin-top: 3rem;
   }
 
   .question-word {
     margin: 0.5rem;
-    font-size: 2rem;
+    font-size: 1.2rem;
   }
 
   .question-word-blank {
-    width: 6rem;
+    width: 5rem;
     background-color: lightgray;
     border-radius: 10px;
     margin: 0.5rem;
-    height: 3rem;
-    box-shadow: 5px 5px gray;
+    height: 2rem;
   }
 
   .question-verse-quote-container {
@@ -865,15 +855,18 @@ export default {
   }
 
   .answer-block {
-    margin: 1rem;
+    margin: 0.5rem;
     padding: 1rem;
-    background-color: lavender;
-    border-radius: 10px;
-    text-align: center;
-    font-size: 1.5rem;
-    font-weight: bold;
+    font-size: 1.2rem;
     cursor: move;
-    box-shadow: 5px 5px;
+  }
+}
+
+/* Desktop  */
+@media only screen and (min-width: 1024px) {
+  .answer-panel-container {
+    width: 80vw;
+    height: 100%;
   }
 }
 </style>

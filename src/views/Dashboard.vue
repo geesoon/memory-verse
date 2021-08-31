@@ -1,10 +1,11 @@
 <template>
   <section class="home-container">
-    <!-- Side Nav Card -->
+    <!-- Desktop Side Nav Card -->
     <header-drawer />
 
     <!-- Main content -->
     <router-view class="content-view" :key="$route.fullPath"></router-view>
+
     <!-- Mobile navigation drawer -->
     <v-bottom-navigation
       :value="this.$route.name"
@@ -61,13 +62,13 @@ export default {
   display: flex;
   flex-direction: row;
   align-items: flex-start;
-  justify-content: flex-start;
+  justify-content: center;
 }
 
 .content-view {
   min-width: 100vw;
   max-width: 100vw;
-  padding: 0rem 1rem 1rem 1rem;
+  padding: 0rem 0.5rem 0.5rem 0.5rem;
 }
 
 .v-avatar > span {
@@ -80,13 +81,13 @@ export default {
 
 @media only screen and (min-width: 1024px) {
   .content-view {
-    min-width: 70vw;
-    max-width: 70vw;
+    min-width: 50vw;
+    max-width: 50vw;
     margin-top: 3rem;
     padding: 1rem;
     box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px,
       rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
-    border-radius: 1rem;
+    border-radius: var(--rounded);
   }
 }
 </style>

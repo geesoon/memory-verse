@@ -45,7 +45,7 @@ const routes = [
         component: () => import("../views/Library.vue"),
       },
       {
-        path: "collection",
+        path: "collection/:collectionId?",
         name: "collection",
         component: () => import("../views/Collection.vue"),
       },

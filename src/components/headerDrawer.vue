@@ -13,14 +13,12 @@
 
     <v-card class="side-nav-card">
       <v-list>
-        <v-list-item class="px-2">
-          <v-list-item-avatar @click="changeRoute('profile')">
-            <v-avatar color="green" size="36">
+        <v-list-item class="px-2" @click="changeRoute('profile')">
+          <v-list-item-avatar>
+            <v-avatar color="action" size="36">
               <span class="black--text headline">{{ this.getAvatarName }}</span>
             </v-avatar>
           </v-list-item-avatar>
-        </v-list-item>
-        <v-list-item link @click="changeRoute('profile')">
           <v-list-item-content>
             <v-list-item-subtitle>{{ this.getUserEmail }}</v-list-item-subtitle>
           </v-list-item-content>
@@ -127,7 +125,7 @@ export default {
   font-weight: bold;
   text-align: center;
   border: 1px solid black;
-  border-radius: 0.5rem;
+  border-radius: var(--rounded);
   box-shadow: 8px 5px;
   cursor: pointer;
 }

@@ -1,7 +1,12 @@
 <template>
   <section>
     <div class="my-collection-bar">
-      <div class="section-title">Your Collection</div>
+      <div class="collection-title">Your Collection</div>
+      <v-btn icon
+        ><span class="material-icons" @click="goToSelectVerse()">
+          add
+        </span></v-btn
+      >
     </div>
     <v-dialog
       v-model="isAddCollection"
@@ -26,54 +31,85 @@
       </template>
     </v-snackbar>
     <section>
-      <v-fab-transition>
-        <v-btn class="fab-add-collection" fab right>
-          <span class="material-icons" @click="goToSelectVerse()">
-            playlist_add
-          </span>
-        </v-btn>
-      </v-fab-transition>
-      <div v-if="collection.length == 0">No collection!</div>
-      <div v-else class="view-toggle">
-        <span
-          class="material-icons"
-          v-if="!isGridView"
-          @click="isGridView = !isGridView"
-        >
-          grid_view
-        </span>
-        <span class="material-icons" v-else @click="isGridView = !isGridView">
-          view_list
-        </span>
+      <div class="search-collection-bar">
+        <v-text-field
+          label="Search"
+          clearable
+          filled
+          dense
+          rounded
+          v-model="search"
+        ></v-text-field>
       </div>
-      <div v-if="!isGridView">
-        <v-list subheader two-line class="list-view-collection">
-          <v-list-item
-            v-for="(item, key) in collection"
-            :key="key"
-            class="my-collection-item"
-            @click="showCollection(item)"
-          >
-            <v-list-item-content>
-              <v-list-item-title v-text="item.name"></v-list-item-title>
-              <v-list-item-subtitle v-text="item.num"></v-list-item-subtitle>
-            </v-list-item-content>
-          </v-list-item>
-        </v-list>
+      <div class="view-toggle" v-if="filteredCollection.length != 0">
+        <v-btn icon v-if="!isGridView" @click="isGridView = !isGridView">
+          <span class="material-icons"> grid_view </span>
+        </v-btn>
+        <v-btn icon v-else @click="isGridView = !isGridView">
+          <span class="material-icons"> view_list </span>
+        </v-btn>
       </div>
 
-      <div v-else class="grid-view-collection">
-        <div
-          v-for="(item, key) in collection"
-          :key="key"
-          class="grid-collection-item"
-          @click="showCollection(item)"
+      <!--  Loading view -->
+      <section v-if="isLoading" class="library-loading-container">
+        <v-progress-circular
+          indeterminate
+          color="primary"
+        ></v-progress-circular>
+      </section>
+
+      <!-- Finish loading view -->
+      <section v-else>
+        <!-- No collection view -->
+        <section v-if="collection.length == 0" class="no-result-container">
+          <div class="no-collection-face">(;-;)</div>
+          <div>No collection</div>
+          <v-btn plain @click="goToSelectVerse()">Create</v-btn>
+        </section>
+
+        <!-- No search result view -->
+        <section
+          v-else-if="filteredCollection.length == 0"
+          class="no-result-container"
         >
-          <div>
-            {{ item.name }}
+          <div class="no-collection-face">(#_#)</div>
+          <div>No result</div>
+        </section>
+
+        <!-- Collection view -->
+        <section v-else>
+          <v-list
+            subheader
+            two-line
+            class="list-view-collection"
+            v-if="!isGridView"
+          >
+            <v-list-item
+              v-for="(item, key) in filteredCollection"
+              :key="key"
+              class="library-collection-item"
+              @click="showCollection(item)"
+            >
+              <v-list-item-content>
+                <v-list-item-title v-text="item.name"></v-list-item-title>
+                <v-list-item-subtitle v-text="item.num"></v-list-item-subtitle>
+              </v-list-item-content>
+            </v-list-item>
+          </v-list>
+          <div v-else class="grid-view-collection">
+            <div
+              v-for="(item, key) in filteredCollection"
+              :key="key"
+              class="grid-collection-item"
+              @click="showCollection(item)"
+            >
+              <div>
+                {{ item.name }}
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        </section>
+      </section>
     </section>
   </section>
 </template>
@@ -90,6 +126,8 @@ export default {
     snackbarMsg: "",
     timeout: 2000,
     isSnackbar: false,
+    isLoading: true,
+    search: "",
   }),
   components: {
     AddNewCollection,
@@ -100,6 +138,22 @@ export default {
     },
     getUserId() {
       return this.$store.getters.getUserInfo.id;
+    },
+    filteredCollection() {
+      if (this.search == "" || this.search == null) {
+        return this.collection;
+      } else {
+        return this.collection.filter((collection) => {
+          var result = collection.name
+            .toLowerCase()
+            .indexOf(this.search.toLowerCase());
+          if (result != -1) {
+            return true;
+          } else {
+            return false;
+          }
+        });
+      }
     },
   },
   methods: {
@@ -116,16 +170,14 @@ export default {
       this.isSnackbar = true;
     },
     getCollection() {
+      this.isLoading = true;
       const db = firebase.firestore();
       this.collection = [];
-      console.log(this.getUserId);
-
       db.collection("users")
         .doc(this.getUserId)
         .collection("collection")
         .get()
         .then((querySnapshot) => {
-          console.log(querySnapshot);
           querySnapshot.forEach((doc) => {
             this.collection.push({
               id: doc.id,
@@ -134,15 +186,19 @@ export default {
               reviewPeriod: doc.data().review_period,
             });
           });
-          console.log(this.collection);
+          this.isLoading = false;
         })
         .catch((error) => {
-          console.log("Error getting users collection", error);
+          this.$store.dispatch("setAlert", { message: error, type: "warning" });
+          this.isLoading = false;
         });
     },
     showCollection(selectedCollection) {
       this.$store.commit("setCollectionId", selectedCollection.id);
-      this.$router.push({ name: "collection" });
+      this.$router.push({
+        name: "collection",
+        params: { collectionId: selectedCollection.id },
+      });
     },
     changeRoute(rn) {
       this.$router.push({ name: rn });
@@ -159,12 +215,38 @@ export default {
 </script>
 
 <style>
+.no-result-container {
+  width: 100%;
+  text-align: center;
+}
+
+.search-collection-bar {
+  margin-top: 1rem;
+}
+
+.library-collection-item {
+  margin: 1rem 0rem;
+  background: var(--primary);
+  text-align: left;
+  border-radius: var(--rounded);
+  font-weight: bold;
+}
+.library-loading-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-width: 100%;
+  min-height: 100vh;
+}
+
 .my-collection-bar {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
   margin-top: 1rem;
+  width: 100%;
 }
 
 .library-avatar {
@@ -188,20 +270,14 @@ export default {
 
 .grid-collection-item {
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: flex-start;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   padding: 2rem 2rem;
+  min-height: 8rem;
   background: var(--primary);
-  border-radius: 0.5rem;
+  border-radius: var(--rounded);
   font-weight: bold;
-}
-
-.fab-add-collection {
-  position: fixed;
-  bottom: 5rem;
-  right: 2rem;
-  z-index: 4;
 }
 
 .add-collection-title-bar {

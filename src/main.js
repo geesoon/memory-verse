@@ -5,8 +5,6 @@ import router from "./router";
 import store from "./store";
 import firebase from "firebase";
 import vuetify from "./plugins/vuetify";
-import Loading from "vue-loading-overlay";
-import "vue-loading-overlay/dist/vue-loading.css";
 
 Vue.config.productionTip = false;
 
@@ -24,17 +22,9 @@ var firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 firebase.analytics();
 
-Vue.component("loading-overlay", Loading);
-
 new Vue({
   router,
   store,
   vuetify,
   render: (h) => h(App),
 }).$mount("#app");
-
-// Reverse the order of collection item to make sure the latest one stay on top of the list
-Vue.filter("reverse", function (value) {
-  // slice to make a copy of array, then reverse the copy
-  return value.slice().reverse();
-});

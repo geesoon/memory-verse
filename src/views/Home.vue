@@ -16,8 +16,11 @@
       Let the word of Christ dwell in you richly...
       <p style="text-align: right">- Col 3:16</p>
     </div>
-    <div v-if="collection.length != 0" class="collection">
-      <div class="section-title">Your Collection</div>
+    <div class="collection-title">Your Collection</div>
+    <div v-if="isLoading" class="home-collection-container">
+      <v-progress-circular indeterminate></v-progress-circular>
+    </div>
+    <div v-else-if="collection.length != 0" class="home-collection-container">
       <div class="collection-list">
         <div
           v-for="(item, key) in collection"
@@ -29,83 +32,32 @@
         </div>
       </div>
     </div>
-    <!-- <div class="bible-books">
-      <div class="bible-books-bar">
-        <div class="section-title">Bible Books</div>
-        <v-dialog
-          v-model="isShowAllBook"
-          persistent
-          fullscreen
-          hide-overlay
-          transition="dialog-bottom-transition"
-        >
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              depressed
-              x-small
-              color="transparent"
-              v-bind="attrs"
-              v-on="on"
-              @click="showAllBook()"
-            >
-              Show All
-            </v-btn>
-          </template>
-          <bible-book-panel
-            @closeDialog="isShowAllBook = false"
-            @answer="goToAnswer()"
-          />
-        </v-dialog>
-      </div>
-      <div class="bible-books-list">
-        <div
-          v-for="n in 15"
-          :key="n"
-          class="book-item"
-          @click="showBookChapter(bibleBooks[n - 1].id)"
-        >
-          {{ bibleBooks[n - 1].abbreviation }}
-        </div>
-      </div>
-    </div> -->
+    <div v-else class="home-collection-container">
+      <div class="no-collection-face">(;-;)</div>
+      <div>No collection</div>
+      <v-btn plain @click="createNewCollection">Create</v-btn>
+    </div>
   </section>
 </template>
 
 <script>
 import firebase from "firebase";
-import Collection from "../apis/collection";
-// import bibleBookPanel from "../components/bibleBookPanel";
-import booksChapter from "../data/book.json";
+import Collection from "@/apis/collection";
 
 export default {
-  // components: {
-  //   bibleBookPanel,
-  // },
   data: () => ({
-    selectedBookId: "",
-    isShowAllBook: false,
-    level: "",
-    recent: [],
     collection: [],
-    bibleBooks: booksChapter.books,
+    isLoading: false,
   }),
   computed: {
     getAvatarName() {
       return this.$store.getters.getAvatarName;
-    },
-    getLevel() {
-      return this.$store.getters.getVerseInfo.level;
     },
     getUserId() {
       return this.$store.getters.getUserInfo.id;
     },
     getUserEmail() {
       return firebase.auth().currentUser.email;
-    },
-  },
-  watch: {
-    level: function () {
-      this.$store.commit("setLevel", this.level);
     },
   },
   created() {
@@ -115,63 +67,44 @@ export default {
       .currentUser.email.split("")[0]
       .toUpperCase();
     this.$store.commit("setAvatarName", avatarName);
-    this.selectedBook = "";
-    this.level = this.getLevel;
   },
   methods: {
-    toggleDrawer() {
-      this.$emit("toggleDrawer");
-    },
-    showBookChapter(bookId) {
-      this.$store.commit("setBibleBookSelectionPanelView", "chapter");
-      this.$store.commit("setSelectedBookId", bookId);
-      this.isShowAllBook = true;
-    },
-    goToAnswer() {
-      this.isShowAllBook = false;
-      this.$router.push("/answer");
-    },
-    goToView(view) {
-      this.$store.commit("setView", view);
-    },
+    createNewCollection() {},
     goToCollection(item) {
       this.$store.commit("setCollectionId", item.id);
-      this.$router.push({ name: "collection" });
-    },
-    showAllBook() {
-      this.$store.commit("setBibleBookSelectionPanelView", "book");
+      this.$router.push({
+        name: "collection",
+        params: { collectionId: item.id },
+      });
     },
     changeRoute(rn) {
       if (this.$route.name != rn) {
         this.$router.push({ name: rn.toLowerCase() });
       }
     },
-    startAnswering(ref) {
-      this.$store.commit("setBook", { name: ref.name, id: ref.id });
-      this.$store.commit("setChapter", ref.chapter);
-      this.$store.commit("setVerses", ref.verse);
-      this.$router.push("/answer");
-    },
     async getCollection() {
+      this.isLoading = true;
       let res = await Collection.getCollection(this.getUserId);
       if (res.valid) {
         this.collection = res.res;
       } else {
         this.collection = [];
       }
+      this.isLoading = false;
     },
   },
 };
 </script>
 
 <style>
-/* Share between library and collection */
-.my-collection-item {
-  margin: 1rem 0rem;
-  background: #d5e37d;
-  text-align: left;
-  border-radius: 0.5rem;
-  font-weight: bold;
+.home-collection-container {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.no-collection-face {
+  font-size: 4rem;
+  color: lightgrey;
 }
 
 .mobile-home-header-bar {
@@ -184,96 +117,51 @@ export default {
 
 .votd {
   font-size: 1.3rem;
-  background: whitesmoke;
-  border-radius: 0.5rem;
+  background: var(--secondary);
+  border-radius: var(--rounded);
   padding: 2rem;
+  margin: 1rem 0rem;
+  color: white;
 }
 
-.section-title {
+.collection-title {
   font-size: 1.5rem;
   font-weight: bold;
 }
 
-.bible-books {
-  padding-bottom: 3rem;
-}
-
-.bible-books,
-.collection,
-.recent-memorized {
+.collection {
   margin: 1rem 0rem;
 }
 
-.bible-books-list,
 .collection-list {
-  margin-top: 1rem;
-}
-
-.collection-list {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-start;
-  overflow-x: scroll;
-  overflow-y: hidden;
-}
-
-.bible-books-list {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  grid-gap: 1rem;
+  grid-gap: 0.5rem;
+  grid-template-columns: repeat(2, 1fr);
 }
-
-.bible-books-list::-webkit-scrollbar,
 .collection-list::-webkit-scrollbar {
   display: none;
 }
 
 .collection-item {
-  min-width: 8rem;
-  max-width: 8rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   min-height: 8rem;
-  max-height: 8rem;
   padding: 1rem;
-  margin: 0rem 0.5rem;
-  border-radius: 0.5rem;
-  background: #d5e37d;
+  border-radius: var(--rounded);
+  background: var(--primary);
   font-size: 1.3rem;
   font-weight: bold;
-  text-align: center;
   cursor: pointer;
 }
 
-.book-item {
-  padding: 2rem 0rem;
-  border-radius: 0.5rem;
-  background: #d5e37d;
-  font-size: 1.3rem;
-  font-weight: bold;
-  text-align: center;
-  cursor: pointer;
-}
-
-.collection-item:hover,
-.book-item:hover {
+.collection-item:hover {
   opacity: 0.8;
 }
 
-.bible-books-bar {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.show-all-book-btn {
-  font-size: 0.8rem;
-  font-weight: bold;
-}
-
 @media only screen and (min-width: 768px) {
-  .bible-books-list {
-    grid-template-columns: repeat(6, 1fr);
+  .collection-list {
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 
@@ -281,11 +169,9 @@ export default {
   .mobile-home-header-bar {
     display: none;
   }
-}
 
-@media only screen and (min-width: 1440px) {
-  .bible-books-list {
-    grid-template-columns: repeat(8, 1fr);
+  .collection-list {
+    grid-template-columns: repeat(5, 1fr);
   }
 }
 </style>

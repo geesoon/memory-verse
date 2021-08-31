@@ -1,19 +1,19 @@
 <template>
-  <v-card flat>
+  <v-card>
     <v-toolbar flat>
       <div class="verse-nav-bar">
         <div>
-          <span class="material-icons" @click="closeAddCollectionDialog()">
-            arrow_back
-          </span>
+          <v-btn icon @click="closeAddCollectionDialog()">
+            <span class="material-icons"> arrow_back </span>
+          </v-btn>
           <v-toolbar-title>Add Collection</v-toolbar-title>
         </div>
-        <span class="material-icons" @click="closeAddCollectionDialog()">
-          clear
-        </span>
+        <v-btn icon @click="closeAddCollectionDialog()">
+          <span class="material-icons"> clear </span>
+        </v-btn>
       </div>
     </v-toolbar>
-    <section class="collection-form-container">
+    <div class="collection-form-container">
       <div>
         <v-text-field
           v-model="collection.name"
@@ -88,8 +88,7 @@
           </v-chip>
         </v-chip-group>
       </div>
-    </section>
-
+    </div>
     <v-card-actions>
       <v-spacer></v-spacer>
       <v-btn color="darken-1" text @click="addCollection()"> Save </v-btn>

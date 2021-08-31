@@ -3,15 +3,30 @@
     <section class="profile-container">
       <div class="profilePic">
         <div class="avatar">{{ this.getAvatarName }}</div>
-        <!-- <div @click="updateProfilePic">Change</div> -->
       </div>
       <div class="profileInfo">
-        <div class="user-email">{{ this.getUserEmail }}</div>
-        <div class="update-pw-btn" @click="updatePassword">Update Password</div>
+        <div class="user-email">
+          <small><strong>Email</strong></small
+          >{{ this.getUserEmail }}
+        </div>
       </div>
-      <div class="logout-btn" @click="logout">Log Out</div>
+      <div v-if="!isLoading" class="profile-action-container">
+        <v-btn
+          rounded
+          class="update-pw-btn"
+          color="action"
+          large
+          @click="updatePassword"
+          >Update Password</v-btn
+        >
+        <v-btn rounded class="logout-btn" color="action" large @click="logout"
+          >Log Out</v-btn
+        >
+      </div>
+      <div v-else>
+        <v-progress-circular indeterminate></v-progress-circular>
+      </div>
     </section>
-    <loading-overlay :active="isLoading" :is-full-page="fullPage" />
   </section>
 </template>
 
@@ -63,6 +78,18 @@ export default {
 </script>
 
 <style>
+.profile-action-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-content: center;
+}
+
+.update-pw-btn,
+.logout-btn {
+  margin: 1rem 0rem;
+}
+
 .profile-container {
   display: flex;
   flex-direction: column;
@@ -81,7 +108,7 @@ export default {
 
 .back-btn {
   border: 1px solid black;
-  border-radius: 0.5rem;
+  border-radius: var(--rounded);
   padding: 0.5rem 1rem;
   cursor: pointer;
 }
@@ -104,30 +131,14 @@ export default {
 .user-email {
   padding: 1rem 3rem;
   margin: 1rem 0rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .profilePic {
   text-align: center;
-}
-
-.update-pw-btn {
-  border-radius: 0.5rem;
-  padding: 1rem 3rem;
-  margin: 1rem 0;
-  cursor: pointer;
-  background: var(--action);
-  color: white;
-  font-weight: bold;
-}
-
-.logout-btn {
-  border-radius: 0.5rem;
-  padding: 1rem 3rem;
-  margin: 1rem 0;
-  cursor: pointer;
-  background: var(--action);
-  color: white;
-  font-weight: bold;
 }
 
 @media only screen and (min-width: 1024px) {

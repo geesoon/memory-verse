@@ -49,12 +49,8 @@
       </v-dialog>
     </div>
     <div>
-      <v-list subheader two-line class="list-view-collection">
-        <v-list-item
-          v-for="(verse, key) in verses"
-          :key="key"
-          class="my-collection-item"
-        >
+      <v-list two-line class="list-view-collection">
+        <v-list-item v-for="(verse, key) in verses" :key="key">
           <v-list-item-content>
             <!-- book chapter:start -->
             <v-list-item-title
@@ -121,9 +117,7 @@
           <v-btn text @click="isShowDeleteConfirmationDialog = false"
             >Cancel</v-btn
           >
-          <v-btn depressed rounded color="red" @click="removeCollection()"
-            >Confirm</v-btn
-          >
+          <v-btn depressed rounded @click="removeCollection()">Confirm</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -392,6 +386,10 @@ export default {
 </script>
 
 <style>
+.verse-item {
+  border-bottom: 1px solid lightgray;
+}
+
 .collection-nav-bar {
   display: flex;
   justify-content: space-between;
