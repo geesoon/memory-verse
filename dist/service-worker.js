@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/precache-manifest.e6a90e183ac80b2b5e3e7c26927f2a0d.js"
+  "/precache-manifest.cac94825c39e546d8b2ec4ffedbac002.js"
 );
 
 workbox.core.setCacheNameDetails({prefix: "memory-verse-application"});
